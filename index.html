@@ -1,1415 +1,1407 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0a0a0a">
-    <title>Shadow Fight 2 - Глава 1</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- AdsGram Script -->
-    <script async src="https://api.adsgram.ai/adsgram.min.js"></script>
-    <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --panel-color: #1a1a2e;
-            --accent: #ff9800;
-            --text: #ffffff;
-            --green: #4caf50;
-            --red: #f44336;
-            --blue: #2196F3;
-            --purple: #9c27b0;
-            --dev-bg: #1a0a2e;
-            --dev-accent: #e040fb;
-        }
-
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: var(--bg-color);
-            color: var(--text);
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            touch-action: manipulation;
-            transition: background-image 0.5s ease-in-out;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            -webkit-overflow-scrolling: touch;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* Экран загрузки */
-        .loading-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-            padding: 20px;
-        }
-        .loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .loading-logo {
-            font-size: 64px;
-            margin-bottom: 20px;
-            animation: pulse 1.5s infinite;
-        }
-        .loading-text {
-            font-size: 28px;
-            color: var(--accent);
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-        .loading-bar-bg {
-            width: 300px;
-            height: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .loading-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent), #ff6b6b);
-            width: 0%;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
-        }
-        .loading-disclaimer {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 11px;
-            color: #666;
-            text-align: center;
-            max-width: 90%;
-            line-height: 1.4;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-        }
-        .version-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 152, 0, 0.2);
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-        }
-
-        /* Экраны */
-        .screen {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 80px;
-            animation: fadeIn 0.3s;
-            -webkit-overflow-scrolling: touch;
-        }
-        .screen.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Верхняя панель */
-        .top-bar {
-            width: 100%;
-            padding: 15px 20px;
-            background: rgba(0,0,0,0.85);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-            z-index: 10;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-        .gold-display { 
-            font-size: 1.2rem; 
-            font-weight: bold; 
-            color: #ffd700; 
-            text-shadow: 2px 2px 4px #000;
-            min-width: 100px;
-        }
-        .energy-container {
-            flex: 1;
-            max-width: 300px;
-            margin: 0 20px;
-        }
-        .energy-bar-bg {
-            width: 100%;
-            height: 28px;
-            background: #222;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 2px solid #444;
-            position: relative;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-        .energy-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00e5ff, #00b8d4);
-            width: 100%;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
-        }
-        .energy-text {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px #000;
-            z-index: 2;
-        }
-        .dev-btn {
-            background: rgba(156, 39, 176, 0.3);
-            border: 1px solid var(--purple);
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            backdrop-filter: blur(5px);
-            min-width: 40px;
-        }
-
-        /* Экран боя */
-        #screen-battle {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 0;
-            position: relative;
-            padding-top: 70px;
-        }
-        .boss-info {
-            width: 90%;
-            padding: 15px;
-            text-align: center;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            border-radius: 12px;
-            margin-bottom: 10px;
-        }
-        .enemy-name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px #000;
-        }
-        .hp-bar-bg {
-            width: 100%; 
-            height: 25px; 
-            background: #222; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            margin: 10px auto; 
-            position: relative;
-            border: 2px solid #444;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-        .hp-bar-fill { 
-            height: 100%; 
-            background: linear-gradient(90deg, #ff1744, #f50057); 
-            width: 100%; 
-            transition: width 0.1s linear;
-            box-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
-        }
-        .hp-text { 
-            position: absolute; 
-            width: 100%; 
-            text-align: center; 
-            top: 2px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            text-shadow: 2px 2px 4px #000; 
-            z-index: 2;
-        }
-        .fight-area {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            position: relative;
-            padding: 10px 20px;
-            flex: 1;
-            margin-top: -20px;
-        }
-        .char-container {
-            position: relative;
-            width: 280px;
-            height: 320px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.1s;
-            margin-top: 10px;
-        }
-        .char-container:active { 
-            transform: scale(0.95); 
-        }
-        .character-img {
-            max-height: 100%;
-            max-width: 100%;
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
-            transition: all 0.1s;
-        }
-        .character-img.hit { 
-            animation: hitShake 0.4s;
-            filter: brightness(1.5) drop-shadow(0 0 30px rgba(255,255,255,0.5));
-        }
-        @keyframes hitShake {
-            0%, 100% { transform: translateX(0) rotate(0deg); }
-            20% { transform: translateX(-15px) rotate(-5deg); }
-            40% { transform: translateX(15px) rotate(5deg); }
-            60% { transform: translateX(-10px) rotate(-3deg); }
-            80% { transform: translateX(10px) rotate(3deg); }
-        }
-        .char-description {
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(0,0,0,0.7);
-            border-radius: 8px;
-            text-align: center;
-            max-width: 300px;
-            border: 1px solid rgba(255,255,255,0.2);
-            backdrop-filter: blur(5px);
-        }
-        .char-desc-text {
-            font-size: 13px;
-            color: #eee;
-            line-height: 1.4;
-            font-style: italic;
-        }
-
-        /* Урон */
-        .damage-popup {
-            position: absolute;
-            font-weight: bold;
-            font-size: 32px;
-            color: #fff;
-            pointer-events: none;
-            animation: damageFloat 1s forwards;
-            text-shadow: 3px 3px 0 #000, 0 0 20px rgba(255,255,255,0.5);
-            z-index: 100;
-        }
-        .damage-popup.crit { 
-            color: #ffeb3b; 
-            font-size: 48px; 
-            text-shadow: 0 0 30px #ff0, 3px 3px 0 #000;
-            animation: critBounce 1s forwards;
-        }
-        @keyframes damageFloat { 
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-120px) scale(1.3); }
-        }
-        @keyframes critBounce {
-            0% { opacity: 1; transform: translateY(0) scale(0.5) rotate(-10deg); }
-            30% { transform: translateY(-30px) scale(1.5) rotate(5deg); }
-            100% { opacity: 0; transform: translateY(-150px) scale(1) rotate(0deg); }
-        }
-
-        /* ЭКРАН ОБРАТНОГО ОТСЧЁТА С КНОПКОЙ FIGHT */
-        .countdown-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 5000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .countdown-screen.active {
-            display: flex;
-        }
-        .countdown-number {
-            font-size: 150px;
-            font-weight: bold;
-            color: var(--accent);
-            text-shadow: 0 0 50px var(--accent), 0 0 100px var(--accent);
-            animation: countdownPop 1s ease-in-out;
-        }
-        .countdown-text {
-            font-size: 24px;
-            color: #fff;
-            margin-top: 30px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-        .fight-button {
-            margin-top: 40px;
-            padding: 20px 60px;
-            font-size: 32px;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            box-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
-            animation: fightPulse 1s infinite;
-            display: none;
-        }
-        .fight-button.active {
-            display: block;
-        }
-        .fight-button:active {
-            transform: scale(0.95);
-        }
-        @keyframes fightPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(244, 67, 54, 0.5); }
-            50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(244, 67, 54, 0.8); }
-        }
-        @keyframes countdownPop {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.2); opacity: 1; }
-            80% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(0.8); opacity: 0; }
-        }
-
-        /* ЭКРАН ПОБЕДЫ */
-        .victory-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 5000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .victory-screen.active {
-            display: flex;
-        }
-        .victory-text {
-            font-size: 64px;
-            font-weight: bold;
-            color: #ffd700;
-            text-shadow: 0 0 30px #ff0, 0 0 60px #ff0;
-            animation: victoryPulse 1s infinite;
-            margin-bottom: 30px;
-        }
-        .victory-enemy-name {
-            font-size: 28px;
-            color: #fff;
-            margin-bottom: 20px;
-        }
-        @keyframes victoryPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        /* Эффект перехода */
-        .transition-effect {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .transition-effect.active {
-            opacity: 1;
-        }
-
-        /* Экраны магазина, профиля, промо, dev */
-        #screen-shop, #screen-profile, #screen-promo, #screen-dev { 
-            background: rgba(26, 26, 46, 0.95); 
-            backdrop-filter: blur(10px);
-            padding-top: 80px;
-        }
-
-        /* Элементы магазина */
-        .shop-item {
-            background: rgba(255,255,255,0.05);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .btn-buy {
-            background: var(--green); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; min-width: 100px;
-            transition: all 0.2s;
-        }
-        .btn-buy:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4); }
-        .btn-buy:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
-        .btn-reset {
-            background: var(--red); color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
-            transition: all 0.2s;
-            font-size: 16px;
-        }
-        .btn-reset:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(244, 67, 54, 0.4); }
-        .btn-dev {
-            background: linear-gradient(135deg, #e040fb 0%, #aa00ff 100%);
-            color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
-            transition: all 0.2s;
-            font-size: 16px;
-            box-shadow: 0 4px 15px rgba(224, 64, 251, 0.4);
-        }
-        .btn-dev:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(224, 64, 251, 0.6); }
-        .btn-dev-danger {
-            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
-        }
-        .ad-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(45deg, #2196F3, #21CBF3);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-        }
-        .ad-btn:active { transform: scale(0.98); }
-
-        /* Статистика */
-        .stat-box {
-            background: rgba(0,0,0,0.4);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .stat-row:last-child { border: none; margin: 0; padding: 0; }
-
-        /* Достижения */
-        .achievement-item {
-            background: rgba(255,255,255,0.05);
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            border-left: 4px solid #444;
-            transition: all 0.3s;
-        }
-        .achievement-item.unlocked {
-            border-left-color: #4caf50;
-            background: rgba(76, 175, 80, 0.1);
-        }
-        .achievement-item.locked {
-            opacity: 0.6;
-        }
-
-        /* Нижняя навигация */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; width: 100%;
-            height: 70px;
-            background: rgba(26, 26, 46, 0.95);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 2px solid #333;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-        .nav-btn {
-            background: none; border: none; color: #888;
-            font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 5px;
-            cursor: pointer; width: 25%; padding: 10px;
-            transition: all 0.2s;
-        }
-        .nav-btn.active { color: var(--accent); }
-        .nav-icon { font-size: 24px; }
-        .nav-btn:active { background: rgba(255,255,255,0.1); }
-
-        /* Уведомления */
-        .toast {
-            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.9); color: #fff; padding: 12px 24px;
-            border-radius: 25px; z-index: 1000; opacity: 0; transition: 0.3s; pointer-events: none;
-            white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-        .toast.show { opacity: 1; top: 120px; }
-
-        /* Аудио контролы */
-        .audio-controls {
-            position: fixed;
-            top: 70px;
-            right: 10px;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .audio-btn {
-            background: rgba(0,0,0,0.6);
-            border: none;
-            color: #fff;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 18px;
-            backdrop-filter: blur(5px);
-        }
-
-        /* Индикатор сохранения */
-        .save-indicator {
-            position: fixed;
-            bottom: 80px;
-            right: 10px;
-            background: rgba(0,0,0,0.6);
-            color: #4caf50;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 50;
-        }
-        .save-indicator.show {
-            opacity: 1;
-        }
-
-        /* Модальные окна */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .modal-content {
-            background: #1a1a2e;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-            border: 2px solid #f44336;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .modal-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .modal-btn.confirm {
-            background: #f44336;
-            color: #fff;
-        }
-        .modal-btn.cancel {
-            background: #444;
-            color: #fff;
-        }
-
-        /* Промо коды */
-        .promo-input-container {
-            margin: 20px 0;
-            text-align: center;
-        }
-        .promo-input {
-            width: 80%;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid var(--purple);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .promo-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(156, 39, 176, 0.5);
-        }
-        .btn-promo {
-            background: var(--purple);
-            color: #fff;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* Меню разработчика */
-        .dev-section {
-            background: rgba(224, 64, 251, 0.1);
-            border: 1px solid var(--dev-accent);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-        .dev-section h3 {
-            color: var(--dev-accent);
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(224, 64, 251, 0.5);
-        }
-        .dev-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--dev-accent);
-            border-radius: 5px;
-            color: #fff;
-            font-size: 14px;
-            margin: 5px 0;
-        }
-        .dev-input:focus {
-            outline: none;
-            border-color: #fff;
-            box-shadow: 0 0 10px rgba(224, 64, 251, 0.5);
-        }
-        .char-select-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin: 10px 0;
-        }
-        .char-select-btn {
-            background: rgba(224, 64, 251, 0.2);
-            border: 1px solid var(--dev-accent);
-            color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .char-select-btn.active {
-            background: var(--dev-accent);
-            box-shadow: 0 0 15px rgba(224, 64, 251, 0.5);
-        }
-
-        /* Промо магазин */
-        .promo-shop-item {
-            background: rgba(156, 39, 176, 0.2);
-            border: 1px solid var(--purple);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-promo-buy {
-            background: var(--purple);
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        /* Рекламное модальное окно */
-        .ad-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-        }
-        .ad-modal.active {
-            display: flex;
-        }
-        .ad-content {
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-        .ad-image {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 0 30px rgba(224, 64, 251, 0.5);
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        .ad-image:hover {
-            transform: scale(1.02);
-        }
-        .ad-video {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-        .ad-text {
-            font-size: 18px;
-            color: #fff;
-            margin: 20px 0;
-            line-height: 1.5;
-        }
-        .ad-timer {
-            font-size: 24px;
-            color: var(--dev-accent);
-            margin: 20px 0;
-            font-weight: bold;
-        }
-        .ad-close-btn {
-            background: var(--dev-accent);
-            color: #fff;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .ad-close-btn:disabled {
-            background: #444;
-            cursor: not-allowed;
-        }
-        .ad-counter {
-            font-size: 14px;
-            color: #888;
-            margin-top: 10px;
-        }
-
-        /* Модальное окно престижа */
-        .prestige-chapter-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 3000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .prestige-chapter-modal.active {
-            display: flex;
-        }
-        .prestige-chapter-content {
-            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            border: 3px solid var(--dev-accent);
-            box-shadow: 0 0 50px rgba(224, 64, 251, 0.5);
-        }
-        .prestige-chapter-title {
-            font-size: 32px;
-            color: var(--dev-accent);
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(224, 64, 251, 0.8);
-        }
-        .prestige-chapter-subtitle {
-            font-size: 24px;
-            color: #ffd700;
-            margin-bottom: 30px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-        }
-        .prestige-chapter-text {
-            font-size: 16px;
-            color: #ccc;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        .prestige-chapter-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-        .prestige-chapter-btn {
-            flex: 1;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .prestige-chapter-btn.prestige {
-            background: linear-gradient(135deg, #e040fb 0%, #aa00ff 100%);
-            color: #fff;
-            box-shadow: 0 4px 20px rgba(224, 64, 251, 0.5);
-        }
-        .prestige-chapter-btn.later {
-            background: #444;
-            color: #fff;
-        }
-        .prestige-chapter-btn:hover {
-            transform: translateY(-3px);
-        }
-
-        .promo-code-list-item {
-            background: rgba(224, 64, 251, 0.1);
-            border: 1px solid var(--dev-accent);
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-        }
-        .promo-code-delete-btn {
-            background: var(--red);
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        /* Статистика в меню разработчика */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 10px 0;
-        }
-        .stat-card {
-            background: rgba(224, 64, 251, 0.15);
-            border: 1px solid var(--dev-accent);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .stat-card-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--dev-accent);
-            margin-bottom: 5px;
-        }
-        .stat-card-label {
-            font-size: 12px;
-            color: #aaa;
-        }
-        .ad-slot-stat {
-            background: rgba(224, 64, 251, 0.1);
-            border: 1px solid var(--dev-accent);
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            font-size: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* Адаптивность для мобильных */
-        @media (max-width: 480px) {
-            .loading-text { font-size: 20px; }
-            .loading-bar-bg { width: 250px; }
-            .char-container { width: 240px; height: 280px; }
-            .top-bar { padding: 10px 15px; }
-            .energy-container { max-width: 200px; }
-            .nav-btn { font-size: 10px; }
-            .nav-icon { font-size: 20px; }
-            .bottom-nav { height: 60px; }
-            .dev-section { padding: 10px; }
-            .char-select-grid { grid-template-columns: repeat(2, 1fr); }
-            .stats-grid { grid-template-columns: 1fr; }
-            .countdown-number { font-size: 100px; }
-            .victory-text { font-size: 48px; }
-            .fight-button { font-size: 24px; padding: 15px 40px; }
-        }
-
-        @media (max-width: 360px) {
-            .loading-text { font-size: 18px; }
-            .loading-bar-bg { width: 200px; }
-            .char-container { width: 200px; height: 240px; }
-            .gold-display { font-size: 1rem; }
-            .energy-text { font-size: 12px; }
-            .countdown-number { font-size: 80px; }
-            .fight-button { font-size: 20px; padding: 12px 30px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0a">
+<title>Shadow Fight 2 - Глава 1</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<!-- AdsGram Script -->
+<script async src="https://api.adsgram.ai/adsgram.min.js"></script>
+<style>
+:root {
+--bg-color: #0a0a0a;
+--panel-color: #1a1a2e;
+--accent: #ff9800;
+--text: #ffffff;
+--green: #4caf50;
+--red: #f44336;
+--blue: #2196F3;
+--purple: #9c27b0;
+--dev-bg: #1a0a2e;
+--dev-accent: #e040fb;
+--diamond: #00bcd4;
+--xp-gold: #ffd700;
+}
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+user-select: none;
+-webkit-tap-highlight-color: transparent;
+-webkit-touch-callout: none;
+}
+body {
+font-family: 'Roboto', sans-serif;
+background: var(--bg-color);
+color: var(--text);
+height: 100vh;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+touch-action: manipulation;
+transition: background-image 0.5s ease-in-out;
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+background-attachment: fixed;
+-webkit-overflow-scrolling: touch;
+}
+body::before {
+content: '';
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0, 0, 0, 0.75);
+z-index: -1;
+pointer-events: none;
+}
+.loading-screen {
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+z-index: 9999;
+transition: opacity 0.5s ease;
+padding: 20px;
+}
+.loading-screen.hidden {
+opacity: 0;
+pointer-events: none;
+}
+.loading-logo {
+font-size: 64px;
+margin-bottom: 20px;
+animation: pulse 1.5s infinite;
+}
+.loading-text {
+font-size: 28px;
+color: var(--accent);
+margin-bottom: 30px;
+text-transform: uppercase;
+letter-spacing: 3px;
+}
+.loading-bar-bg {
+width: 300px;
+height: 10px;
+background: rgba(255,255,255,0.1);
+border-radius: 5px;
+overflow: hidden;
+}
+.loading-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, var(--accent), #ff6b6b);
+width: 0%;
+transition: width 0.3s ease;
+box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
+}
+.loading-disclaimer {
+position: absolute;
+bottom: 30px;
+left: 50%;
+transform: translateX(-50%);
+font-size: 11px;
+color: #666;
+text-align: center;
+max-width: 90%;
+line-height: 1.4;
+padding: 10px;
+background: rgba(0,0,0,0.3);
+border-radius: 8px;
+}
+.version-badge {
+position: absolute;
+top: 20px;
+right: 20px;
+background: rgba(255, 152, 0, 0.2);
+border: 1px solid var(--accent);
+color: var(--accent);
+padding: 5px 12px;
+border-radius: 15px;
+font-size: 12px;
+font-weight: bold;
+}
+@keyframes pulse {
+0%, 100% { transform: scale(1); opacity: 1; }
+50% { transform: scale(1.1); opacity: 0.7; }
+}
+.screen {
+display: none;
+flex: 1;
+overflow-y: auto;
+padding: 20px;
+padding-bottom: 80px;
+animation: fadeIn 0.3s;
+-webkit-overflow-scrolling: touch;
+}
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.top-bar {
+width: 100%;
+padding: 15px 20px;
+background: rgba(0,0,0,0.85);
+display: flex;
+justify-content: space-between;
+align-items: center;
+backdrop-filter: blur(10px);
+z-index: 10;
+border-bottom: 2px solid rgba(255,255,255,0.1);
+position: fixed;
+top: 0;
+left: 0;
+}
+.currency-display {
+display: flex;
+gap: 15px;
+align-items: center;
+}
+.gold-display {
+font-size: 1.2rem;
+font-weight: bold;
+color: #ffd700;
+text-shadow: 2px 2px 4px #000;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+.diamond-display {
+font-size: 1.2rem;
+font-weight: bold;
+color: var(--diamond);
+text-shadow: 2px 2px 4px #000;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+.xp-display {
+font-size: 0.9rem;
+font-weight: bold;
+color: var(--xp-gold);
+text-shadow: 2px 2px 4px #000;
+display: flex;
+align-items: center;
+gap: 5px;
+}
+.energy-container {
+flex: 1;
+max-width: 300px;
+margin: 0 20px;
+}
+.energy-bar-bg {
+width: 100%;
+height: 28px;
+background: #222;
+border-radius: 14px;
+overflow: hidden;
+border: 2px solid #444;
+position: relative;
+box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.energy-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, #00e5ff, #00b8d4);
+width: 100%;
+transition: width 0.3s ease;
+box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+}
+.energy-text {
+position: absolute;
+width: 100%;
+text-align: center;
+top: 50%;
+transform: translateY(-50%);
+font-size: 14px;
+font-weight: bold;
+text-shadow: 2px 2px 4px #000;
+z-index: 2;
+}
+.dev-btn {
+background: rgba(156, 39, 176, 0.3);
+border: 1px solid var(--purple);
+color: #fff;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 18px;
+backdrop-filter: blur(5px);
+min-width: 40px;
+}
+#screen-battle {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+padding: 0;
+position: relative;
+padding-top: 70px;
+}
+.boss-info {
+width: 90%;
+padding: 15px;
+text-align: center;
+background: rgba(0,0,0,0.6);
+backdrop-filter: blur(5px);
+border-radius: 12px;
+margin-bottom: 10px;
+}
+.enemy-name {
+font-size: 1.5rem;
+font-weight: bold;
+margin-bottom: 10px;
+text-transform: uppercase;
+letter-spacing: 2px;
+text-shadow: 2px 2px 4px #000;
+}
+.round-info {
+font-size: 1rem;
+color: var(--accent);
+margin-bottom: 10px;
+text-shadow: 2px 2px 4px #000;
+}
+.hp-bar-bg {
+width: 100%;
+height: 25px;
+background: #222;
+border-radius: 12px;
+overflow: hidden;
+margin: 10px auto;
+position: relative;
+border: 2px solid #444;
+box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.hp-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, #ff1744, #f50057);
+width: 100%;
+transition: width 0.1s linear;
+box-shadow: 0 0 10px rgba(255, 23, 68, 0.5);
+}
+.hp-text {
+position: absolute;
+width: 100%;
+text-align: center;
+top: 2px;
+font-size: 14px;
+font-weight: bold;
+text-shadow: 2px 2px 4px #000;
+z-index: 2;
+}
+.fight-area {
+width: 100%;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+position: relative;
+padding: 10px 20px;
+flex: 1;
+margin-top: -20px;
+}
+.char-container {
+position: relative;
+width: 280px;
+height: 320px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: transform 0.1s;
+margin-top: 10px;
+}
+.char-container:active {
+transform: scale(0.95);
+}
+.character-img {
+max-height: 100%;
+max-width: 100%;
+filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+transition: all 0.1s;
+}
+.character-img.hit {
+animation: hitShake 0.4s;
+filter: brightness(1.5) drop-shadow(0 0 30px rgba(255,255,255,0.5));
+}
+.character-img.crit-hit {
+animation: critHitShake 0.6s;
+filter: brightness(2) drop-shadow(0 0 40px rgba(255, 215, 0, 0.8));
+}
+@keyframes hitShake {
+0%, 100% { transform: translateX(0) rotate(0deg); }
+20% { transform: translateX(-15px) rotate(-5deg); }
+40% { transform: translateX(15px) rotate(5deg); }
+60% { transform: translateX(-10px) rotate(-3deg); }
+80% { transform: translateX(10px) rotate(3deg); }
+}
+@keyframes critHitShake {
+0%, 100% { transform: translateX(0) rotate(0deg) scale(1); }
+20% { transform: translateX(-20px) rotate(-10deg) scale(1.1); }
+40% { transform: translateX(20px) rotate(10deg) scale(1.1); }
+60% { transform: translateX(-15px) rotate(-5deg) scale(1.05); }
+80% { transform: translateX(15px) rotate(5deg) scale(1.05); }
+}
+.char-description {
+margin-top: 10px;
+padding: 10px;
+background: rgba(0,0,0,0.7);
+border-radius: 8px;
+text-align: center;
+max-width: 300px;
+border: 1px solid rgba(255,255,255,0.2);
+backdrop-filter: blur(5px);
+}
+.char-desc-text {
+font-size: 13px;
+color: #eee;
+line-height: 1.4;
+font-style: italic;
+}
+.damage-popup {
+position: absolute;
+font-weight: bold;
+font-size: 32px;
+color: #fff;
+pointer-events: none;
+animation: damageFloat 1s forwards;
+text-shadow: 3px 3px 0 #000, 0 0 20px rgba(255,255,255,0.5);
+z-index: 100;
+}
+.damage-popup.crit {
+color: #ffeb3b;
+font-size: 48px;
+text-shadow: 0 0 30px #ff0, 3px 3px 0 #000;
+animation: critBounce 1s forwards;
+}
+@keyframes damageFloat {
+0% { opacity: 1; transform: translateY(0) scale(1); }
+100% { opacity: 0; transform: translateY(-120px) scale(1.3); }
+}
+@keyframes critBounce {
+0% { opacity: 1; transform: translateY(0) scale(0.5) rotate(-10deg); }
+30% { transform: translateY(-30px) scale(1.5) rotate(5deg); }
+100% { opacity: 0; transform: translateY(-150px) scale(1) rotate(0deg); }
+}
+/* ЭКРАН ПОБЕДЫ */
+.victory-screen {
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.95);
+z-index: 5000;
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+}
+.victory-screen.active {
+display: flex;
+}
+.victory-text {
+font-size: 64px;
+font-weight: bold;
+color: #ffd700;
+text-shadow: 0 0 30px #ff0, 0 0 60px #ff0;
+animation: victoryPulse 1s infinite;
+margin-bottom: 30px;
+}
+.victory-enemy-name {
+font-size: 28px;
+color: #fff;
+margin-bottom: 20px;
+}
+.victory-next-btn {
+background: linear-gradient(135deg, #ff9800, #f57c00);
+color: #fff;
+border: none;
+padding: 20px 50px;
+border-radius: 15px;
+font-size: 20px;
+font-weight: bold;
+cursor: pointer;
+margin-top: 30px;
+box-shadow: 0 0 30px rgba(255, 152, 0, 0.5);
+transition: all 0.3s;
+}
+.victory-next-btn:hover {
+transform: scale(1.05);
+box-shadow: 0 0 50px rgba(255, 152, 0, 0.8);
+}
+.victory-next-btn:active {
+transform: scale(0.95);
+}
+@keyframes victoryPulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.1); }
+}
+.transition-effect {
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: #000;
+z-index: 1000;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.3s;
+}
+.transition-effect.active {
+opacity: 1;
+}
+#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette {
+background: rgba(26, 26, 46, 0.95);
+backdrop-filter: blur(10px);
+padding-top: 80px;
+}
+.shop-item {
+background: rgba(255,255,255,0.05);
+padding: 15px;
+margin-bottom: 10px;
+border-radius: 10px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+border: 1px solid rgba(255,255,255,0.1);
+}
+.btn-buy {
+background: var(--green); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; min-width: 100px;
+transition: all 0.2s;
+}
+.btn-buy:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4); }
+.btn-buy:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
+.btn-buy.purchased {
+background: #4caf50;
+cursor: default;
+}
+.btn-buy.purchased::after {
+content: ' ✓';
+}
+.btn-reset {
+background: var(--red); color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
+transition: all 0.2s;
+font-size: 16px;
+}
+.btn-reset:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(244, 67, 54, 0.4); }
+.btn-dev {
+background: linear-gradient(135deg, #e040fb 0%, #aa00ff 100%);
+color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
+transition: all 0.2s;
+font-size: 16px;
+box-shadow: 0 4px 15px rgba(224, 64, 251, 0.4);
+}
+.btn-dev:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(224, 64, 251, 0.6); }
+.btn-dev-danger {
+background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+}
+.ad-btn {
+width: 100%;
+padding: 18px;
+background: linear-gradient(45deg, #2196F3, #21CBF3);
+color: white;
+border: none;
+border-radius: 12px;
+font-size: 16px;
+font-weight: bold;
+margin-bottom: 20px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 10px;
+box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+.ad-btn:active { transform: scale(0.98); }
+.stat-box {
+background: rgba(0,0,0,0.4);
+padding: 20px;
+border-radius: 12px;
+margin-bottom: 15px;
+border: 1px solid rgba(255,255,255,0.1);
+}
+.stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.stat-row:last-child { border: none; margin: 0; padding: 0; }
+.achievement-item {
+background: rgba(255,255,255,0.05);
+padding: 12px;
+margin-bottom: 8px;
+border-radius: 8px;
+border-left: 4px solid #444;
+transition: all 0.3s;
+}
+.achievement-item.unlocked {
+border-left-color: #4caf50;
+background: rgba(76, 175, 80, 0.1);
+}
+.achievement-item.locked {
+opacity: 0.6;
+}
+.achievement-progress {
+font-size: 11px;
+color: #888;
+margin-top: 5px;
+}
+.bottom-nav {
+position: fixed;
+bottom: 0; left: 0; width: 100%;
+height: 70px;
+background: rgba(26, 26, 46, 0.95);
+display: flex;
+justify-content: space-around;
+align-items: center;
+border-top: 2px solid #333;
+z-index: 100;
+backdrop-filter: blur(10px);
+}
+.nav-btn {
+background: none; border: none; color: #888;
+font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+cursor: pointer; width: 20%; padding: 10px;
+transition: all 0.2s;
+}
+.nav-btn.active { color: var(--accent); }
+.nav-icon { font-size: 24px; }
+.nav-btn:active { background: rgba(255,255,255,0.1); }
+.toast {
+position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+background: rgba(0,0,0,0.9); color: #fff; padding: 12px 24px;
+border-radius: 25px; z-index: 1000; opacity: 0; transition: 0.3s; pointer-events: none;
+white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);
+box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+}
+.toast.show { opacity: 1; top: 120px; }
+.audio-controls {
+position: fixed;
+top: 120px;
+right: 10px;
+z-index: 50;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.audio-btn {
+background: rgba(0,0,0,0.6);
+border: none;
+color: #fff;
+width: 40px;
+height: 40px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 18px;
+backdrop-filter: blur(5px);
+}
+.save-indicator {
+position: fixed;
+bottom: 80px;
+right: 10px;
+background: rgba(0,0,0,0.6);
+color: #4caf50;
+padding: 5px 10px;
+border-radius: 15px;
+font-size: 12px;
+opacity: 0;
+transition: opacity 0.3s;
+z-index: 50;
+}
+.save-indicator.show {
+opacity: 1;
+}
+.modal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.9);
+z-index: 2000;
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
+.modal-content {
+background: #1a1a2e;
+padding: 30px;
+border-radius: 20px;
+max-width: 400px;
+width: 100%;
+text-align: center;
+border: 2px solid #f44336;
+}
+.modal-buttons {
+display: flex;
+gap: 10px;
+margin-top: 20px;
+}
+.modal-btn {
+flex: 1;
+padding: 12px;
+border: none;
+border-radius: 8px;
+font-weight: bold;
+cursor: pointer;
+}
+.modal-btn.confirm {
+background: #f44336;
+color: #fff;
+}
+.modal-btn.cancel {
+background: #444;
+color: #fff;
+}
+.promo-input-container {
+margin: 20px 0;
+text-align: center;
+}
+.promo-input {
+width: 80%;
+padding: 15px;
+background: rgba(255,255,255,0.1);
+border: 2px solid var(--purple);
+border-radius: 10px;
+color: #fff;
+font-size: 16px;
+text-align: center;
+margin-bottom: 10px;
+}
+.promo-input:focus {
+outline: none;
+border-color: var(--accent);
+box-shadow: 0 0 15px rgba(156, 39, 176, 0.5);
+}
+.btn-promo {
+background: var(--purple);
+color: #fff;
+border: none;
+padding: 15px 30px;
+border-radius: 10px;
+font-weight: bold;
+cursor: pointer;
+font-size: 16px;
+}
+.dev-section {
+background: rgba(224, 64, 251, 0.1);
+border: 1px solid var(--dev-accent);
+padding: 15px;
+border-radius: 10px;
+margin: 15px 0;
+}
+.dev-section h3 {
+color: var(--dev-accent);
+margin-bottom: 10px;
+text-shadow: 0 0 10px rgba(224, 64, 251, 0.5);
+}
+.dev-input {
+width: 100%;
+padding: 10px;
+background: rgba(0,0,0,0.3);
+border: 1px solid var(--dev-accent);
+border-radius: 5px;
+color: #fff;
+font-size: 14px;
+margin: 5px 0;
+}
+.dev-input:focus {
+outline: none;
+border-color: #fff;
+box-shadow: 0 0 10px rgba(224, 64, 251, 0.5);
+}
+.char-select-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 10px;
+margin: 10px 0;
+}
+.char-select-btn {
+background: rgba(224, 64, 251, 0.2);
+border: 1px solid var(--dev-accent);
+color: #fff;
+padding: 10px;
+border-radius: 5px;
+cursor: pointer;
+font-size: 12px;
+}
+.char-select-btn.active {
+background: var(--dev-accent);
+box-shadow: 0 0 15px rgba(224, 64, 251, 0.5);
+}
+.promo-shop-item {
+background: rgba(156, 39, 176, 0.2);
+border: 1px solid var(--purple);
+padding: 15px;
+margin-bottom: 10px;
+border-radius: 10px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.btn-promo-buy {
+background: var(--purple);
+color: #fff;
+border: none;
+padding: 10px 20px;
+border-radius: 8px;
+font-weight: bold;
+cursor: pointer;
+}
+.btn-promo-buy.purchased {
+background: #4caf50;
+cursor: default;
+}
+.ad-modal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.95);
+z-index: 3000;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+padding: 20px;
+}
+.ad-modal.active {
+display: flex;
+}
+.ad-content {
+max-width: 500px;
+width: 100%;
+text-align: center;
+}
+.ad-image {
+max-width: 100%;
+max-height: 300px;
+border-radius: 10px;
+margin: 20px 0;
+box-shadow: 0 0 30px rgba(224, 64, 251, 0.5);
+cursor: pointer;
+transition: transform 0.3s;
+}
+.ad-image:hover {
+transform: scale(1.02);
+}
+.ad-video {
+max-width: 100%;
+max-height: 300px;
+border-radius: 10px;
+margin: 20px 0;
+}
+.ad-text {
+font-size: 18px;
+color: #fff;
+margin: 20px 0;
+line-height: 1.5;
+}
+.ad-timer {
+font-size: 24px;
+color: var(--dev-accent);
+margin: 20px 0;
+font-weight: bold;
+}
+.ad-close-btn {
+background: var(--dev-accent);
+color: #fff;
+border: none;
+padding: 15px 40px;
+border-radius: 10px;
+font-weight: bold;
+font-size: 16px;
+cursor: pointer;
+margin-top: 20px;
+}
+.ad-close-btn:disabled {
+background: #444;
+cursor: not-allowed;
+}
+.ad-counter {
+font-size: 14px;
+color: #888;
+margin-top: 10px;
+}
+.prestige-chapter-modal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.95);
+z-index: 3000;
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
+.prestige-chapter-modal.active {
+display: flex;
+}
+.prestige-chapter-content {
+background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);
+padding: 40px;
+border-radius: 20px;
+max-width: 500px;
+width: 100%;
+text-align: center;
+border: 3px solid var(--dev-accent);
+box-shadow: 0 0 50px rgba(224, 64, 251, 0.5);
+}
+.prestige-chapter-title {
+font-size: 32px;
+color: var(--dev-accent);
+margin-bottom: 20px;
+text-shadow: 0 0 20px rgba(224, 64, 251, 0.8);
+}
+.prestige-chapter-subtitle {
+font-size: 24px;
+color: #ffd700;
+margin-bottom: 30px;
+text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+.prestige-chapter-text {
+font-size: 16px;
+color: #ccc;
+margin-bottom: 30px;
+line-height: 1.6;
+}
+.prestige-chapter-buttons {
+display: flex;
+gap: 15px;
+justify-content: center;
+}
+.prestige-chapter-btn {
+flex: 1;
+padding: 15px 30px;
+border: none;
+border-radius: 10px;
+font-weight: bold;
+font-size: 16px;
+cursor: pointer;
+transition: all 0.3s;
+}
+.prestige-chapter-btn.prestige {
+background: linear-gradient(135deg, #e040fb 0%, #aa00ff 100%);
+color: #fff;
+box-shadow: 0 4px 20px rgba(224, 64, 251, 0.5);
+}
+.prestige-chapter-btn.later {
+background: #444;
+color: #fff;
+}
+.prestige-chapter-btn:hover {
+transform: translateY(-3px);
+}
+.roulette-container {
+text-align: center;
+padding: 20px;
+}
+.roulette-cost {
+font-size: 16px;
+color: var(--diamond);
+margin-bottom: 10px;
+}
+.slot-machine {
+display: flex;
+justify-content: center;
+gap: 10px;
+margin: 20px auto;
+padding: 20px;
+background: linear-gradient(135deg, #1a1a2e, #2d1b4e);
+border-radius: 15px;
+border: 3px solid var(--accent);
+box-shadow: 0 0 30px rgba(255, 152, 0, 0.5);
+}
+.slot-reel {
+width: 80px;
+height: 100px;
+background: #fff;
+border-radius: 10px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 48px;
+border: 3px solid #333;
+overflow: hidden;
+position: relative;
+}
+.slot-reel.spinning {
+animation: slotSpin 0.1s infinite;
+}
+@keyframes slotSpin {
+0% { transform: translateY(-5px); }
+50% { transform: translateY(5px); }
+100% { transform: translateY(-5px); }
+}
+.roulette-btn {
+background: linear-gradient(135deg, #ff9800, #f57c00);
+color: #fff;
+border: none;
+padding: 15px 40px;
+border-radius: 12px;
+font-weight: bold;
+font-size: 18px;
+cursor: pointer;
+margin-top: 20px;
+box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+}
+.roulette-btn:disabled {
+background: #444;
+cursor: not-allowed;
+}
+.roulette-result {
+font-size: 24px;
+font-weight: bold;
+margin-top: 20px;
+min-height: 40px;
+}
+.roulette-prizes {
+margin-top: 20px;
+font-size: 12px;
+color: #888;
+text-align: left;
+background: rgba(0,0,0,0.3);
+padding: 15px;
+border-radius: 10px;
+}
+.roulette-prizes h4 {
+color: var(--accent);
+margin-bottom: 10px;
+}
+.free-spin-info {
+background: linear-gradient(135deg, #4caf50, #45a049);
+padding: 10px;
+border-radius: 8px;
+margin-bottom: 15px;
+font-size: 14px;
+}
+.xp-container {
+background: rgba(0,0,0,0.4);
+padding: 20px;
+border-radius: 12px;
+margin-bottom: 15px;
+border: 1px solid rgba(255,255,255,0.1);
+}
+.xp-bar-bg {
+width: 100%;
+height: 20px;
+background: #222;
+border-radius: 10px;
+overflow: hidden;
+margin: 10px 0;
+position: relative;
+border: 2px solid #444;
+}
+.xp-bar-fill {
+height: 100%;
+background: linear-gradient(90deg, #ffd700, #ff9800);
+width: 0%;
+transition: width 0.5s ease;
+box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+.xp-text {
+position: absolute;
+width: 100%;
+text-align: center;
+top: 50%;
+transform: translateY(-50%);
+font-size: 12px;
+font-weight: bold;
+text-shadow: 2px 2px 4px #000;
+z-index: 2;
+}
+.rank-badge {
+font-size: 18px;
+font-weight: bold;
+color: var(--xp-gold);
+text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+.login-log {
+background: rgba(0,0,0,0.6);
+padding: 15px;
+border-radius: 10px;
+margin-bottom: 15px;
+border: 1px solid var(--accent);
+}
+.login-log h4 {
+color: var(--accent);
+margin-bottom: 10px;
+}
+.login-log p {
+font-size: 13px;
+color: #ccc;
+margin: 5px 0;
+}
+@media (max-width: 480px) {
+.loading-text { font-size: 20px; }
+.loading-bar-bg { width: 250px; }
+.char-container { width: 240px; height: 280px; }
+.top-bar { padding: 10px 15px; }
+.energy-container { max-width: 200px; }
+.nav-btn { font-size: 10px; }
+.nav-icon { font-size: 20px; }
+.bottom-nav { height: 60px; }
+.dev-section { padding: 10px; }
+.char-select-grid { grid-template-columns: repeat(2, 1fr); }
+.countdown-number { font-size: 100px; }
+.victory-text { font-size: 48px; }
+.slot-reel { width: 60px; height: 80px; font-size: 36px; }
+}
+@media (max-width: 360px) {
+.loading-text { font-size: 18px; }
+.loading-bar-bg { width: 200px; }
+.char-container { width: 200px; height: 240px; }
+.gold-display { font-size: 1rem; }
+.energy-text { font-size: 12px; }
+.slot-reel { width: 50px; height: 70px; font-size: 28px; }
+}
+</style>
 </head>
 <body>
-<!-- ЭКРАН ЗАГРУЗКИ С ДИСКЛЕЙМЕРОМ -->
 <div class="loading-screen" id="loadingScreen">
-    <div class="version-badge" id="versionBadge">v1.0</div>
-    <div class="loading-logo">⚔️</div>
-    <div class="loading-text">Shadow Fight 2</div>
-    <div class="loading-bar-bg">
-        <div class="loading-bar-fill" id="loadingBar"></div>
-    </div>
-    <div class="loading-disclaimer">
-        ⚠️ ДИСКЛЕЙМЕР: Игра является фанатским проектом и не связана с официальными разработчиками Shadow Fight 2.
-        Разработчики не несут ответственности за любой ущерб, возникший в результате использования игры.
-        Все права на оригинальную игру принадлежат Nekki.
-    </div>
+<div class="version-badge" id="versionBadge">V1.0.03</div>
+<div class="loading-logo">⚔️</div>
+<div class="loading-text">Shadow Fight 2</div>
+<div class="loading-bar-bg">
+<div class="loading-bar-fill" id="loadingBar"></div>
+</div>
+<div class="loading-disclaimer">
+⚠️ ДИСКЛЕЙМЕР: Игра является фанатским проектом и не связана с официальными разработчиками Shadow Fight 2. Все права на оригинальную игру принадлежат Nekki. Игра создана в образовательных целях.
+</div>
 </div>
 
-<!-- ЭКРАН ОБРАТНОГО ОТСЧЁТА С КНОПКОЙ FIGHT -->
-<div class="countdown-screen" id="countdownScreen">
-    <div class="countdown-number" id="countdownNumber">3</div>
-    <div class="countdown-text" id="countdownText">Следующий противник</div>
-    <button class="fight-button" id="fightButton" onclick="startFight()">⚔️ FIGHT!</button>
-</div>
-
-<!-- ЭКРАН ПОБЕДЫ -->
+<!-- ЭКРАН ПОБЕДЫ С КНОПКОЙ -->
 <div class="victory-screen" id="victoryScreen">
-    <div class="victory-text">🏆 ПОБЕДА!</div>
-    <div class="victory-enemy-name" id="victoryEnemyName">Шин повержен</div>
+<div class="victory-text">🏆 ПОБЕДА!</div>
+<div class="victory-enemy-name" id="victoryEnemyName">Шин повержен</div>
+<button class="victory-next-btn" id="victoryNextBtn" onclick="goToNextEnemy()">⚔️ Следующий противник</button>
 </div>
 
-<!-- Аудио элементы -->
 <audio id="bgMusic" loop>
-    <source src="audio/background.mp3" type="audio/mpeg">
+<source src="audio/background.mp3" type="audio/mpeg">
 </audio>
 <audio id="clickSound">
-    <source src="audio/click.mp3" type="audio/mpeg">
+<source src="audio/click.mp3" type="audio/mpeg">
 </audio>
 <audio id="critSound">
-    <source src="audio/crit.mp3" type="audio/mpeg">
+<source src="audio/crit.mp3" type="audio/mpeg">
 </audio>
 <audio id="transitionSound">
-    <source src="audio/transition.mp3" type="audio/mpeg">
+<source src="audio/transition.mp3" type="audio/mpeg">
 </audio>
 <audio id="winSound">
-    <source src="audio/win.mp3" type="audio/mpeg">
+<source src="audio/win.mp3" type="audio/mpeg">
 </audio>
 <audio id="fightSound">
-    <source src="audio/fight.mp3" type="audio/mpeg">
+<source src="audio/fight.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Эффект перехода -->
 <div class="transition-effect" id="transitionEffect"></div>
 
-<!-- Аудио контролы -->
 <div class="audio-controls">
-    <button class="audio-btn" onclick="toggleMusic()" id="musicBtn">🎵</button>
-    <button class="audio-btn" onclick="toggleSound()" id="soundBtn">🔊</button>
+<button class="audio-btn" onclick="toggleMusic()" id="musicBtn">🎵</button>
+<button class="audio-btn" onclick="toggleSound()" id="soundBtn">🔊</button>
 </div>
-<!-- Индикатор сохранения -->
+
 <div class="save-indicator" id="saveIndicator">💾 Сохранено</div>
 
-<!-- РЕКЛАМНЫЙ МОДАЛЬНЫЙ ЭКРАН -->
-<div class="ad-modal" id="adModal">
-    <div class="ad-content">
-        <h2 style="color: var(--dev-accent); margin-bottom: 10px;">📺 Реклама <span id="adCounter" class="ad-counter"></span></h2>
-        <div id="adMediaContainer"></div>
-        <div class="ad-text" id="adText"></div>
-        <div class="ad-timer" id="adTimer">Подождите: 10с</div>
-        <button class="ad-close-btn" id="adCloseBtn" disabled onclick="closeAd()">Получить награду</button>
-    </div>
-</div>
-
-<!-- МОДАЛЬНОЕ ОКНО ПРЕСТИЖА ПОСЛЕ БОССА -->
-<div class="prestige-chapter-modal" id="prestigeChapterModal">
-    <div class="prestige-chapter-content">
-        <div class="prestige-chapter-title">🏆 ГЛАВА 1 ПРОЙДЕНА!</div>
-        <div class="prestige-chapter-subtitle">🔜 СКОРО 2 ГЛАВА</div>
-        <div class="prestige-chapter-text">
-            Поздравляем! Вы победили Рысь и завершили первую главу!<br><br>
-            Вторая глава уже в разработке. Пока вы можете активировать престиж для получения бонусов к следующей главе.
-        </div>
-        <div class="prestige-chapter-buttons">
-            <button class="prestige-chapter-btn later" onclick="closePrestigeChapterModal()">Позже</button>
-            <button class="prestige-chapter-btn prestige" onclick="doPrestigeFromModal()">🔄 Активировать Престиж</button>
-        </div>
-    </div>
-</div>
-
-<!-- ЭКРАН 1: БОЙ -->
 <div id="screen-battle" class="screen active">
-    <div class="boss-info">
-        <div class="enemy-name" id="enemyName">Шин</div>
-        <div class="hp-bar-bg">
-            <div class="hp-bar-fill" id="hpFill"></div>
-            <div class="hp-text"><span id="hpText">800/800</span></div>
-        </div>
-    </div>
-    <div class="fight-area">
-        <div class="char-container" id="charContainer">
-            <img id="charImg" src="" class="character-img" alt="Enemy">
-        </div>
-        <div class="char-description">
-            <div class="char-desc-text" id="charDesc">
-                Мастер боевых искусств. Быстрый и ловкий противник.
-            </div>
-        </div>
-    </div>
+<div class="boss-info">
+<div class="enemy-name" id="enemyName">Шин</div>
+<div class="round-info" id="roundInfo">Раунд 1 из 2</div>
+<div class="hp-bar-bg">
+<div class="hp-bar-fill" id="hpFill"></div>
+<div class="hp-text"><span id="hpText">3000/3000</span></div>
 </div>
-<!-- ЭКРАН 2: МАГАЗИН -->
+</div>
+<div class="fight-area">
+<div class="char-container" id="charContainer">
+<img id="charImg" src="" class="character-img" alt="Enemy">
+</div>
+<div class="char-description">
+<div class="char-desc-text" id="charDesc">
+Мастер боевых искусств. Быстрый и ловкий противник.
+</div>
+</div>
+</div>
+</div>
+
 <div id="screen-shop" class="screen">
-    <h2 style="margin: 20px 0; text-align: center;">⚔️ Магазин</h2>
-    <button class="ad-btn" onclick="watchAd()">
-        📺 Реклама (+<span id="adRewardDisplay">500</span> 💰)
-    </button>
-    <div class="shop-item">
-        <div>
-            <div style="font-weight: bold;">⚡ +50 Энергии</div>
-            <small style="color:#888">Мгновенное восстановление</small>
-        </div>
-        <button class="btn-buy" onclick="buyEnergy()" style="background: #2196F3;">
-            100 💰
-        </button>
-    </div>
-    <div class="shop-item">
-        <div>
-            <div style="font-weight: bold;">⚔️ Урон +1</div>
-            <small style="color:#888">Текущий: <span id="shopDmg">1</span></small>
-        </div>
-        <button class="btn-buy" id="btnBuyDmg" onclick="buyUpgrade('damage')">
-            <span id="costDmg">15</span> 💰
-        </button>
-    </div>
-    <div class="shop-item">
-        <div>
-            <div style="font-weight: bold;">🎯 Крит +1%</div>
-            <small style="color:#888">Текущий: <span id="shopCrit">5</span>%</small>
-        </div>
-        <button class="btn-buy" id="btnBuyCrit" onclick="buyUpgrade('critChance')">
-            <span id="costCrit">75</span> 💰
-        </button>
-    </div>
-    <div class="shop-item">
-        <div>
-            <div style="font-weight: bold;">💥 Крит.Урон +10%</div>
-            <small style="color:#888">Текущий: <span id="shopCritDmg">200</span>%</small>
-        </div>
-        <button class="btn-buy" id="btnBuyCritDmg" onclick="buyUpgrade('critDamage')">
-            <span id="costCritDmg">150</span> 💰
-        </button>
-    </div>
-    <div class="shop-item">
-        <div>
-            <div style="font-weight: bold;">⚡ Макс.Энергия +10</div>
-            <small style="color:#888">Текущий: <span id="shopEnergy">100</span></small>
-        </div>
-        <button class="btn-buy" id="btnBuyEnergy" onclick="buyUpgrade('maxEnergy')">
-            <span id="costEnergy">300</span> 💰
-        </button>
-    </div>
+<h2 style="margin: 20px 0; text-align: center;">⚔️ Магазин</h2>
+<button class="ad-btn" onclick="watchAd()">
+📺 Реклама (+500 💰)
+</button>
+<button class="ad-btn" onclick="watchAdForDiamond()" style="background: linear-gradient(45deg, #00bcd4, #0097a7);">
+💎 Реклама (+1 💎)</button>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">⚡ +50 Энергии</div>
+<small style="color:#888">Мгновенное восстановление</small>
+</div>
+<button class="btn-buy" onclick="buyEnergy()" style="background: #2196F3;">
+100 💰
+</button>
+</div>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">⚔️ Урон +1</div>
+<small style="color:#888">Текущий: <span id="shopDmg">1</span></small>
+</div>
+<button class="btn-buy" id="btnBuyDmg" onclick="buyUpgrade('damage')">
+<span id="costDmg">15</span> 💰
+</button>
+</div>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">🎯 Крит +1%</div>
+<small style="color:#888">Текущий: <span id="shopCrit">5</span>%</small>
+</div>
+<button class="btn-buy" id="btnBuyCrit" onclick="buyUpgrade('critChance')">
+<span id="costCrit">75</span> 💰
+</button>
+</div>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">💥 Крит.Урон +10%</div>
+<small style="color:#888">Текущий: <span id="shopCritDmg">200</span>%</small>
+</div>
+<button class="btn-buy" id="btnBuyCritDmg" onclick="buyUpgrade('critDamage')">
+<span id="costCritDmg">150</span> 💰
+</button>
+</div>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">⚡ Макс.Энергия +10</div>
+<small style="color:#888">Текущий: <span id="shopEnergy">100</span></small>
+</div>
+<button class="btn-buy" id="btnBuyEnergy" onclick="buyUpgrade('maxEnergy')">
+<span id="costEnergy">300</span> 💰
+</button>
+</div>
 </div>
 
-<!-- ЭКРАН 3: ПРОФИЛЬ -->
 <div id="screen-profile" class="screen">
-    <h2 style="margin: 20px 0; text-align: center;">📊 Профиль</h2>
-    <div class="stat-box">
-        <div class="stat-row"><span>💀 Убито врагов:</span> <span id="statKills">0</span></div>
-        <div class="stat-row"><span>👆 Всего кликов:</span> <span id="statClicks">0</span></div>
-        <div class="stat-row"><span>🏆 Престиж:</span> <span id="statPrestige">0</span></div>
-        <div class="stat-row"><span>📅 День:</span> <span id="statDay">1</span></div>
-        <div class="stat-row"><span>🔥 Серия входов:</span> <span id="statStreak">0</span>/7</div>
-        <div class="stat-row"><span>🎯 Критов:</span> <span id="statCrits">0</span></div>
-        <div class="stat-row"><span>💰 Всего золота:</span> <span id="statTotalGold">0</span></div>
-    </div>
-    <h3 style="margin: 20px 0 10px; text-align: center;">🏆 Достижения</h3>
-    <div id="achievementsList"></div>
-    <button class="btn-reset" onclick="showResetModal()">
-        ☠️ СБРОСИТЬ ПРОГРЕСС
-    </button>
-    <p style="font-size:11px; color:#888; margin-top:10px; text-align:center;">
-        Полностью сбрасывает весь прогресс игры
-    </p>
-    <button class="btn-buy" style="width:100%; margin-top:10px; background:#ff9800; padding: 15px;" onclick="doPrestige()">
-        🔄 ПРЕСТИЖ (сохраняет бонусы)
-    </button>
-    <p style="font-size:11px; color:#888; margin-top:10px; text-align:center;">
-        +10% к урону за каждое очко престижа
-    </p>
+<h2 style="margin: 20px 0; text-align: center;">📊 Профиль</h2>
+<div class="login-log">
+<h4>📜 Лог входа</h4>
+<p id="lastLoginLog">Последний вход: Никогда</p>
+<p id="playTimeLog">Время в игре: 0 мин</p>
+</div>
+<div class="xp-container">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<span class="rank-badge" id="rankBadge">Новичок</span>
+<span style="color: var(--xp-gold);">Уровень <span id="levelDisplay">1</span></span>
+</div>
+<div class="xp-bar-bg">
+<div class="xp-bar-fill" id="xpFill"></div>
+<div class="xp-text"><span id="xpText">0/100 XP</span></div>
+</div>
+</div>
+<div class="stat-box">
+<div class="stat-row"><span>💀 Убито врагов:</span> <span id="statKills">0</span></div>
+<div class="stat-row"><span>👆 Всего кликов:</span> <span id="statClicks">0</span></div>
+<div class="stat-row"><span>🏆 Престиж:</span> <span id="statPrestige">0</span></div>
+<div class="stat-row"><span>📅 День:</span> <span id="statDay">1</span></div>
+<div class="stat-row"><span>🔥 Серия входов:</span> <span id="statStreak">0</span>/7</div>
+<div class="stat-row"><span>🎯 Критов:</span> <span id="statCrits">0</span></div>
+<div class="stat-row"><span>💰 Всего золота:</span> <span id="statTotalGold">0</span></div>
+<div class="stat-row"><span>💎 Промо алмазы:</span> <span id="statDiamonds">0</span></div>
+<div class="stat-row"><span>🎰 Прокруток рулетки:</span> <span id="statRoulette">0</span></div>
+</div>
+<h3 style="margin: 20px 0 10px; text-align: center;">🏆 Достижения</h3>
+<div id="achievementsList"></div>
+<button class="btn-buy" style="width:100%; margin-top:10px; background:#ff9800; padding: 15px;" onclick="doPrestige()">
+🔄 ПРЕСТИЖ (сохраняет бонусы)
+</button>
+<p style="font-size:11px; color:#888; margin-top:10px; text-align:center;">
++10% к урону за каждое очко престижа
+</p>
 </div>
 
-<!-- ЭКРАН 4: ПРОМО КОДЫ -->
 <div id="screen-promo" class="screen">
-    <h2 style="margin: 20px 0; text-align: center;">🎁 Промо коды</h2>
-    <div class="promo-input-container">
-        <input type="text" class="promo-input" id="promoCodeInput" placeholder="Введите промо код">
-        <button class="btn-promo" onclick="activatePromoCode()">Активировать</button>
-    </div>
-    <h3 style="margin: 20px 0 10px; text-align: center; color: var(--purple);">💎 Промо магазин</h3>
-    <div class="promo-shop-item">
-        <div>
-            <div style="font-weight: bold;">💰 1000 Золота</div>
-            <small style="color:#888">Мгновенное получение</small>
-        </div>
-        <button class="btn-promo-buy" onclick="buyPromoItem('gold1000')">
-            5 💎
-        </button>
-    </div>
-    <div class="promo-shop-item">
-        <div>
-            <div style="font-weight: bold;">💰 5000 Золота</div>
-            <small style="color:#888">Мгновенное получение</small>
-        </div>
-        <button class="btn-promo-buy" onclick="buyPromoItem('gold5000')">
-            20 💎
-        </button>
-    </div>
-    <div class="promo-shop-item">
-        <div>
-            <div style="font-weight: bold;">⚡ Полная энергия</div>
-            <small style="color:#888">Восстановление энергии</small>
-        </div>
-        <button class="btn-promo-buy" onclick="buyPromoItem('energy')">
-            3 💎
-        </button>
-    </div>
-    <div class="promo-shop-item">
-        <div>
-            <div style="font-weight: bold;">⚔️ Урон +5</div>
-            <small style="color:#888">Постоянное улучшение</small>
-        </div>
-        <button class="btn-promo-buy" onclick="buyPromoItem('damage5')">
-            10 💎
-        </button>
-    </div>
+<h2 style="margin: 20px 0; text-align: center;">🎁 Промо коды</h2>
+<div class="promo-input-container">
+<input type="text" class="promo-input" id="promoCodeInput" placeholder="Введите промо код">
+<button class="btn-promo" onclick="activatePromoCode()">Активировать</button>
+</div>
+<h3 style="margin: 20px 0 10px; text-align: center; color: var(--purple);">💎 Промо магазин</h3>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">💰 1000 Золота</div>
+<small style="color:#888">Мгновенное получение</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('gold1000')">
+5 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">💰 5000 Золота</div>
+<small style="color:#888">Мгновенное получение</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('gold5000')">
+20 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">⚡ Полная энергия</div>
+<small style="color:#888">Восстановление энергии</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('energy')">
+3 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">⚔️ Урон +5</div>
+<small style="color:#888">Постоянное улучшение</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('damage5')">
+10 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">🎯 Крит +5%</div>
+<small style="color:#888">Постоянное улучшение</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('crit5')">
+15 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">💥 Крит.Урон +50%</div>
+<small style="color:#888">Постоянное улучшение</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('critDmg50')">
+25 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">🤖 Авто-клик (навсегда)</div>
+<small style="color:#888">Единоразовая покупка</small>
+</div>
+<button class="btn-promo-buy" id="btnAutoClick" onclick="buyPromoItem('autoclick')">
+100 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">⚡ Авто-покупка энергии</div>
+<small style="color:#888">Автоматически за золото</small>
+</div>
+<button class="btn-promo-buy" id="btnAutoEnergy" onclick="buyPromoItem('autoenergy')">
+50 💎
+</button>
+</div>
 </div>
 
-<!-- ЭКРАН 5: МЕНЮ РАЗРАБОТЧИКА -->
+<div id="screen-roulette" class="screen">
+<h2 style="margin: 20px 0; text-align: center;">🎰 Казино Удачи</h2>
+<div class="roulette-container">
+<div class="free-spin-info" id="freeSpinInfo">
+🎁 Бесплатный спин доступен!
+</div>
+<div class="roulette-cost">Стоимость: 3 💎 за прокрутку</div>
+<div class="slot-machine">
+<div class="slot-reel" id="reel1">🍒</div>
+<div class="slot-reel" id="reel2">🍒</div>
+<div class="slot-reel" id="reel3">🍒</div>
+</div>
+<div class="roulette-result" id="rouletteResult">Испытай удачу!</div>
+<button class="roulette-btn" id="rouletteBtn" onclick="spinRoulette()">🎰 Крутить!</button>
+<div class="roulette-prizes">
+<h4>🏆 Шансы выигрыша:</h4>
+<p>💰 Золото = 50% (Высокий)</p>
+<p>⚔️ Улучшение = 25% (Средний)</p>
+<p>💰💎 Золото + Алмазы = 20% (Низкий)</p>
+<p>🎉 ДЖЕКПОТ = 5% (Супер низкий)</p>
+</div>
+</div>
+</div>
+
 <div id="screen-dev" class="screen">
-    <h2 style="margin: 20px 0; text-align: center; color: var(--dev-accent); text-shadow: 0 0 15px rgba(224, 64, 251, 0.8);">🔧 Меню разработчика</h2>
-    
-    <!-- СТАТИСТИКА РЕКЛАМЫ И ПРОМОКОДОВ -->
-    <div class="dev-section">
-        <h3>📊 Общая статистика</h3>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-card-value" id="totalAdViews">0</div>
-                <div class="stat-card-label">📺 Просмотров рекламы</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-card-value" id="totalPromoActivations">0</div>
-                <div class="stat-card-label">🎁 Активаций промокодов</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="dev-section">
-        <h3>⚙️ Версия игры</h3>
-        <input type="text" class="dev-input" id="devVersionInput" placeholder="Версия (например: 1.0)" value="1.0">
-        <button class="btn-dev" onclick="saveVersion()" style="margin-top: 10px;">💾 Сохранить версию</button>
-    </div>
-
-    <div class="dev-section">
-        <h3>👤 Выбор персонажа</h3>
-        <div class="char-select-grid" id="devCharSelect"></div>
-    </div>
-
-    <div class="dev-section">
-        <h3>💰 Добавить золото</h3>
-        <input type="number" class="dev-input" id="devGoldInput" placeholder="Количество золота">
-        <button class="btn-dev" onclick="devAddGold()" style="margin-top: 10px;">Добавить</button>
-    </div>
-
-    <div class="dev-section">
-        <h3>📺 Настройка рекламы (5 слотов)</h3>
-        <div style="margin-bottom: 10px;">
-            <label style="color: var(--dev-accent); font-size: 12px;">Текущий слот: <span id="currentAdSlot">1</span>/5</label>
-        </div>
-        
-        <!-- Выбор слота -->
-        <div style="display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;">
-            <button class="btn-buy" onclick="selectAdSlot(0)" style="flex: 1; min-width: 60px; font-size: 12px;" id="slotBtn0">Слот 1</button>
-            <button class="btn-buy" onclick="selectAdSlot(1)" style="flex: 1; min-width: 60px; font-size: 12px;" id="slotBtn1">Слот 2</button>
-            <button class="btn-buy" onclick="selectAdSlot(2)" style="flex: 1; min-width: 60px; font-size: 12px;" id="slotBtn2">Слот 3</button>
-            <button class="btn-buy" onclick="selectAdSlot(3)" style="flex: 1; min-width: 60px; font-size: 12px;" id="slotBtn3">Слот 4</button>
-            <button class="btn-buy" onclick="selectAdSlot(4)" style="flex: 1; min-width: 60px; font-size: 12px;" id="slotBtn4">Слот 5</button>
-        </div>
-
-        <!-- Настройки рекламы -->
-        <div class="ad-slot-editor">
-            <h4>⚙️ Параметры рекламы</h4>
-            <input type="text" class="dev-input" id="adImageUrl" placeholder="🖼️ URL картинки (https://...)">
-            <input type="text" class="dev-input" id="adVideoUrl" placeholder="🎬 URL видео MP4 (https://...)">
-            <input type="text" class="dev-input" id="adLinkUrl" placeholder="🔗 URL ссылки для перехода (https://...)">
-            <input type="text" class="dev-input" id="adTextContent" placeholder="📝 Текст рекламы">
-            <input type="number" class="dev-input" id="adReward" placeholder="💰 Награда (золото)" value="500" min="100">
-            <input type="number" class="dev-input" id="adTimer" placeholder="⏱️ Продолжительность (мин. 10 сек)" value="10" min="10">
-            
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button class="btn-dev" onclick="saveAdConfig()" style="flex: 1;">💾 Сохранить слот</button>
-                <button class="btn-dev" onclick="testAd()" style="flex: 1;">🧪 Тест рекламы</button>
-            </div>
-        </div>
-
-        <!-- Предпросмотр настроек -->
-        <div class="ad-preview">
-            <h4 style="color: var(--dev-accent); margin-bottom: 10px;">📋 Текущие настройки слота <span id="previewSlotNum">1</span></h4>
-            <div class="ad-preview-item">
-                <span class="ad-preview-label">Картинка:</span>
-                <span class="ad-preview-value" id="previewImage">Не задана</span>
-            </div>
-            <div class="ad-preview-item">
-                <span class="ad-preview-label">Видео:</span>
-                <span class="ad-preview-value" id="previewVideo">Не задано</span>
-            </div>
-            <div class="ad-preview-item">
-                <span class="ad-preview-label">Ссылка:</span>
-                <span class="ad-preview-value" id="previewLink">Не задана</span>
-            </div>
-            <div class="ad-preview-item">
-                <span class="ad-preview-label">Текст:</span>
-                <span class="ad-preview-value" id="previewText" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Не задан</span>
-            </div>
-            <div class="ad-preview-item">
-                <span class="ad-preview-label">Награда:</span>
-                <span class="ad-preview-value" id="previewReward">500 💰</span>
-            </div>
-            <div class="ad-preview-item">
-                <span class="ad-preview-label">Время:</span>
-                <span class="ad-preview-value" id="previewTimer">10 сек</span>
-            </div>
-            <div class="ad-preview-item">
-                <span class="ad-preview-label">Просмотров:</span>
-                <span class="ad-preview-value" id="previewViews">0</span>
-            </div>
-        </div>
-
-        <!-- Статистика по всем слотам -->
-        <div style="margin-top: 15px;">
-            <label style="color: var(--dev-accent); font-size: 12px;">📊 Статистика всех слотов:</label>
-            <div id="adSlotsStatsList" style="margin-top: 10px;"></div>
-        </div>
-    </div>
-
-    <div class="dev-section">
-        <h3>🎁 Управление промо кодами</h3>
-        <input type="text" class="dev-input" id="devPromoCodeName" placeholder="Название промо кода">
-        <input type="number" class="dev-input" id="devPromoCodeReward" placeholder="Награда (золото)">
-        <input type="number" class="dev-input" id="devPromoCodePromo" placeholder="Награда (промо валюта)">
-        <button class="btn-dev" onclick="devCreatePromoCode()" style="margin-top: 10px;">➕ Создать</button>
-        <h4 style="color: var(--dev-accent); margin: 15px 0 10px;">📋 Активные промо коды:</h4>
-        <div id="devPromoCodesList"></div>
-    </div>
-
-    <button class="btn-reset" onclick="closeDevMenu()" style="margin-top: 20px;">
-        🔒 Закрыть меню
-    </button>
+<h2 style="margin: 20px 0; text-align: center; color: var(--dev-accent);">🔧 Меню разработчика</h2>
+<div class="dev-section">
+<h3>👤 Выбор персонажа</h3>
+<div class="char-select-grid" id="devCharSelect"></div>
+</div>
+<div class="dev-section">
+<h3>💰 Добавить золото</h3>
+<input type="number" class="dev-input" id="devGoldInput" placeholder="Количество золота">
+<button class="btn-dev" onclick="devAddGold()" style="margin-top: 10px;">Добавить</button>
+</div>
+<div class="dev-section">
+<h3>💎 Добавить алмазы</h3>
+<input type="number" class="dev-input" id="devDiamondInput" placeholder="Количество алмазов">
+<button class="btn-dev" onclick="devAddDiamonds()" style="margin-top: 10px;">Добавить</button>
+</div>
+<div class="dev-section">
+<h3>☠️ Сброс прогресса</h3>
+<button class="btn-reset" onclick="confirmReset()" style="margin-top: 10px;">☠️ СБРОСИТЬ ПРОГРЕСС</button>
+<p style="font-size:11px; color:#888; margin-top:10px;">Полностью сбрасывает весь прогресс игры</p>
+</div>
+<button class="btn-reset" onclick="closeDevMenu()" style="margin-top: 20px;">
+🔒 Закрыть меню
+</button>
 </div>
 
-<!-- НИЖНЯЯ НАВИГАЦИЯ -->
 <div class="bottom-nav">
-    <button class="nav-btn active" onclick="switchScreen('battle', this)">
-        <span class="nav-icon">⚔️</span>
-        <span>Бой</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('shop', this)">
-        <span class="nav-icon">🛒</span>
-        <span>Магазин</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('promo', this)">
-        <span class="nav-icon">🎁</span>
-        <span>Промо</span>
-    </button>
-    <button class="nav-btn" onclick="switchScreen('profile', this)">
-        <span class="nav-icon">👤</span>
-        <span>Профиль</span>
-    </button>
+<button class="nav-btn active" onclick="switchScreen('battle', this)">
+<span class="nav-icon">⚔️</span>
+<span>Бой</span>
+</button>
+<button class="nav-btn" onclick="switchScreen('shop', this)">
+<span class="nav-icon">🛒</span>
+<span>Магазин</span>
+</button>
+<button class="nav-btn" onclick="switchScreen('promo', this)">
+<span class="nav-icon">🎁</span>
+<span>Промо</span>
+</button>
+<button class="nav-btn" onclick="switchScreen('roulette', this)">
+<span class="nav-icon">🎰</span>
+<span>Казино</span>
+</button>
+<button class="nav-btn" onclick="switchScreen('profile', this)">
+<span class="nav-icon">👤</span>
+<span>Профиль</span>
+</button>
 </div>
 
-<!-- ВЕРХНЯЯ ПАНЕЛЬ -->
 <div class="top-bar">
-    <div class="gold-display">💰 <span id="uiGold">500</span></div>
-    <div class="energy-container">
-        <div class="energy-bar-bg">
-            <div class="energy-bar-fill" id="energyFill"></div>
-            <div class="energy-text"><span id="uiEnergy">100/100</span></div>
-        </div>
-    </div>
-    <button class="dev-btn" onclick="openDevMenu()">⚙️</button>
+<div class="currency-display">
+<div class="gold-display">💰 <span id="uiGold">500</span></div>
+<div class="diamond-display">💎 <span id="uiDiamonds">0</span></div>
+</div>
+<div class="energy-container">
+<div class="energy-bar-bg">
+<div class="energy-bar-fill" id="energyFill"></div>
+<div class="energy-text"><span id="uiEnergy">100/100</span></div>
+</div>
+</div>
+<div class="xp-display">⭐ <span id="uiLevel">1</span></div>
+<button class="dev-btn" onclick="openDevMenu()">⚙️</button>
 </div>
 
-<!-- Модальное окно сброса -->
-<div class="modal" id="resetModal" onclick="if(event.target===this) this.style.display='none'">
-    <div class="modal-content">
-        <h2 style="color: #f44336; margin-bottom: 15px;">⚠️ СБРОС ПРОГРЕССА</h2>
-        <p style="color: #ccc; margin-bottom: 20px;">
-            Вы уверены? Весь прогресс будет удалён безвозвратно!<br><br>
-            • Золото<br>
-            • Улучшения<br>
-            • Достижения<br>
-            • Прогресс главы
-        </p>
-        <div class="modal-buttons">
-            <button class="modal-btn cancel" onclick="hideResetModal()">Отмена</button>
-            <button class="modal-btn confirm" onclick="confirmReset()">СБРОСИТЬ</button>
-        </div>
-    </div>
-</div>
-
-<!-- Модальное окно разработчика -->
 <div class="modal" id="devPasswordModal" onclick="if(event.target===this) this.style.display='none'">
-    <div class="modal-content" style="border-color: var(--dev-accent);">
-        <h2 style="color: var(--dev-accent); margin-bottom: 15px;">🔐 Меню разработчика</h2>
-        <p style="color: #ccc; margin-bottom: 20px;">Введите пароль для доступа</p>
-        <input type="password" class="promo-input" id="devPasswordInput" placeholder="Пароль" style="width: 100%;">
-        <div class="modal-buttons">
-            <button class="modal-btn cancel" onclick="closeDevPasswordModal()">Отмена</button>
-            <button class="modal-btn confirm" style="background: var(--dev-accent);" onclick="checkDevPassword()">Войти</button>
-        </div>
-    </div>
+<div class="modal-content" style="border-color: var(--dev-accent);">
+<h2 style="color: var(--dev-accent); margin-bottom: 15px;">🔐 Меню разработчика</h2>
+<p style="color: #ccc; margin-bottom: 20px;">Введите пароль для доступа</p>
+<input type="password" class="promo-input" id="devPasswordInput" placeholder="Пароль" style="width: 100%;">
+<div class="modal-buttons">
+<button class="modal-btn cancel" onclick="closeDevPasswordModal()">Отмена</button>
+<button class="modal-btn confirm" style="background: var(--dev-accent);" onclick="checkDevPassword()">Войти</button>
+</div>
+</div>
+</div>
+
+<div class="prestige-chapter-modal" id="prestigeChapterModal">
+<div class="prestige-chapter-content">
+<div class="prestige-chapter-title">🏆 ГЛАВА 1 ПРОЙДЕНА!</div>
+<div class="prestige-chapter-subtitle">🔄 СБРОСИТЬ ЧЕРЕЗ ПРЕСТИЖ?</div>
+<div class="prestige-chapter-text">
+Поздравляем! Вы победили Рысь и завершили первую главу!<br><br>
+Хотите сбросить прогресс через престиж и получить бонусы к урону?
+</div>
+<div class="prestige-chapter-buttons">
+<button class="prestige-chapter-btn later" onclick="closePrestigeChapterModal()">Позже</button>
+<button class="prestige-chapter-btn prestige" onclick="doPrestigeFromModal()">🔄 Престиж</button>
+</div>
+</div>
 </div>
 
 <div id="toast" class="toast">Сообщение</div>
@@ -1417,862 +1409,1083 @@
 <script>
 // ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
 const CHARACTERS = {
-    shin: { name: 'Шин', hp: 800, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Я ШИН первый телохранитель Рыси. Меня считают самым слабым телохранителем.', achievementId: 1, order: 1 },
-    brick: { name: 'Кирпич', hp: 2500, img: 'images/brick.png', bgImg: 'backgrounds/brick.jpg', desc: 'Я КИРПИЧ второй телохранитель Рыси и член Ордена ассасинов. Ты для меня букашка.', achievementId: 2, order: 2 },
-    needle: { name: 'Игла', hp: 6500, img: 'images/needle.png', bgImg: 'backgrounds/needle.jpg', desc: 'Я ИГЛА третий телохранитель Рыси. Ты же меня не обидешь?.', achievementId: 3, order: 3 },
-    ghost: { name: 'Призрак', hp: 12000, img: 'images/ghost.png', bgImg: 'backgrounds/ghost.jpg', desc: 'Я ПРИЗРАК, четвертый телохранитель РЫСИ из ордена ассасинов.', achievementId: 4, order: 4 },
-    dandy: { name: 'Щёголь', hp: 18000, img: 'images/dandy.png', bgImg: 'backgrounds/dandy.jpg', desc: 'Я ЩЕГОЛЬ, пятый телохранитель РЫСИ. Я высокомерен и не скрываю это.', achievementId: 5, order: 5 },
-    lynx: { name: 'Рысь', hp: 350000, img: 'images/lynx.png', bgImg: 'backgrounds/lynx.jpg', desc: 'Я РЫСЬ глава Ордена ассасинов. Моя жизнь до того, как я взошёл на эту вершину — тайна.', achievementId: 6, isBoss: true, order: 6 }
+shin: { name: 'Шин', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Я ШИН первый телохранитель Рыси.', achievementId: 1, order: 1, rounds: 2 },
+brick: { name: 'Кирпич', hp: 8000, img: 'images/brick.png', bgImg: 'backgrounds/brick.jpg', desc: 'Я КИРПИЧ второй телохранитель Рыси.', achievementId: 2, order: 2, rounds: 2 },
+needle: { name: 'Игла', hp: 18000, img: 'images/needle.png', bgImg: 'backgrounds/needle.jpg', desc: 'Я ИГЛА третий телохранитель Рыси.', achievementId: 3, order: 3, rounds: 2 },
+ghost: { name: 'Призрак', hp: 35000, img: 'images/ghost.png', bgImg: 'backgrounds/ghost.jpg', desc: 'Я ПРИЗРАК, четвертый телохранитель.', achievementId: 4, order: 4, rounds: 2 },
+dandy: { name: 'Щёголь', hp: 60000, img: 'images/dandy.png', bgImg: 'backgrounds/dandy.jpg', desc: 'Я ЩЕГОЛЬ, пятый телохранитель.', achievementId: 5, order: 5, rounds: 2 },
+lynx: { name: 'Рысь', hp: 200000, img: 'images/lynx.png', bgImg: 'backgrounds/lynx.jpg', desc: 'Я РЫСЬ глава Ордена ассасинов.', achievementId: 6, isBoss: true, order: 6, rounds: 3 }
 };
-
 const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx'];
 
-// Промо коды со статистикой
 let promoCodes = {
-    'START2025': { gold: 1000, promo: 5, used: false, activations: 0 },
-    'SHADOW': { gold: 500, promo: 2, used: false, activations: 0 },
-    'FIGHT2': { gold: 2000, promo: 10, used: false, activations: 0 },
-    'WELCOME': { gold: 500, promo: 3, used: false, activations: 0 }
+'START2026': { gold: 1000, promo: 3, used: false, activations: 0 },
+'WELCOME': { gold: 1000, promo: 3, used: false, activations: 0 },
+'FIGHT298': { gold: 5000, promo: 5, used: false, activations: 0 },
+'BLACK13': { gold: 1000, promo: 1, used: false, activations: 0 },
+'SHIN99': { gold: 3000, promo: 4, used: false, activations: 0 },
+'TIKTOK202620': { gold: 500, promo: 1, used: false, activations: 0 },
+'CLIK100': { gold: 4000, promo: 4, used: false, activations: 0 },
+'SHADOW1245': { gold: 7000, promo: 6, used: false, activations: 0 },
+'100LV': { gold: 10000, promo: 10, used: false, activations: 0 },
+'ZXC90': { gold: 2500, promo: 2, used: false, activations: 0 },
+'NEWYEAR2000': { gold: 15000, promo: 15, used: false, activations: 0 },
+'LEGEND': { gold: 20000, promo: 20, used: false, activations: 0 },
+'VIP202': { gold: 5000, promo: 25, used: false, activations: 0 },
+'FREEGOLD': { gold: 3000, promo: 0, used: false, activations: 0 },
+'POWERUP': { gold: 1000, promo: 5, used: false, activations: 0 }
 };
 
-// 5 СЛОТОВ РЕКЛАМЫ С УЛУЧШЕННОЙ СТАТИСТИКОЙ
 let adSlots = [
-    { id: 1, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Смотрите рекламу и получите золото!', reward: 500, timer: 10, views: 0 },
-    { id: 2, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Бонусная реклама!', reward: 500, timer: 10, views: 0 },
-    { id: 3, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Специальное предложение!', reward: 500, timer: 10, views: 0 },
-    { id: 4, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Уникальная награда!', reward: 500, timer: 10, views: 0 },
-    { id: 5, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Последний шанс!', reward: 500, timer: 10, views: 0 }
+{ id: 1, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Смотрите рекламу и получите золото!', reward: 500, timer: 10, views: 0 }
 ];
 
-// Общая статистика
 let stats = { totalAdViews: 0, totalPromoActivations: 0 };
 let currentAdSlot = 0;
-let gameVersion = '1.0';
+let gameVersion = 'V1.0.03';
 
-const ACHIEVEMENTS = [
-    { id: 1, name: 'Победа над Шином', desc: 'Победите Шина', reward: 100 },
-    { id: 2, name: 'Громила повержен', desc: 'Победите Кирпича', reward: 250 },
-    { id: 3, name: 'Острая победа', desc: 'Победите Иглу', reward: 500 },
-    { id: 4, name: 'Охотник на призраков', desc: 'Победите Призрака', reward: 1000 },
-    { id: 5, name: 'Модный победитель', desc: 'Победите Щёголя', reward: 2000 },
-    { id: 6, name: 'ЛЕГЕНДА', desc: 'Победите Рысь', reward: 10000 },
-    { id: 7, name: 'Новичок', desc: '100 кликов', reward: 50 },
-    { id: 8, name: 'Воин', desc: '1000 кликов', reward: 200 },
-    { id: 9, name: 'Богач', desc: '10000 золота', reward: 500 },
-    { id: 10, name: 'Глава 1', desc: 'Пройдите главу 1', reward: 5000 }
+const RANKS = [
+{ level: 1, name: 'Новичок', xpRequired: 100 },
+{ level: 2, name: 'Ученик', xpRequired: 250 },
+{ level: 3, name: 'Боец', xpRequired: 500 },
+{ level: 4, name: 'Воин', xpRequired: 1000 },
+{ level: 5, name: 'Ветеран', xpRequired: 2000 },
+{ level: 6, name: 'Мастер', xpRequired: 4000 },
+{ level: 7, name: 'Эксперт', xpRequired: 7000 },
+{ level: 8, name: 'Легенда', xpRequired: 11000 },
+{ level: 9, name: 'Герой', xpRequired: 16000 },
+{ level: 10, name: 'Чемпион', xpRequired: 22000 },
+{ level: 11, name: 'Тень', xpRequired: 30000 },
+{ level: 12, name: 'Бог Войны', xpRequired: 50000 }
 ];
 
-// Награды за ежедневный вход (7 дней)
+const ACHIEVEMENTS = [
+{ id: 1, name: 'Победа над Шином', desc: 'Победите Шина', reward: 100, diamondReward: 1, current: 0, required: 1 },
+{ id: 2, name: 'Громила повержен', desc: 'Победите Кирпича', reward: 250, diamondReward: 1, current: 0, required: 1 },
+{ id: 3, name: 'Острая победа', desc: 'Победите Иглу', reward: 500, diamondReward: 1, current: 0, required: 1 },
+{ id: 4, name: 'Охотник на призраков', desc: 'Победите Призрака', reward: 1000, diamondReward: 1, current: 0, required: 1 },
+{ id: 5, name: 'Модный победитель', desc: 'Победите Щёголя', reward: 2000, diamondReward: 1, current: 0, required: 1 },
+{ id: 6, name: 'ЛЕГЕНДА', desc: 'Победите Рысь', reward: 10000, diamondReward: 1, current: 0, required: 1 },
+{ id: 7, name: 'Новичок', desc: '100 кликов', reward: 50, diamondReward: 1, current: 0, required: 100 },
+{ id: 8, name: 'Воин', desc: '1000 кликов', reward: 200, diamondReward: 1, current: 0, required: 1000 },
+{ id: 9, name: 'Богач', desc: '10000 золота', reward: 500, diamondReward: 1, current: 0, required: 10000 },
+{ id: 10, name: 'Глава 1', desc: 'Пройдите главу 1', reward: 5000, diamondReward: 1, current: 0, required: 1 },
+{ id: 11, name: 'Коллекционер', desc: '100000 золота', reward: 10000, diamondReward: 1, current: 0, required: 100000 },
+{ id: 12, name: 'Алмазный магнат', desc: '100 алмазов', reward: 5000, diamondReward: 1, current: 0, required: 100 },
+{ id: 13, name: 'Критический удар', desc: '100 критов', reward: 1000, diamondReward: 1, current: 0, required: 100 },
+{ id: 14, name: 'Непобедимый', desc: '50 побед', reward: 5000, diamondReward: 1, current: 0, required: 50 },
+{ id: 15, name: 'Уровень 10', desc: 'Достигните 10 уровня', reward: 10000, diamondReward: 1, current: 0, required: 10 },
+{ id: 16, name: 'Рекламный магнат', desc: '50 просмотров рекламы', reward: 5000, diamondReward: 1, current: 0, required: 50 },
+{ id: 17, name: 'Рулеточник', desc: '25 прокруток рулетки', reward: 3000, diamondReward: 1, current: 0, required: 25 },
+{ id: 18, name: 'Серийный боец', desc: '7 дней подряд', reward: 7000, diamondReward: 1, current: 0, required: 7 },
+{ id: 19, name: 'Первопроходец', desc: 'Первое достижение', reward: 100, diamondReward: 1, current: 0, required: 1 }
+];
+
 const DAILY_REWARDS = [
-    { day: 1, gold: 100, promo: 1, text: '🎁 День 1: +100 💰 +1 💎' },
-    { day: 2, gold: 200, promo: 2, text: '🎁 День 2: +200 💰 +2 💎' },
-    { day: 3, gold: 300, promo: 3, text: '🎁 День 3: +300 💰 +3 💎' },
-    { day: 4, gold: 500, promo: 5, text: '🎁 День 4: +500 💰 +5 💎' },
-    { day: 5, gold: 750, promo: 7, text: '🎁 День 5: +750 💰 +7 💎' },
-    { day: 6, gold: 1000, promo: 10, text: '🎁 День 6: +1000 💰 +10 💎' },
-    { day: 7, gold: 2000, promo: 20, text: '🏆 День 7: +2000 💰 +20 💎 БОНУС!' }
+{ day: 1, gold: 100, promo: 1, text: '🎁 День 1: +100 💰 +1 💎' },
+{ day: 2, gold: 200, promo: 2, text: '🎁 День 2: +200 💰 +2 💎' },
+{ day: 3, gold: 300, promo: 3, text: '🎁 День 3: +300 💰 +3 💎' },
+{ day: 4, gold: 500, promo: 5, text: '🎁 День 4: +500 💰 +5 💎' },
+{ day: 5, gold: 750, promo: 7, text: '🎁 День 5: +750 💰 +7 💎' },
+{ day: 6, gold: 1000, promo: 10, text: '🎁 День 6: +1000 💰 +10 💎' },
+{ day: 7, gold: 2000, promo: 20, text: '🏆 День 7: +2000 💰 +20 💎 БОНУС!' }
 ];
 
 const tg = window.Telegram.WebApp;
 if(tg && tg.ready) tg.expand();
 
 let game = {
-    gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200,
-    energy: 100, maxEnergy: 100, prestige: 0, clicks: 0, totalCrits: 0, day: 1,
-    lastLogin: null, lastSave: null, achievements: [], chapter1Complete: false, usedPromoCodes: [],
-    costs: { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 },
-    currentEnemy: 'shin', enemyHp: 800, musicOn: true, soundOn: true,
-    loginStreak: 0, lastLoginDate: null, claimedDaily: []
+gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200,
+energy: 100, maxEnergy: 100, prestige: 0, clicks: 0, totalCrits: 0, day: 1,
+lastLogin: null, lastSave: null, achievements: [], chapter1Complete: false, usedPromoCodes: [],
+costs: { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 },
+currentEnemy: 'shin', enemyHp: 3000, musicOn: true, soundOn: true,
+loginStreak: 0, lastLoginDate: null, claimedDaily: [],
+xp: 0, level: 1, totalWins: 0, rouletteSpins: 0,
+currentRound: 1, maxRounds: 2, enemyMaxHp: 3000,
+totalPlayTime: 0,
+autoClick: false,
+autoEnergy: false,
+freeSpinAvailable: true,
+lastFreeSpin: null
 };
 
 let autoSaveInterval, energyRegenInterval, adTimerInterval, adTimeLeft = 0;
-let countdownInterval;
+let rouletteSpinning = false;
+let lastClickTime = 0;
+const CLICK_DELAY = 150;
+let autoClickInterval = null;
 
-// ================= ИНИЦИАЛИЗАЦИЯ =================
 window.onload = function() {
-    showLoadingScreen();
+showLoadingScreen();
 };
 
 function showLoadingScreen() {
-    const loadingBar = document.getElementById('loadingBar');
-    const loadingScreen = document.getElementById('loadingScreen');
-    let progress = 0;
-    const loadInterval = setInterval(() => {
-        progress += Math.random() * 15 + 5;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(loadInterval);
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-                setTimeout(() => {
-                    loadingScreen.style.display = 'none';
-                    initGame();
-                }, 500);
-            }, 500);
-        }
-        loadingBar.style.width = progress + '%';
-    }, 200);
+const loadingBar = document.getElementById('loadingBar');
+const loadingScreen = document.getElementById('loadingScreen');
+let progress = 0;
+const loadInterval = setInterval(() => {
+progress += Math.random() * 15 + 5;
+if (progress >= 100) {
+progress = 100;
+clearInterval(loadInterval);
+setTimeout(() => {
+loadingScreen.classList.add('hidden');
+setTimeout(() => {
+loadingScreen.style.display = 'none';
+initGame();
+}, 500);
+}, 500);
+}
+loadingBar.style.width = progress + '%';
+}, 200);
 }
 
 function initGame() {
-    loadGame();
-    checkDaily();
-    checkDailyLoginReward();
-    initAudio();
-    updateUI();
-    renderDevCharSelect();
-    renderDevPromoCodes();
-    renderAdSlots();
-    renderAdSlotsStats();
-    updateVersionBadge();
-    updateDevStats();
-    updateAdPreview();
-    
-    autoSaveInterval = setInterval(() => { saveGame(true); }, 10000);
-    energyRegenInterval = setInterval(() => {
-        if(game.energy < game.maxEnergy) { game.energy++; updateUI(); }
-    }, 60000);
-    
-    setInterval(checkAchievements, 2000);
-    
-    const charContainer = document.getElementById('charContainer');
-    charContainer.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        handleAttack(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: false });
-    charContainer.addEventListener('mousedown', function(e) {
-        handleAttack(e.clientX, e.clientY);
-    });
-    
-    document.addEventListener('click', initAudio, { once: true });
-    window.addEventListener('beforeunload', () => { saveGame(true); });
+loadGame();
+checkDaily();
+checkDailyLoginReward();
+checkFreeSpin();
+initAudio();
+updateUI();
+updateLoginLog();
+renderDevCharSelect();
+updateVersionBadge();
+updatePromoShopButtons();
+startAutoClicker();
+autoSaveInterval = setInterval(() => { saveGame(true); }, 10000);
+energyRegenInterval = setInterval(() => {
+if(game.energy < game.maxEnergy) {
+game.energy++;
+if(game.energy > game.maxEnergy) game.energy = game.maxEnergy;
+updateUI();
+}
+}, 60000);
+setInterval(checkAchievements, 2000);
+setInterval(updatePlayTime, 60000);
+setInterval(autoEnergyPurchase, 5000);
+const charContainer = document.getElementById('charContainer');
+charContainer.addEventListener('touchstart', function(e) {
+e.preventDefault();
+handleAttack(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: false });
+charContainer.addEventListener('mousedown', function(e) {
+handleAttack(e.clientX, e.clientY);
+});
+document.addEventListener('click', initAudio, { once: true });
+window.addEventListener('beforeunload', () => { saveGame(true); });
 }
 
-function initAudio() {
-    const music = document.getElementById('bgMusic');
-    if (game.musicOn && music.paused) {
-        music.volume = 0.3;
-        music.play().catch(e => console.log('Audio autoplay blocked'));
-    }
+function startAutoClicker() {
+if (autoClickInterval) {
+clearInterval(autoClickInterval);
+}
+if (game.autoClick) {
+autoClickInterval = setInterval(() => {
+if (game.energy > 0) {
+handleAttack(window.innerWidth / 2, window.innerHeight / 2);
+}
+}, 1000);
+}
 }
 
-function toggleMusic() {
-    game.musicOn = !game.musicOn;
-    const music = document.getElementById('bgMusic');
-    const btn = document.getElementById('musicBtn');
-    if (game.musicOn) { music.play(); btn.innerHTML = '🎵'; showToast('🎵 Музыка включена'); }
-    else { music.pause(); btn.innerHTML = '🔇'; showToast('🔇 Музыка выключена'); }
-    saveGame();
+function updatePlayTime() {
+game.totalPlayTime++;
+updateUI();
 }
 
-function toggleSound() {
-    game.soundOn = !game.soundOn;
-    const btn = document.getElementById('soundBtn');
-    btn.innerHTML = game.soundOn ? '🔊' : '🔇';
-    showToast(game.soundOn ? '🔊 Звук включён' : '🔇 Звук выключен');
-    saveGame();
+function updateLoginLog() {
+const lastLoginEl = document.getElementById('lastLoginLog');
+const playTimeEl = document.getElementById('playTimeLog');
+if (game.lastLogin) {
+const lastLogin = new Date(game.lastLogin);
+lastLoginEl.textContent = `Последний вход: ${lastLogin.toLocaleString('ru-RU')}`;
+} else {
+lastLoginEl.textContent = 'Последний вход: Никогда';
+}
+const hours = Math.floor(game.totalPlayTime / 60);
+const mins = game.totalPlayTime % 60;
+playTimeEl.textContent = `Время в игре: ${hours}ч ${mins}мин`;
 }
 
-function playSound(soundId) {
-    if (!game.soundOn) return;
-    const sound = document.getElementById(soundId);
-    if (sound) { sound.currentTime = 0; sound.volume = 0.5; sound.play().catch(e => {}); }
+function checkFreeSpin() {
+const now = Date.now();
+const oneDay = 24 * 60 * 60 * 1000;
+if (game.lastFreeSpin && (now - game.lastFreeSpin) >= oneDay) {
+game.freeSpinAvailable = true;
+}
+const freeSpinInfo = document.getElementById('freeSpinInfo');
+if (game.freeSpinAvailable) {
+freeSpinInfo.style.display = 'block';
+freeSpinInfo.innerHTML = '🎁 Бесплатный спин доступен!';
+freeSpinInfo.style.background = 'linear-gradient(135deg, #4caf50, #45a049)';
+} else if (game.lastFreeSpin) {
+const timeLeft = oneDay - (now - game.lastFreeSpin);
+const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+freeSpinInfo.style.display = 'block';
+freeSpinInfo.innerHTML = `⏳ Бесплатный спин через: ${hours}ч ${minutes}мин`;
+freeSpinInfo.style.background = 'linear-gradient(135deg, #ff9800, #f57c00)';
+} else {
+freeSpinInfo.style.display = 'block';
+freeSpinInfo.innerHTML = '🎁 Бесплатный спин доступен!';
+}
 }
 
-// ================= ЕЖЕДНЕВНЫЕ НАГРАДЫ =================
-function checkDailyLoginReward() {
-    const today = new Date().toISOString().split('T')[0];
-    const streakDay = Math.min(game.loginStreak, 7);
-    
-    if (game.lastLoginDate !== today && !game.claimedDaily.includes(streakDay)) {
-        const reward = DAILY_REWARDS[streakDay - 1];
-        if (reward) {
-            game.gold += reward.gold;
-            game.totalGold += reward.gold;
-            game.promoCurrency += reward.promo;
-            game.claimedDaily.push(streakDay);
-            showToast(reward.text);
-            playSound('winSound');
-            updateUI();
-            saveGame();
-        }
-    }
+function useFreeSpin() {
+if (!game.freeSpinAvailable) {
+return false;
+}
+game.freeSpinAvailable = false;
+game.lastFreeSpin = Date.now();
+checkFreeSpin();
+saveGame();
+return true;
 }
 
-// ================= БОЕВАЯ СИСТЕМА =================
 function handleAttack(x, y) {
-    if (game.energy <= 0) { showToast('⚡ Нет энергии! Купите в магазине'); return; }
-    game.energy--; game.clicks++; playSound('clickSound');
-    let dmg = game.damage * (1 + (game.prestige * 0.1));
-    let isCrit = Math.random() * 100 < game.critChance;
-    if (isCrit) {
-        dmg = Math.floor(dmg * (game.critDamage / 100));
-        game.totalCrits++;
-        showDamage(x, y, `CRIT ${dmg}!`, true);
-        playSound('critSound');
-    } else {
-        showDamage(x, y, dmg, false);
-    }
-    const img = document.getElementById('charImg');
-    img.classList.remove('hit'); void img.offsetWidth; img.classList.add('hit');
-    game.enemyHp -= dmg;
-    if (game.enemyHp < 0) game.enemyHp = 0;
-    let goldGain = Math.floor(dmg / 3);
-    game.gold += goldGain; game.totalGold += goldGain;
-    if (game.enemyHp <= 0) { enemyDefeated(); }
-    updateUI();
+const now = Date.now();
+if (now - lastClickTime < CLICK_DELAY) {
+return;
+}
+lastClickTime = now;
+if (game.energy <= 0) {
+if (game.autoEnergy && game.gold >= 100) {
+buyEnergy();
+} else {
+showToast('⚡ Нет энергии! Купите в магазине');
+}
+return;
+}
+game.energy--;
+game.clicks++;
+playSound('clickSound');
+const char = CHARACTERS[game.currentEnemy];
+let dmg = game.damage * (1 + (game.prestige * 0.1));
+let isCrit = Math.random() * 100 < game.critChance;
+if (isCrit) {
+dmg = Math.floor(dmg * (game.critDamage / 100));
+game.totalCrits++;
+showDamage(x, y, `CRIT ${dmg}!`, true);
+playSound('critSound');
+const img = document.getElementById('charImg');
+img.classList.remove('hit', 'crit-hit');
+void img.offsetWidth;
+img.classList.add('crit-hit');
+} else {
+showDamage(x, y, dmg, false);
+playSound('clickSound');
+const img = document.getElementById('charImg');
+img.classList.remove('hit', 'crit-hit');
+void img.offsetWidth;
+img.classList.add('hit');
+}
+game.enemyHp -= dmg;
+if (game.enemyHp < 0) game.enemyHp = 0;
+let goldGain = Math.floor(dmg / 3);
+game.gold += goldGain;
+game.totalGold += goldGain;
+addXP(1);
+updateAchievementProgress(7, game.clicks);
+updateAchievementProgress(8, game.clicks);
+updateAchievementProgress(9, game.totalGold);
+updateAchievementProgress(11, game.totalGold);
+updateAchievementProgress(13, game.totalCrits);
+if (game.enemyHp <= 0) {
+enemyDefeated();
+}
+updateUI();
+}
+
+function autoEnergyPurchase() {
+if (game.autoEnergy && game.energy <= 10 && game.gold >= 100) {
+buyEnergy();
+showToast('⚡ Авто-покупка энергии!');
+}
 }
 
 function enemyDefeated() {
-    // Убрано зацикливание звука - playSound вызывается только один раз
-    const char = CHARACTERS[game.currentEnemy];
-    let bonus = Math.floor(char.hp / 20);
-    game.gold += bonus; game.totalGold += bonus;
-    showToast(`💀 ${char.name} повержен! +${bonus} 💰`);
-    
-    if (!game.achievements.includes(char.achievementId)) {
-        game.achievements.push(char.achievementId);
-        const ach = ACHIEVEMENTS.find(a => a.id === char.achievementId);
-        game.gold += ach.reward;
-        showToast(`🏆 ${ach.name}!`);
-    }
-    
-    // ПОКАЗЫВАЕМ ЭКРАН ПОБЕДЫ
-    setTimeout(() => {
-        showVictoryScreen(char.name);
-    }, 500);
+const char = CHARACTERS[game.currentEnemy];
+let bonus = Math.floor(char.hp / 20);
+game.gold += bonus;
+game.totalGold += bonus;
+showToast(`💀 ${char.name} повержен! +${bonus} 💰`);
+if (!game.achievements.includes(char.achievementId)) {
+game.achievements.push(char.achievementId);
+const ach = ACHIEVEMENTS.find(a => a.id === char.achievementId);
+if (ach) {
+game.gold += ach.reward;
+game.promoCurrency += ach.diamondReward;
+showToast(`🏆 ${ach.name}! +${ach.reward} 💰 +${ach.diamondReward} 💎`);
+updateAchievementProgress(char.achievementId, 1);
+}
+}
+game.totalWins++;
+updateAchievementProgress(14, game.totalWins);
+setTimeout(() => {
+showVictoryScreen(char.name);
+}, 500);
 }
 
-// ЭКРАН ПОБЕДЫ
 function showVictoryScreen(enemyName) {
-    const victoryScreen = document.getElementById('victoryScreen');
-    const victoryEnemyName = document.getElementById('victoryEnemyName');
-    
-    victoryEnemyName.textContent = `${enemyName} повержен`;
-    victoryScreen.classList.add('active');
-    
-    // Через 2 секунды показываем обратный отсчёт
-    setTimeout(() => {
-        victoryScreen.classList.remove('active');
-        nextEnemyWithCountdown();
-    }, 2000);
+const victoryScreen = document.getElementById('victoryScreen');
+const victoryEnemyName = document.getElementById('victoryEnemyName');
+const victoryNextBtn = document.getElementById('victoryNextBtn');
+victoryEnemyName.textContent = `${enemyName} повержен`;
+victoryScreen.classList.add('active');
+// Кнопка уже есть в HTML, просто показываем экран
 }
 
-// ОБРАТНЫЙ ОТСЧЁТ 3-2-1-0-FIGHT! С КНОПКОЙ
-function nextEnemyWithCountdown() {
-    let currentIndex = CHARACTER_ORDER.indexOf(game.currentEnemy);
-    
-    if (currentIndex < CHARACTER_ORDER.length - 1) {
-        const nextEnemyKey = CHARACTER_ORDER[currentIndex + 1];
-        const nextChar = CHARACTERS[nextEnemyKey];
-        
-        // Запускаем обратный отсчёт 3-2-1-0-FIGHT!
-        showCountdown(() => {
-            // После отсчёта показываем кнопку FIGHT!
-            const countdownScreen = document.getElementById('countdownScreen');
-            const countdownNumber = document.getElementById('countdownNumber');
-            const countdownText = document.getElementById('countdownText');
-            const fightButton = document.getElementById('fightButton');
-            
-            countdownNumber.textContent = '⚔️';
-            countdownText.textContent = 'Готов к бою?';
-            fightButton.classList.add('active');
-            
-            // Сохраняем следующего врага для кнопки FIGHT
-            window.nextEnemyData = {
-                key: nextEnemyKey,
-                char: nextChar
-            };
-        });
-    } else {
-        // Глава пройдена
-        if (!game.chapter1Complete) {
-            game.chapter1Complete = true;
-            if (!game.achievements.includes(10)) {
-                game.achievements.push(10);
-                game.gold += 5000;
-                setTimeout(() => {
-                    document.getElementById('prestigeChapterModal').classList.add('active');
-                }, 1000);
-            }
-        }
-        showToast('🏆 Глава 1 пройдена! Заново...');
-        setTimeout(() => {
-            game.currentEnemy = 'shin';
-            game.enemyHp = CHARACTERS.shin.hp;
-            document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
-            updateCharacterDisplay();
-            updateUI();
-        }, 2000);
-    }
+function goToNextEnemy() {
+document.getElementById('victoryScreen').classList.remove('active');
+nextEnemy();
 }
 
-// ФУНКЦИЯ ОБРАТНОГО ОТСЧЁТА 3-2-1-0-FIGHT!
-function showCountdown(callback) {
-    const countdownScreen = document.getElementById('countdownScreen');
-    const countdownNumber = document.getElementById('countdownNumber');
-    const countdownText = document.getElementById('countdownText');
-    const fightButton = document.getElementById('fightButton');
-    
-    // Скрываем кнопку FIGHT в начале
-    fightButton.classList.remove('active');
-    
-    let count = 3;
-    
-    countdownScreen.classList.add('active');
-    countdownNumber.textContent = count;
-    countdownText.textContent = 'Следующий противник';
-    countdownNumber.style.animation = 'none';
-    void countdownNumber.offsetWidth;
-    countdownNumber.style.animation = 'countdownPop 1s ease-in-out';
-    
-    countdownInterval = setInterval(() => {
-        count--;
-        if (count >= 0) {
-            countdownNumber.textContent = count;
-            countdownNumber.style.animation = 'none';
-            void countdownNumber.offsetWidth;
-            countdownNumber.style.animation = 'countdownPop 1s ease-in-out';
-        } else {
-            clearInterval(countdownInterval);
-            if (callback) callback();
-        }
-    }, 1000);
+function nextEnemy() {
+let currentIndex = CHARACTER_ORDER.indexOf(game.currentEnemy);
+const char = CHARACTERS[game.currentEnemy];
+// Проверка на следующий раунд ТОГО ЖЕ персонажа
+if (game.currentRound < char.rounds) {
+game.currentRound++;
+game.enemyHp = char.hp;
+game.enemyMaxHp = char.hp;
+updateRoundInfo();
+updateCharacterDisplay();
+updateUI();
+saveGame();
+showToast(`⚔️ Раунд ${game.currentRound} из ${char.rounds}`);
+}
+// Переход к СЛЕДУЮЩЕМУ персонажу по порядку
+else if (currentIndex < CHARACTER_ORDER.length - 1) {
+const nextEnemyKey = CHARACTER_ORDER[currentIndex + 1];
+const nextChar = CHARACTERS[nextEnemyKey];
+game.currentEnemy = nextEnemyKey;
+game.currentRound = 1;
+game.maxRounds = nextChar.rounds;
+game.enemyHp = nextChar.hp;
+game.enemyMaxHp = nextChar.hp;
+document.body.style.backgroundImage = `url('${nextChar.bgImg}')`;
+updateRoundInfo();
+updateCharacterDisplay();
+showToast(`⚔️ Новый противник: ${nextChar.name}!`);
+updateUI();
+saveGame();
+}
+// Глава пройдена - после Рыси
+else {
+if (!game.chapter1Complete) {
+game.chapter1Complete = true;
+if (!game.achievements.includes(10)) {
+game.achievements.push(10);
+const ach = ACHIEVEMENTS.find(a => a.id === 10);
+game.gold += ach.reward;
+game.promoCurrency += ach.diamondReward;
+updateAchievementProgress(10, 1);
+setTimeout(() => {
+document.getElementById('prestigeChapterModal').classList.add('active');
+}, 1000);
+}
+}
+showToast('🏆 Глава 1 пройдена! Заново...');
+setTimeout(() => {
+game.currentEnemy = 'shin';
+game.currentRound = 1;
+game.maxRounds = 2;
+game.enemyHp = CHARACTERS.shin.hp;
+game.enemyMaxHp = CHARACTERS.shin.hp;
+document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
+updateCharacterDisplay();
+updateUI();
+}, 2000);
+}
+updateUI();
+saveGame();
 }
 
-// КНОПКА FIGHT! - НАЧАЛО БОЯ
-function startFight() {
-    const countdownScreen = document.getElementById('countdownScreen');
-    const fightButton = document.getElementById('fightButton');
-    
-    // Воспроизводим звук FIGHT
-    playSound('fightSound');
-    
-    // Скрываем экран отсчёта
-    countdownScreen.classList.remove('active');
-    fightButton.classList.remove('active');
-    
-    // Показываем следующего врага
-    if (window.nextEnemyData) {
-        playSound('transitionSound');
-        game.currentEnemy = window.nextEnemyData.key;
-        game.enemyHp = window.nextEnemyData.char.hp;
-        document.body.style.backgroundImage = `url('${window.nextEnemyData.char.bgImg}')`;
-        updateCharacterDisplay();
-        showToast(`⚔️ Новый противник: ${window.nextEnemyData.char.name}!`);
-        updateUI();
-        saveGame();
-        
-        // Очищаем данные
-        window.nextEnemyData = null;
-    }
+function updateRoundInfo() {
+const char = CHARACTERS[game.currentEnemy];
+document.getElementById('roundInfo').textContent = `Раунд ${game.currentRound} из ${char.rounds}`;
 }
 
-// ================= РЕКЛАМНАЯ СИСТЕМА (AdsGram) =================
-// Замените функцию watchAd() на эту:
-function watchAd() {
-    // Показываем AdsGram рекламу
-    if (typeof AdsGram !== 'undefined') {
-        AdsGram.showAd({
-            blockId: '23249', // Замените на ваш ID
-            onSuccess: function() {
-                // Игрок посмотрел рекламу - даём награду
-                const ad = adSlots[currentAdSlot];
-                game.gold += ad.reward;
-                game.totalGold += ad.reward;
-                ad.views++;
-                stats.totalAdViews++;
-                showToast(`📺 +${ad.reward} 💰 за просмотр рекламы!`);
-                playSound('winSound');
-                currentAdSlot = (currentAdSlot + 1) % 5;
-                updateUI();
-                updateDevStats();
-                saveGame();
-            },
-            onError: function(error) {
-                console.log('Ad error:', error);
-                showToast('❌ Ошибка загрузки рекламы');
-            }
-        });
-    } else {
-        // Fallback для тестирования без AdsGram
-        showToast('🧪 Тестовая реклама (нет AdsGram)');
-        setTimeout(() => {
-            const ad = adSlots[currentAdSlot];
-            game.gold += ad.reward;
-            game.totalGold += ad.reward;
-            showToast(`📺 +${ad.reward} 💰`);
-            currentAdSlot = (currentAdSlot + 1) % 5;
-            updateUI();
-            saveGame();
-        }, 3000);
-    }
+function spinRoulette() {
+if (rouletteSpinning) return;
+let cost = 3;
+let isFree = false;
+if (game.freeSpinAvailable) {
+if (!confirm('Использовать бесплатный спин?')) {
+if (game.promoCurrency < cost) {
+showToast('❌ Недостаточно алмазов! Нужно 3 💎');
+return;
+}
+} else {
+isFree = true;
+useFreeSpin();
+}
+} else if (game.promoCurrency < cost) {
+showToast('❌ Недостаточно алмазов! Нужно 3 💎');
+return;
+}
+if (!isFree) {
+game.promoCurrency -= cost;
+}
+game.rouletteSpins++;
+updateAchievementProgress(17, game.rouletteSpins);
+rouletteSpinning = true;
+document.getElementById('rouletteBtn').disabled = true;
+const reels = [
+document.getElementById('reel1'),
+document.getElementById('reel2'),
+document.getElementById('reel3')
+];
+reels.forEach(reel => reel.classList.add('spinning'));
+let spinInterval = setInterval(() => {
+reels.forEach(reel => {
+reel.textContent = ['🍒', '🍋', '🍇', '💎', '7️⃣', '⚔️'][Math.floor(Math.random() * 6)];
+});
+}, 100);
+setTimeout(() => {
+clearInterval(spinInterval);
+reels.forEach(reel => reel.classList.remove('spinning'));
+const rand = Math.random() * 100;
+let result;
+if (rand < 50) {
+result = 'gold';
+} else if (rand < 75) {
+result = 'upgrade';
+} else if (rand < 95) {
+result = 'gold_diamond';
+} else {
+result = 'jackpot';
+}
+const results = getResultByType(result);
+reels[0].textContent = results[0];
+reels[1].textContent = results[1];
+reels[2].textContent = results[2];
+checkWin(results, result);
+rouletteSpinning = false;
+document.getElementById('rouletteBtn').disabled = false;
+updateUI();
+saveGame();
+}, 3000);
 }
 
-function closeAd() {
-    clearInterval(adTimerInterval);
-    document.getElementById('adModal').classList.remove('active');
-    const ad = adSlots[currentAdSlot];
-    ad.views++;
-    stats.totalAdViews++;
-    game.gold += ad.reward;
-    game.totalGold += ad.reward;
-    showToast(`📺 +${ad.reward} 💰`);
-    playSound('winSound');
-    currentAdSlot = (currentAdSlot + 1) % 5;
-    document.getElementById('currentAdSlot').textContent = currentAdSlot + 1;
-    updateUI();
-    updateDevStats();
-    updateAdPreview();
-    saveGame();
+function getResultByType(type) {
+switch(type) {
+case 'gold':
+return ['🍒', '🍒', '🍋'];
+case 'upgrade':
+return ['⚔️', '⚔️', '🍇'];
+case 'gold_diamond':
+return ['💎', '💎', '🍇'];
+case 'jackpot':
+return ['7️⃣', '7️⃣', '7️⃣'];
+default:
+return ['🍒', '🍋', '🍇'];
+}
 }
 
-function testAd() {
-    watchAd();
+function checkWin(results, resultType) {
+const resultEl = document.getElementById('rouletteResult');
+if (resultType === 'gold') {
+const amount = Math.floor(Math.random() * 500) + 500;
+game.gold += amount;
+resultEl.textContent = `💰 Золото: +${amount} 💰`;
+} else if (resultType === 'upgrade') {
+const upgrades = ['damage', 'critChance', 'critDamage', 'maxEnergy'];
+const randomUpgrade = upgrades[Math.floor(Math.random() * upgrades.length)];
+buyUpgrade(randomUpgrade, true);
+resultEl.textContent = '⚔️ Случайное улучшение!';
+} else if (resultType === 'gold_diamond') {
+const gold = Math.floor(Math.random() * 1000) + 1000;
+const diamonds = Math.floor(Math.random() * 3) + 1;
+game.gold += gold;
+game.promoCurrency += diamonds;
+resultEl.textContent = `💰💎 +${gold} 💰 +${diamonds} 💎`;
+} else if (resultType === 'jackpot') {
+game.gold += 10000;
+game.promoCurrency += 20;
+resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!';
+}
+addXP(10);
+updateUI();
 }
 
-function saveAdConfig() {
-    const slot = adSlots[currentAdSlot];
-    slot.imageUrl = document.getElementById('adImageUrl').value.trim();
-    slot.videoUrl = document.getElementById('adVideoUrl').value.trim();
-    slot.linkUrl = document.getElementById('adLinkUrl').value.trim();
-    slot.text = document.getElementById('adTextContent').value.trim() || 'Смотрите рекламу и получите золото!';
-    slot.reward = Math.max(100, parseInt(document.getElementById('adReward').value) || 500);
-    slot.timer = Math.max(10, parseInt(document.getElementById('adTimer').value) || 10);
-    
-    localStorage.setItem('sf2_adSlots', JSON.stringify(adSlots));
-    showToast(`✅ Реклама слота ${currentAdSlot + 1} сохранена!`);
-    renderAdSlots();
-    renderAdSlotsStats();
-    updateAdPreview();
-    updateUI();
-    saveGame();
-}
-
-function loadAdConfig() {
-    const saved = localStorage.getItem('sf2_adSlots');
-    if (saved) adSlots = JSON.parse(saved);
-    renderAdSlots();
-    renderAdSlotsStats();
-    updateAdPreview();
-}
-
-function renderAdSlots() {
-    const container = document.getElementById('adSlotsList');
-    if (!container) return;
-    
-    for (let i = 0; i < 5; i++) {
-        const btn = document.getElementById(`slotBtn${i}`);
-        if (btn) {
-            btn.style.background = i === currentAdSlot ? 'var(--dev-accent)' : 'var(--green)';
-        }
-    }
-    
-    document.getElementById('currentAdSlot').textContent = currentAdSlot + 1;
-}
-
-function renderAdSlotsStats() {
-    const container = document.getElementById('adSlotsStatsList');
-    if (!container) return;
-    container.innerHTML = '';
-    
-    adSlots.forEach((slot, index) => {
-        const div = document.createElement('div');
-        div.className = 'ad-slot-stat';
-        div.innerHTML = `
-            <div style="flex: 1;">
-                <div style="font-weight: bold; color: var(--dev-accent);">Слот ${index + 1}</div>
-                <div style="font-size: 10px; color: #aaa;">${slot.timer}с | ${slot.reward} 💰</div>
-            </div>
-            <div style="text-align: right;">
-                <div style="font-weight: bold;">${slot.views}</div>
-                <div style="font-size: 10px; color: #aaa;">просмотров</div>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-}
-
-function selectAdSlot(index) {
-    currentAdSlot = index;
-    const slot = adSlots[index];
-    document.getElementById('adImageUrl').value = slot.imageUrl;
-    document.getElementById('adVideoUrl').value = slot.videoUrl;
-    document.getElementById('adLinkUrl').value = slot.linkUrl;
-    document.getElementById('adTextContent').value = slot.text;
-    document.getElementById('adReward').value = slot.reward;
-    document.getElementById('adTimer').value = Math.max(10, slot.timer);
-    
-    renderAdSlots();
-    updateAdPreview();
-    showToast(`📝 Выбран слот ${index + 1}`);
-}
-
-function updateAdPreview() {
-    const slot = adSlots[currentAdSlot];
-    
-    document.getElementById('previewSlotNum').textContent = currentAdSlot + 1;
-    document.getElementById('previewImage').textContent = slot.imageUrl ? '✅ Задана' : '❌ Не задана';
-    document.getElementById('previewImage').style.color = slot.imageUrl ? '#4caf50' : '#f44336';
-    
-    document.getElementById('previewVideo').textContent = slot.videoUrl ? '✅ Задано' : '❌ Не задано';
-    document.getElementById('previewVideo').style.color = slot.videoUrl ? '#4caf50' : '#f44336';
-    
-    document.getElementById('previewLink').textContent = slot.linkUrl ? '✅ Задана' : '❌ Не задана';
-    document.getElementById('previewLink').style.color = slot.linkUrl ? '#4caf50' : '#f44336';
-    
-    document.getElementById('previewText').textContent = slot.text || 'Не задан';
-    document.getElementById('previewReward').textContent = `${slot.reward} 💰`;
-    document.getElementById('previewTimer').textContent = `${Math.max(10, slot.timer)} сек`;
-    document.getElementById('previewViews').textContent = slot.views;
-}
-
-// ================= СТАТИСТИКА В МЕНЮ РАЗРАБОТЧИКА =================
-function updateDevStats() {
-    document.getElementById('totalAdViews').textContent = stats.totalAdViews;
-    let totalPromo = 0;
-    Object.values(promoCodes).forEach(code => { totalPromo += code.activations; });
-    document.getElementById('totalPromoActivations').textContent = totalPromo;
-    renderAdSlotsStats();
-}
-
-// ================= ВЕРСИЯ ИГРЫ =================
-function saveVersion() {
-    gameVersion = document.getElementById('devVersionInput').value || '1.0';
-    localStorage.setItem('sf2_version', gameVersion);
-    updateVersionBadge();
-    showToast(`✅ Версия ${gameVersion} сохранена!`);
-    saveGame();
-}
-
-function updateVersionBadge() {
-    const saved = localStorage.getItem('sf2_version');
-    if (saved) { gameVersion = saved; document.getElementById('devVersionInput').value = gameVersion; }
-    document.getElementById('versionBadge').textContent = `v${gameVersion}`;
-}
-
-// ================= МОДАЛЬНОЕ ОКНО ПРЕСТИЖА =================
-function closePrestigeChapterModal() { document.getElementById('prestigeChapterModal').classList.remove('active'); }
-function doPrestigeFromModal() { closePrestigeChapterModal(); doPrestige(); }
-
-// ================= МАГАЗИН =================
 function buyEnergy() {
-    if (game.gold >= 100) {
-        game.gold -= 100; game.energy = Math.min(game.energy + 50, game.maxEnergy);
-        showToast('⚡ +50 Энергии!'); playSound('clickSound'); updateUI(); saveGame();
-    } else { showToast('❌ Недостаточно золота'); }
+if (game.gold >= 100) {
+game.gold -= 100;
+game.energy = Math.min(game.energy + 50, game.maxEnergy);
+showToast('⚡ +50 Энергии!');
+playSound('clickSound');
+updateUI();
+saveGame();
+} else {
+showToast('❌ Недостаточно золота');
+}
 }
 
 function updateCharacterDisplay() {
-    const char = CHARACTERS[game.currentEnemy];
-    document.getElementById('charImg').src = char.img;
-    document.getElementById('charDesc').textContent = char.desc;
-    document.getElementById('charImg').onerror = function() {
-        this.style.display = 'none';
-        const container = document.getElementById('charContainer');
-        container.style.background = 'rgba(0,0,0,0.6)';
-        container.style.border = '3px solid #fff';
-        container.innerHTML = `<div style="color:#fff; text-align:center; padding: 20px;"><div style="font-size: 24px; font-weight: bold;">${char.name}</div><div style="font-size: 12px; color: #aaa;">(Нет картинки)</div></div>`;
-    };
+const char = CHARACTERS[game.currentEnemy];
+document.getElementById('charImg').src = char.img;
+document.getElementById('charDesc').textContent = char.desc;
+document.getElementById('charImg').onerror = function() {
+this.style.display = 'none';
+const container = document.getElementById('charContainer');
+container.style.background = 'rgba(0,0,0,0.6)';
+container.style.border = '3px solid #fff';
+container.innerHTML = `<div style="color:#fff; text-align:center; padding: 20px;"><div style="font-size: 24px; font-weight: bold;">${char.name}</div></div>`;
+};
 }
 
-function buyUpgrade(type) {
-    let cost = game.costs[type];
-    if (game.gold >= cost) {
-        game.gold -= cost;
-        if (type === 'damage') game.damage++;
-        if (type === 'critChance') game.critChance = Math.min(game.critChance + 1, 50);
-        if (type === 'critDamage') game.critDamage += 10;
-        if (type === 'maxEnergy') { game.maxEnergy += 10; game.energy = game.maxEnergy; }
-        game.costs[type] = Math.floor(cost * 1.6);
-        showToast('✅ Улучшено!'); playSound('clickSound'); updateUI(); saveGame();
-    } else { showToast('❌ Недостаточно золота'); }
+function buyUpgrade(type, free = false) {
+let cost = game.costs[type];
+if (free || game.gold >= cost) {
+if (!free) game.gold -= cost;
+if (type === 'damage') game.damage++;
+if (type === 'critChance') game.critChance = Math.min(game.critChance + 1, 50);
+if (type === 'critDamage') game.critDamage += 10;
+if (type === 'maxEnergy') { game.maxEnergy += 10; game.energy = game.maxEnergy; }
+if (!free) {
+game.costs[type] = Math.floor(cost * 1.6);
+}
+showToast('✅ Улучшено!');
+playSound('clickSound');
+updateUI();
+saveGame();
+} else {
+showToast('❌ Недостаточно золота');
+}
 }
 
-// ================= ПРОМО КОДЫ =================
 function activatePromoCode() {
-    const input = document.getElementById('promoCodeInput');
-    const code = input.value.trim().toUpperCase();
-    if (!code) { showToast('❌ Введите код!'); return; }
-    if (game.usedPromoCodes.includes(code)) { showToast('❌ Код уже использован!'); return; }
-    if (promoCodes[code]) {
-        const promo = promoCodes[code];
-        game.gold += promo.gold; game.totalGold += promo.gold; game.promoCurrency += promo.promo;
-        game.usedPromoCodes.push(code);
-        promo.activations++; stats.totalPromoActivations++;
-        showToast(`🎁 Код активирован! +${promo.gold} 💰 +${promo.promo} 💎`);
-        playSound('winSound'); input.value = ''; updateUI(); updateDevStats(); renderDevPromoCodes(); saveGame();
-    } else { showToast('❌ Неверный код!'); }
+const input = document.getElementById('promoCodeInput');
+const code = input.value.trim().toUpperCase();
+if (!code) { showToast('❌ Введите код!'); return; }
+if (game.usedPromoCodes.includes(code)) { showToast('❌ Код уже использован!'); return; }
+if (promoCodes[code]) {
+const promo = promoCodes[code];
+game.gold += promo.gold;
+game.totalGold += promo.gold;
+game.promoCurrency += promo.promo;
+game.usedPromoCodes.push(code);
+promo.activations++;
+stats.totalPromoActivations++;
+showToast(`🎁 Код активирован! +${promo.gold} 💰 +${promo.promo} 💎`);
+playSound('winSound');
+input.value = '';
+updateUI();
+saveGame();
+} else {
+showToast('❌ Неверный код!');
+}
 }
 
 function buyPromoItem(item) {
-    const items = { 'gold1000': { cost: 5, gold: 1000 }, 'gold5000': { cost: 20, gold: 5000 }, 'energy': { cost: 3, energy: 100 }, 'damage5': { cost: 10, damage: 5 } };
-    const purchase = items[item];
-    if (!purchase) return;
-    if (game.promoCurrency >= purchase.cost) {
-        game.promoCurrency -= purchase.cost;
-        if (purchase.gold) { game.gold += purchase.gold; game.totalGold += purchase.gold; }
-        if (purchase.energy) { game.energy = game.maxEnergy; }
-        if (purchase.damage) { game.damage += purchase.damage; }
-        showToast('✅ Покупка успешна!'); playSound('winSound'); updateUI(); saveGame();
-    } else { showToast('❌ Недостаточно промо валюты!'); }
+const items = {
+'gold1000': { cost: 5, gold: 1000 },
+'gold5000': { cost: 20, gold: 5000 },
+'energy': { cost: 3, energy: 100 },
+'damage5': { cost: 10, damage: 5 },
+'crit5': { cost: 15, critChance: 5 },
+'critDmg50': { cost: 25, critDamage: 50 },
+'autoclick': { cost: 100, autoClick: true, oneTime: true },
+'autoenergy': { cost: 50, autoEnergy: true, oneTime: true }
+};
+const purchase = items[item];
+if (!purchase) return;
+if (purchase.oneTime) {
+if (purchase.autoClick && game.autoClick) {
+showToast('❌ Уже куплено!');
+return;
+}
+if (purchase.autoEnergy && game.autoEnergy) {
+showToast('❌ Уже куплено!');
+return;
+}
+}
+if (game.promoCurrency >= purchase.cost) {
+game.promoCurrency -= purchase.cost;
+if (purchase.gold) { game.gold += purchase.gold; game.totalGold += purchase.gold; }
+if (purchase.energy) { game.energy = game.maxEnergy; }
+if (purchase.damage) { game.damage += purchase.damage; }
+if (purchase.critChance) { game.critChance = Math.min(game.critChance + purchase.critChance, 50); }
+if (purchase.critDamage) { game.critDamage += purchase.critDamage; }
+if (purchase.autoClick) {
+game.autoClick = true;
+startAutoClicker();
+}
+if (purchase.autoEnergy) { game.autoEnergy = true; }
+showToast('✅ Покупка успешна!');
+playSound('winSound');
+updateUI();
+updatePromoShopButtons();
+saveGame();
+} else {
+showToast('❌ Недостаточно промо валюты!');
+}
 }
 
-// ================= МЕНЮ РАЗРАБОТЧИКА =================
+function updatePromoShopButtons() {
+const btnAutoClick = document.getElementById('btnAutoClick');
+const btnAutoEnergy = document.getElementById('btnAutoEnergy');
+if (btnAutoClick) {
+if (game.autoClick) {
+btnAutoClick.classList.add('purchased');
+btnAutoClick.textContent = 'Куплено ✓';
+btnAutoClick.disabled = true;
+}
+}
+if (btnAutoEnergy) {
+if (game.autoEnergy) {
+btnAutoEnergy.classList.add('purchased');
+btnAutoEnergy.textContent = 'Куплено ✓';
+btnAutoEnergy.disabled = true;
+}
+}
+}
+
 function openDevMenu() { document.getElementById('devPasswordModal').style.display = 'flex'; }
 function closeDevPasswordModal() { document.getElementById('devPasswordModal').style.display = 'none'; document.getElementById('devPasswordInput').value = ''; }
-
 function checkDevPassword() {
-    const password = document.getElementById('devPasswordInput').value;
-    if (password === '159000a') {
-        closeDevPasswordModal();
-        switchScreen('dev', document.querySelectorAll('.nav-btn')[0]);
-        renderDevCharSelect();
-        renderDevPromoCodes();
-        renderAdSlots();
-        renderAdSlotsStats();
-        updateDevStats();
-        updateAdPreview();
-        showToast('🔧 Меню разработчика открыто');
-    } else { showToast('❌ Неверный пароль!'); document.getElementById('devPasswordInput').value = ''; }
+const password = document.getElementById('devPasswordInput').value;
+if (password === '159000a') {
+closeDevPasswordModal();
+switchScreen('dev', document.querySelectorAll('.nav-btn')[0]);
+renderDevCharSelect();
+showToast('🔧 Меню разработчика открыто');
+} else { showToast('❌ Неверный пароль!'); document.getElementById('devPasswordInput').value = ''; }
 }
-
 function closeDevMenu() { switchScreen('battle', document.querySelectorAll('.nav-btn')[0]); }
-
 function renderDevCharSelect() {
-    const container = document.getElementById('devCharSelect');
-    container.innerHTML = '';
-    CHARACTER_ORDER.forEach(key => {
-        const char = CHARACTERS[key];
-        const btn = document.createElement('button');
-        btn.className = `char-select-btn ${game.currentEnemy === key ? 'active' : ''}`;
-        btn.textContent = char.name;
-        btn.onclick = () => devSelectCharacter(key);
-        container.appendChild(btn);
-    });
+const container = document.getElementById('devCharSelect');
+container.innerHTML = '';
+CHARACTER_ORDER.forEach(key => {
+const char = CHARACTERS[key];
+const btn = document.createElement('button');
+btn.className = `char-select-btn ${game.currentEnemy === key ? 'active' : ''}`;
+btn.textContent = char.name;
+btn.onclick = () => devSelectCharacter(key);
+container.appendChild(btn);
+});
 }
-
 function devSelectCharacter(key) {
-    game.currentEnemy = key; game.enemyHp = CHARACTERS[key].hp;
-    document.body.style.backgroundImage = `url('${CHARACTERS[key].bgImg}')`;
-    updateCharacterDisplay(); renderDevCharSelect(); updateUI();
-    showToast(`👤 Персонаж: ${CHARACTERS[key].name}`); saveGame();
+game.currentEnemy = key;
+game.currentRound = 1;
+game.enemyHp = CHARACTERS[key].hp;
+game.enemyMaxHp = CHARACTERS[key].hp;
+document.body.style.backgroundImage = `url('${CHARACTERS[key].bgImg}')`;
+updateCharacterDisplay();
+renderDevCharSelect();
+updateUI();
+showToast(`👤 Персонаж: ${CHARACTERS[key].name}`);
+saveGame();
 }
-
 function devAddGold() {
-    const input = document.getElementById('devGoldInput');
-    const amount = parseInt(input.value);
-    if (amount > 0) {
-        game.gold += amount; game.totalGold += amount;
-        showToast(`💰 Добавлено ${amount} золота`); input.value = ''; updateUI(); saveGame();
-    }
+const input = document.getElementById('devGoldInput');
+const amount = parseInt(input.value);
+if (amount > 0) {
+game.gold += amount;
+game.totalGold += amount;
+showToast(`💰 Добавлено ${amount} золота`);
+input.value = '';
+updateUI();
+saveGame();
+}
+}
+function devAddDiamonds() {
+const input = document.getElementById('devDiamondInput');
+const amount = parseInt(input.value);
+if (amount > 0) {
+game.promoCurrency += amount;
+showToast(`💎 Добавлено ${amount} алмазов`);
+input.value = '';
+updateUI();
+saveGame();
+}
+}
+function addXP(amount) {
+game.xp += amount;
+const nextRank = RANKS.find(r => r.level === game.level + 1);
+if (nextRank && game.xp >= nextRank.xpRequired) {
+game.level++;
+game.xp = 0;
+showToast(`⭐ Уровень повышен! Теперь вы ${RANKS.find(r => r.level === game.level)?.name || 'Бог Войны'}!`);
+playSound('winSound');
+updateAchievementProgress(15, game.level);
+}
+updateUI();
+saveGame();
 }
 
-function devCreatePromoCode() {
-    const nameInput = document.getElementById('devPromoCodeName');
-    const rewardGoldInput = document.getElementById('devPromoCodeReward');
-    const rewardPromoInput = document.getElementById('devPromoCodePromo');
-    const name = nameInput.value.trim().toUpperCase();
-    const gold = parseInt(rewardGoldInput.value) || 0;
-    const promo = parseInt(rewardPromoInput.value) || 0;
-    if (name && (gold > 0 || promo > 0)) {
-        promoCodes[name] = { gold, promo, used: false, activations: 0 };
-        showToast(`🎁 Промо код ${name} создан!`);
-        nameInput.value = ''; rewardGoldInput.value = ''; rewardPromoInput.value = '';
-        renderDevPromoCodes(); saveGame();
-    } else { showToast('❌ Заполните все поля!'); }
+function getRankName() {
+const rank = RANKS.find(r => r.level === game.level);
+return rank ? rank.name : 'Бог Войны';
 }
 
-function devDeletePromoCode(code) {
-    if (confirm(`Удалить промо код ${code}?`)) {
-        delete promoCodes[code];
-        showToast(`🗑️ Промо код ${code} удалён`);
-        renderDevPromoCodes(); updateDevStats(); saveGame();
-    }
+function getNextLevelXP() {
+const rank = RANKS.find(r => r.level === game.level + 1);
+return rank ? rank.xpRequired : 50000;
 }
 
-function renderDevPromoCodes() {
-    const container = document.getElementById('devPromoCodesList');
-    container.innerHTML = '';
-    Object.entries(promoCodes).forEach(([code, data]) => {
-        const div = document.createElement('div');
-        div.className = 'promo-code-list-item';
-        div.innerHTML = `<div><strong style="color: var(--dev-accent);">${code}</strong>: ${data.gold} 💰 + ${data.promo} 💎<div style="color: #888; font-size: 10px; margin-top: 3px;">Активаций: ${data.activations}</div></div><button class="promo-code-delete-btn" onclick="devDeletePromoCode('${code}')">🗑️</button>`;
-        container.appendChild(div);
-    });
+function updateAchievementProgress(id, value) {
+const ach = ACHIEVEMENTS.find(a => a.id === id);
+if (ach) {
+ach.current = value;
+}
 }
 
-// ================= СБРОС ПРОГРЕССА =================
-function showResetModal() { document.getElementById('resetModal').style.display = 'flex'; }
-function hideResetModal() { document.getElementById('resetModal').style.display = 'none'; }
-
-function confirmReset() {
-    game = { gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200, energy: 100, maxEnergy: 100, prestige: 0, clicks: 0, totalCrits: 0, day: 1, lastLogin: null, lastSave: null, achievements: [], chapter1Complete: false, usedPromoCodes: [], costs: { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 }, currentEnemy: 'shin', enemyHp: 800, musicOn: game.musicOn, soundOn: game.soundOn, loginStreak: 0, lastLoginDate: null, claimedDaily: [] };
-    stats = { totalAdViews: 0, totalPromoActivations: 0 };
-    adSlots.forEach(slot => { slot.views = 0; });
-    Object.values(promoCodes).forEach(code => { code.activations = 0; });
-    document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
-    updateCharacterDisplay(); hideResetModal();
-    showToast('☠️ Прогресс сброшен!'); playSound('winSound'); updateUI(); updateDevStats(); updateAdPreview(); saveGame();
+function checkDailyLoginReward() {
+const today = new Date().toISOString().split('T')[0];
+const streakDay = Math.min(game.loginStreak, 7);
+if (game.lastLoginDate !== today && !game.claimedDaily.includes(streakDay)) {
+const reward = DAILY_REWARDS[streakDay - 1];
+if (reward) {
+game.gold += reward.gold;
+game.totalGold += reward.gold;
+game.promoCurrency += reward.promo;
+game.claimedDaily.push(streakDay);
+showToast(reward.text);
+playSound('winSound');
+updateUI();
+saveGame();
+}
+}
 }
 
-// ================= ПРЕСТИЖ =================
-function doPrestige() {
-    let points = Math.floor(game.clicks / 1000);
-    if (points < 1) points = 1;
-    if (confirm(`Престиж: ${points} очков?\n+${points * 10}% к урону навсегда`)) {
-        game.prestige += points; game.gold = 500; game.damage = 1; game.critChance = 5; game.critDamage = 200;
-        game.maxEnergy = 100; game.energy = 100; game.currentEnemy = 'shin'; game.enemyHp = CHARACTERS.shin.hp;
-        game.costs = { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 };
-        document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
-        updateCharacterDisplay(); showToast(`🔄 Престиж! +${points} очков`); playSound('winSound'); updateUI(); saveGame();
-    }
+function watchAd() {
+if (typeof AdsGram !== 'undefined') {
+AdsGram.showAd({
+blockId: '23249',
+onSuccess: function() {
+const ad = adSlots[currentAdSlot];
+game.gold += ad.reward;
+game.totalGold += ad.reward;
+ad.views++;
+stats.totalAdViews++;
+showToast(`📺 +${ad.reward} 💰 за просмотр рекламы!`);
+playSound('winSound');
+currentAdSlot = (currentAdSlot + 1) % 5;
+updateAchievementProgress(16, stats.totalAdViews);
+updateUI();
+saveGame();
+},
+onError: function(error) {
+console.log('Ad error:', error);
+showToast('❌ Ошибка загрузки рекламы');
+}
+});
+} else {
+showToast('🧪 Тестовая реклама (нет AdsGram)');
+setTimeout(() => {
+const ad = adSlots[currentAdSlot];
+game.gold += ad.reward;
+game.totalGold += ad.reward;
+showToast(`📺 +${ad.reward} 💰`);
+currentAdSlot = (currentAdSlot + 1) % 5;
+updateUI();
+saveGame();
+}, 3000);
+}
+}
+
+function watchAdForDiamond() {
+if (typeof AdsGram !== 'undefined') {
+AdsGram.showAd({
+blockId: '23249',
+onSuccess: function() {
+game.promoCurrency += 1;
+stats.totalAdViews++;
+showToast(`📺 +1 💎 за просмотр рекламы!`);
+playSound('winSound');
+updateUI();
+saveGame();
+},
+onError: function(error) {
+console.log('Ad error:', error);
+showToast('❌ Ошибка загрузки рекламы');
+}
+});
+} else {
+showToast('🧪 Тестовая реклама (нет AdsGram)');
+setTimeout(() => {
+game.promoCurrency += 1;
+showToast(`📺 +1 💎`);
+updateUI();
+saveGame();
+}, 3000);
+}
+}
+
+function initAudio() {
+const music = document.getElementById('bgMusic');
+if (game.musicOn && music.paused) {
+music.volume = 0.3;
+music.play().catch(e => console.log('Audio autoplay blocked'));
+}
+}
+
+function toggleMusic() {
+game.musicOn = !game.musicOn;
+const music = document.getElementById('bgMusic');
+const btn = document.getElementById('musicBtn');
+if (game.musicOn) { music.play(); btn.innerHTML = '🎵'; showToast('🎵 Музыка включена'); }
+else { music.pause(); btn.innerHTML = '🔇'; showToast('🔇 Музыка выключена'); }
+saveGame();
+}
+
+function toggleSound() {
+game.soundOn = !game.soundOn;
+const btn = document.getElementById('soundBtn');
+btn.innerHTML = game.soundOn ? '🔊' : '🔇';
+showToast(game.soundOn ? '🔊 Звук включён' : '🔇 Звук выключен');
+saveGame();
+}
+
+function playSound(soundId) {
+if (!game.soundOn) return;
+const sound = document.getElementById(soundId);
+if (sound) { sound.currentTime = 0; sound.volume = 0.5; sound.play().catch(e => {}); }
 }
 
 function checkAchievements() {
-    ACHIEVEMENTS.forEach((ach) => {
-        if (!game.achievements.includes(ach.id)) {
-            let unlocked = false;
-            if (ach.id === 7 && game.clicks >= 100) unlocked = true;
-            else if (ach.id === 8 && game.clicks >= 1000) unlocked = true;
-            else if (ach.id === 9 && game.totalGold >= 10000) unlocked = true;
-            else if (ach.id === 10 && game.chapter1Complete) unlocked = true;
-            if (unlocked) {
-                game.achievements.push(ach.id); game.gold += ach.reward; game.totalGold += ach.reward;
-                showToast(`🏆 ${ach.name}! +${ach.reward} 💰`); playSound('winSound');
-            }
-        }
-    });
-    updateUI();
+ACHIEVEMENTS.forEach((ach) => {
+if (!game.achievements.includes(ach.id)) {
+let unlocked = false;
+if (ach.id === 7 && game.clicks >= 100) unlocked = true;
+else if (ach.id === 8 && game.clicks >= 1000) unlocked = true;
+else if (ach.id === 9 && game.totalGold >= 10000) unlocked = true;
+else if (ach.id === 10 && game.chapter1Complete) unlocked = true;
+else if (ach.id === 11 && game.totalGold >= 100000) unlocked = true;
+else if (ach.id === 12 && game.promoCurrency >= 100) unlocked = true;
+else if (ach.id === 13 && game.totalCrits >= 100) unlocked = true;
+else if (ach.id === 14 && game.totalWins >= 50) unlocked = true;
+else if (ach.id === 15 && game.level >= 10) unlocked = true;
+else if (ach.id === 16 && stats.totalAdViews >= 50) unlocked = true;
+else if (ach.id === 17 && game.rouletteSpins >= 25) unlocked = true;
+else if (ach.id === 18 && game.loginStreak >= 7) unlocked = true;
+else if (ach.id === 19 && game.achievements.length >= 1) unlocked = true;
+if (unlocked) {
+game.achievements.push(ach.id);
+game.gold += ach.reward;
+game.promoCurrency += ach.diamondReward;
+game.totalGold += ach.reward;
+showToast(`🏆 ${ach.name}! +${ach.reward} 💰 +${ach.diamondReward} 💎`);
+playSound('winSound');
+}
+}
+});
+updateUI();
 }
 
 function checkDaily() {
-    const today = new Date().toDateString();
-    const todayISO = new Date().toISOString().split('T')[0];
-    
-    if (game.lastLogin !== today) {
-        // Проверяем, был ли вход вчера для продолжения серии
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayISO = yesterday.toISOString().split('T')[0];
-        
-        if (game.lastLoginDate === yesterdayISO) {
-            game.loginStreak++;
-        } else if (game.lastLoginDate !== todayISO) {
-            game.loginStreak = 1;
-        }
-        
-        game.day++;
-        game.lastLogin = today;
-        game.lastLoginDate = todayISO;
-        game.energy = game.maxEnergy;
-        showToast(`📅 День ${game.day}! Серия входов: ${game.loginStreak}/7`);
-        saveGame();
-    }
+const today = new Date().toDateString();
+const todayISO = new Date().toISOString().split('T')[0];
+if (game.lastLogin !== today) {
+const yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
+const yesterdayISO = yesterday.toISOString().split('T')[0];
+if (game.lastLoginDate === yesterdayISO) {
+game.loginStreak++;
+} else if (game.lastLoginDate !== todayISO) {
+game.loginStreak = 1;
+}
+game.day++;
+game.lastLogin = today;
+game.lastLoginDate = todayISO;
+game.energy = game.maxEnergy;
+showToast(`📅 День ${game.day}! Серия входов: ${game.loginStreak}/7`);
+updateAchievementProgress(18, game.loginStreak);
+saveGame();
+}
 }
 
 function switchScreen(screenId, btn) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-' + screenId).classList.add('active');
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    if (screenId === 'profile') renderAchievements();
-    if (screenId === 'dev') { renderAdSlotsStats(); updateDevStats(); updateAdPreview(); }
+document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-' + screenId).classList.add('active');
+document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+if(btn) btn.classList.add('active');
+if (screenId === 'profile') {
+renderAchievements();
+updateLoginLog();
+}
 }
 
 function updateUI() {
-    const char = CHARACTERS[game.currentEnemy];
-    document.getElementById('uiGold').innerText = Math.floor(game.gold);
-    document.getElementById('uiEnergy').innerText = `${game.energy}/${game.maxEnergy}`;
-    let energyPct = (game.energy / game.maxEnergy) * 100;
-    document.getElementById('energyFill').style.width = energyPct + '%';
-    document.getElementById('enemyName').innerText = char.name + (char.isBoss ? ' (БОСС)' : '');
-    let hpPct = (game.enemyHp / char.hp) * 100;
-    document.getElementById('hpFill').style.width = hpPct + '%';
-    document.getElementById('hpText').innerText = `${Math.ceil(game.enemyHp)}/${char.hp}`;
-    document.getElementById('shopDmg').innerText = game.damage;
-    document.getElementById('shopCrit').innerText = game.critChance;
-    document.getElementById('shopCritDmg').innerText = game.critDamage;
-    document.getElementById('shopEnergy').innerText = game.maxEnergy;
-    document.getElementById('costDmg').innerText = game.costs.damage;
-    document.getElementById('costCrit').innerText = game.costs.critChance;
-    document.getElementById('costCritDmg').innerText = game.costs.critDamage;
-    document.getElementById('costEnergy').innerText = game.costs.maxEnergy;
-    document.getElementById('btnBuyDmg').disabled = game.gold < game.costs.damage;
-    document.getElementById('btnBuyCrit').disabled = game.gold < game.costs.critChance;
-    document.getElementById('btnBuyCritDmg').disabled = game.gold < game.costs.critDamage;
-    document.getElementById('btnBuyEnergy').disabled = game.gold < game.costs.maxEnergy;
-    document.getElementById('statKills').innerText = game.achievements.filter(id => id <= 6).length;
-    document.getElementById('statClicks').innerText = game.clicks;
-    document.getElementById('statPrestige').innerText = game.prestige;
-    document.getElementById('statDay').innerText = game.day;
-    document.getElementById('statCrits').innerText = game.totalCrits;
-    document.getElementById('statTotalGold').innerText = Math.floor(game.totalGold);
-    document.getElementById('statStreak').innerText = Math.min(game.loginStreak, 7);
-    
-    const currentAd = adSlots[currentAdSlot];
-    document.getElementById('adRewardDisplay').innerText = currentAd.reward;
+const char = CHARACTERS[game.currentEnemy];
+document.getElementById('uiGold').innerText = Math.floor(game.gold);
+document.getElementById('uiDiamonds').innerText = Math.floor(game.promoCurrency);
+document.getElementById('uiLevel').innerText = game.level;
+document.getElementById('uiEnergy').innerText = `${game.energy}/${game.maxEnergy}`;
+let energyPct = (game.energy / game.maxEnergy) * 100;
+document.getElementById('energyFill').style.width = energyPct + '%';
+document.getElementById('enemyName').innerText = char.name + (char.isBoss ? ' (БОСС)' : '');
+updateRoundInfo();
+let hpPct = (game.enemyHp / game.enemyMaxHp) * 100;
+document.getElementById('hpFill').style.width = hpPct + '%';
+document.getElementById('hpText').innerText = `${Math.ceil(game.enemyHp)}/${game.enemyMaxHp}`;
+document.getElementById('shopDmg').innerText = game.damage;
+document.getElementById('shopCrit').innerText = game.critChance;
+document.getElementById('shopCritDmg').innerText = game.critDamage;
+document.getElementById('shopEnergy').innerText = game.maxEnergy;
+document.getElementById('costDmg').innerText = game.costs.damage;
+document.getElementById('costCrit').innerText = game.costs.critChance;
+document.getElementById('costCritDmg').innerText = game.costs.critDamage;
+document.getElementById('costEnergy').innerText = game.costs.maxEnergy;
+document.getElementById('btnBuyDmg').disabled = game.gold < game.costs.damage;
+document.getElementById('btnBuyCrit').disabled = game.gold < game.costs.critChance;
+document.getElementById('btnBuyCritDmg').disabled = game.gold < game.costs.critDamage;
+document.getElementById('btnBuyEnergy').disabled = game.gold < game.costs.maxEnergy;
+document.getElementById('statKills').innerText = game.achievements.filter(id => id <= 6).length;
+document.getElementById('statClicks').innerText = game.clicks;
+document.getElementById('statPrestige').innerText = game.prestige;
+document.getElementById('statDay').innerText = game.day;
+document.getElementById('statCrits').innerText = game.totalCrits;
+document.getElementById('statTotalGold').innerText = Math.floor(game.totalGold);
+document.getElementById('statStreak').innerText = Math.min(game.loginStreak, 7);
+document.getElementById('statDiamonds').innerText = Math.floor(game.promoCurrency);
+document.getElementById('statRoulette').innerText = game.rouletteSpins;
+document.getElementById('rankBadge').innerText = getRankName();
+document.getElementById('levelDisplay').innerText = game.level;
+const nextLevelXP = getNextLevelXP();
+const xpPct = (game.xp / nextLevelXP) * 100;
+document.getElementById('xpFill').style.width = xpPct + '%';
+document.getElementById('xpText').innerText = `${game.xp}/${nextLevelXP} XP`;
 }
 
 function renderAchievements() {
-    const list = document.getElementById('achievementsList');
-    list.innerHTML = '';
-    ACHIEVEMENTS.forEach(ach => {
-        const unlocked = game.achievements.includes(ach.id);
-        list.innerHTML += `<div class="achievement-item ${unlocked ? 'unlocked' : 'locked'}"><div style="font-weight: bold; color: ${unlocked ? '#4caf50' : '#888'}">${unlocked ? '✅' : '🔒'} ${ach.name}</div><div style="font-size: 12px; color: #aaa; margin-top: 5px;">${ach.desc} | ${ach.reward} 💰</div></div>`;
-    });
+const list = document.getElementById('achievementsList');
+list.innerHTML = '';
+ACHIEVEMENTS.forEach(ach => {
+const unlocked = game.achievements.includes(ach.id);
+const progress = ach.required > 0 ? `${Math.min(ach.current, ach.required)}/${ach.required}` : '';
+const percent = ach.required > 0 ? Math.round((ach.current / ach.required) * 100) : 0;
+list.innerHTML += `<div class="achievement-item ${unlocked ? 'unlocked' : 'locked'}">
+<div style="font-weight: bold; color: ${unlocked ? '#4caf50' : '#888'}">${unlocked ? '✅' : '🔒'} ${ach.name}</div>
+<div style="font-size: 12px; color: #aaa; margin-top: 5px;">${ach.desc} | ${ach.reward} 💰 + ${ach.diamondReward} 💎</div>
+${!unlocked && progress ? `<div class="achievement-progress">Прогресс: ${progress} (${percent}%)</div>` : ''}
+</div>`;
+});
 }
 
 function showDamage(x, y, text, isCrit) {
-    const el = document.createElement('div');
-    el.className = `damage-popup ${isCrit ? 'crit' : ''}`;
-    el.innerText = text;
-    el.style.left = (x - 40) + 'px'; el.style.top = (y - 80) + 'px';
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1000);
+const el = document.createElement('div');
+el.className = `damage-popup ${isCrit ? 'crit' : ''}`;
+el.innerText = text;
+el.style.left = (x - 40) + 'px';
+el.style.top = (y - 80) + 'px';
+document.body.appendChild(el);
+setTimeout(() => el.remove(), 1000);
 }
 
 function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.innerText = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
+const t = document.getElementById('toast');
+t.innerText = msg;
+t.classList.add('show');
+setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ================= АВТОСОХРАНЕНИЕ =================
 function saveGame(showIndicator = false) {
-    game.lastSave = new Date().toISOString();
-    localStorage.setItem('sf2_chapter1', JSON.stringify(game));
-    localStorage.setItem('sf2_promoCodes', JSON.stringify(promoCodes));
-    localStorage.setItem('sf2_adSlots', JSON.stringify(adSlots));
-    localStorage.setItem('sf2_version', gameVersion);
-    localStorage.setItem('sf2_currentAdSlot', currentAdSlot);
-    localStorage.setItem('sf2_stats', JSON.stringify(stats));
-    if (showIndicator) {
-        const indicator = document.getElementById('saveIndicator');
-        indicator.classList.add('show');
-        setTimeout(() => indicator.classList.remove('show'), 2000);
-    }
+game.lastSave = new Date().toISOString();
+localStorage.setItem('sf2_chapter1', JSON.stringify(game));
+localStorage.setItem('sf2_promoCodes', JSON.stringify(promoCodes));
+localStorage.setItem('sf2_adSlots', JSON.stringify(adSlots));
+localStorage.setItem('sf2_version', gameVersion);
+localStorage.setItem('sf2_currentAdSlot', currentAdSlot);
+localStorage.setItem('sf2_stats', JSON.stringify(stats));
+if (showIndicator) {
+const indicator = document.getElementById('saveIndicator');
+indicator.classList.add('show');
+setTimeout(() => indicator.classList.remove('show'), 2000);
+}
 }
 
 function loadGame() {
-    const saved = localStorage.getItem('sf2_chapter1');
-    const savedPromo = localStorage.getItem('sf2_promoCodes');
-    const savedAdSlots = localStorage.getItem('sf2_adSlots');
-    const savedVersion = localStorage.getItem('sf2_version');
-    const savedCurrentAdSlot = localStorage.getItem('sf2_currentAdSlot');
-    const savedStats = localStorage.getItem('sf2_stats');
-    
-    if (saved) { const parsed = JSON.parse(saved); game = { ...game, ...parsed }; }
-    if (savedPromo) promoCodes = { ...promoCodes, ...JSON.parse(savedPromo) };
-    if (savedAdSlots) adSlots = JSON.parse(savedAdSlots);
-    if (savedVersion) gameVersion = savedVersion;
-    if (savedCurrentAdSlot) currentAdSlot = parseInt(savedCurrentAdSlot);
-    if (savedStats) stats = JSON.parse(savedStats);
-    
-    const char = CHARACTERS[game.currentEnemy];
-    if (char) { document.body.style.backgroundImage = `url('${char.bgImg}')`; updateCharacterDisplay(); }
-    if (!game.musicOn) document.getElementById('musicBtn').innerHTML = '🔇';
-    if (!game.soundOn) document.getElementById('soundBtn').innerHTML = '🔇';
+const saved = localStorage.getItem('sf2_chapter1');
+const savedPromo = localStorage.getItem('sf2_promoCodes');
+const savedAdSlots = localStorage.getItem('sf2_adSlots');
+const savedVersion = localStorage.getItem('sf2_version');
+const savedCurrentAdSlot = localStorage.getItem('sf2_currentAdSlot');
+const savedStats = localStorage.getItem('sf2_stats');
+if (saved) { const parsed = JSON.parse(saved); game = { ...game, ...parsed }; }
+if (savedPromo) promoCodes = { ...promoCodes, ...JSON.parse(savedPromo) };
+if (savedAdSlots) adSlots = JSON.parse(savedAdSlots);
+if (savedVersion) gameVersion = savedVersion;
+if (savedCurrentAdSlot) currentAdSlot = parseInt(savedCurrentAdSlot);
+if (savedStats) stats = JSON.parse(savedStats);
+const char = CHARACTERS[game.currentEnemy];
+if (char) {
+document.body.style.backgroundImage = `url('${char.bgImg}')`;
+updateCharacterDisplay();
+game.enemyMaxHp = char.hp;
+}
+if (!game.musicOn) document.getElementById('musicBtn').innerHTML = '🔇';
+if (!game.soundOn) document.getElementById('soundBtn').innerHTML = '🔇';
+}
+
+function updateVersionBadge() {
+document.getElementById('versionBadge').textContent = `v${gameVersion}`;
+}
+
+function doPrestige() {
+let points = Math.floor(game.clicks / 1000);
+if (points < 1) points = 1;
+if (confirm(`Престиж: ${points} очков?
++${points * 10}% к урону навсегда`)) {
+game.prestige += points;
+game.gold = 500;
+game.damage = 1;
+game.critChance = 5;
+game.critDamage = 200;
+game.maxEnergy = 100;
+game.energy = 100;
+game.currentEnemy = 'shin';
+game.currentRound = 1;
+game.enemyHp = CHARACTERS.shin.hp;
+game.enemyMaxHp = CHARACTERS.shin.hp;
+game.costs = { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 };
+document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
+updateCharacterDisplay();
+showToast(`🔄 Престиж! +${points} очков`);
+playSound('winSound');
+updateUI();
+saveGame();
+closePrestigeChapterModal();
+}
+}
+
+function doPrestigeFromModal() {
+doPrestige();
+}
+
+function closePrestigeChapterModal() {
+document.getElementById('prestigeChapterModal').classList.remove('active');
+}
+
+function confirmReset() {
+if (!confirm('☠️ Вы уверены? Весь прогресс будет удалён безвозвратно!')) return;
+game = {
+gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200,
+energy: 100, maxEnergy: 100, prestige: 0, clicks: 0, totalCrits: 0, day: 1,
+lastLogin: null, lastSave: null, achievements: [], chapter1Complete: false, usedPromoCodes: [],
+costs: { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 },
+currentEnemy: 'shin', enemyHp: 3000, enemyMaxHp: 3000, musicOn: game.musicOn, soundOn: game.soundOn,
+loginStreak: 0, lastLoginDate: null, claimedDaily: [],
+xp: 0, level: 1, totalWins: 0, rouletteSpins: 0,
+currentRound: 1, maxRounds: 2,
+totalPlayTime: 0,
+autoClick: false,
+autoEnergy: false,
+freeSpinAvailable: true,
+lastFreeSpin: null
+};
+stats = { totalAdViews: 0, totalPromoActivations: 0 };
+adSlots.forEach(slot => { slot.views = 0; });
+Object.values(promoCodes).forEach(code => { code.activations = 0; });
+document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
+updateCharacterDisplay();
+showToast('☠️ Прогресс сброшен!');
+playSound('winSound');
+updateUI();
+saveGame();
 }
 </script>
 </body>
