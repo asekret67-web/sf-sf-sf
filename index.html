@@ -10,6 +10,10 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <!-- AdsGram Script -->
 <script async src="https://api.adsgram.ai/adsgram.min.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <style>
 :root {
 --bg-color: #0a0a0a;
@@ -385,7 +389,65 @@ animation: critBounce 1s forwards;
 30% { transform: translateY(-30px) scale(1.5) rotate(5deg); }
 100% { opacity: 0; transform: translateY(-150px) scale(1) rotate(0deg); }
 }
-/* ЭКРАН ПОБЕДЫ */
+.countdown-screen {
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.95);
+z-index: 5000;
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+}
+.countdown-screen.active {
+display: flex;
+}
+.countdown-number {
+font-size: 150px;
+font-weight: bold;
+color: var(--accent);
+text-shadow: 0 0 50px var(--accent), 0 0 100px var(--accent);
+animation: countdownPop 1s ease-in-out;
+}
+.countdown-text {
+font-size: 24px;
+color: #fff;
+margin-top: 30px;
+text-transform: uppercase;
+letter-spacing: 3px;
+}
+.fight-button {
+margin-top: 40px;
+padding: 20px 60px;
+font-size: 32px;
+font-weight: bold;
+color: #fff;
+background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+border: none;
+border-radius: 15px;
+cursor: pointer;
+text-transform: uppercase;
+letter-spacing: 5px;
+box-shadow: 0 0 30px rgba(244, 67, 54, 0.5);
+animation: fightPulse 1s infinite;
+display: none;
+}
+.fight-button.active {
+display: block;
+}
+.fight-button:active {
+transform: scale(0.95);
+}
+@keyframes fightPulse {
+0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(244, 67, 54, 0.5); }
+50% { transform: scale(1.05); box-shadow: 0 0 50px rgba(244, 67, 54, 0.8); }
+}
+@keyframes countdownPop {
+0% { transform: scale(0.3); opacity: 0; }
+50% { transform: scale(1.2); opacity: 1; }
+80% { transform: scale(1); opacity: 1; }
+100% { transform: scale(0.8); opacity: 0; }
+}
 .victory-screen {
 position: fixed;
 top: 0; left: 0; width: 100%; height: 100%;
@@ -412,26 +474,6 @@ font-size: 28px;
 color: #fff;
 margin-bottom: 20px;
 }
-.victory-next-btn {
-background: linear-gradient(135deg, #ff9800, #f57c00);
-color: #fff;
-border: none;
-padding: 20px 50px;
-border-radius: 15px;
-font-size: 20px;
-font-weight: bold;
-cursor: pointer;
-margin-top: 30px;
-box-shadow: 0 0 30px rgba(255, 152, 0, 0.5);
-transition: all 0.3s;
-}
-.victory-next-btn:hover {
-transform: scale(1.05);
-box-shadow: 0 0 50px rgba(255, 152, 0, 0.8);
-}
-.victory-next-btn:active {
-transform: scale(0.95);
-}
 @keyframes victoryPulse {
 0%, 100% { transform: scale(1); }
 50% { transform: scale(1.1); }
@@ -448,7 +490,7 @@ transition: opacity 0.3s;
 .transition-effect.active {
 opacity: 1;
 }
-#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette {
+#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard {
 background: rgba(26, 26, 46, 0.95);
 backdrop-filter: blur(10px);
 padding-top: 80px;
@@ -556,7 +598,7 @@ backdrop-filter: blur(10px);
 .nav-btn {
 background: none; border: none; color: #888;
 font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 5px;
-cursor: pointer; width: 20%; padding: 10px;
+cursor: pointer; width: 16.66%; padding: 10px;
 transition: all 0.2s;
 }
 .nav-btn.active { color: var(--accent); }
@@ -1022,6 +1064,106 @@ font-size: 13px;
 color: #ccc;
 margin: 5px 0;
 }
+.leaderboard-container {
+padding: 20px;
+}
+.leaderboard-list {
+background: rgba(0,0,0,0.3);
+border-radius: 10px;
+padding: 15px;
+max-height: 400px;
+overflow-y: auto;
+}
+.leaderboard-item {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 12px;
+margin-bottom: 8px;
+background: rgba(255,255,255,0.05);
+border-radius: 8px;
+border-left: 3px solid transparent;
+}
+.leaderboard-item:nth-child(1) {
+border-left-color: #ffd700;
+background: rgba(255, 215, 0, 0.1);
+}
+.leaderboard-item:nth-child(2) {
+border-left-color: #c0c0c0;
+background: rgba(192, 192, 192, 0.1);
+}
+.leaderboard-item:nth-child(3) {
+border-left-color: #cd7f32;
+background: rgba(205, 127, 50, 0.1);
+}
+.leaderboard-rank {
+font-size: 18px;
+font-weight: bold;
+color: var(--accent);
+min-width: 30px;
+}
+.leaderboard-name {
+flex: 1;
+margin-left: 10px;
+font-weight: bold;
+}
+.leaderboard-value {
+font-size: 16px;
+color: var(--xp-gold);
+font-weight: bold;
+}
+.leaderboard-me {
+border: 2px solid var(--accent);
+margin-top: 20px;
+}
+.registration-modal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.95);
+z-index: 4000;
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
+.registration-modal.active {
+display: flex;
+}
+.registration-content {
+background: #1a1a2e;
+padding: 30px;
+border-radius: 20px;
+max-width: 400px;
+width: 100%;
+text-align: center;
+border: 2px solid var(--accent);
+}
+.registration-input {
+width: 100%;
+padding: 15px;
+background: rgba(255,255,255,0.1);
+border: 2px solid var(--accent);
+border-radius: 10px;
+color: #fff;
+font-size: 16px;
+text-align: center;
+margin-bottom: 15px;
+}
+.registration-input:focus {
+outline: none;
+border-color: var(--green);
+}
+.registration-btn {
+background: var(--green);
+color: #fff;
+border: none;
+padding: 15px 30px;
+border-radius: 10px;
+font-weight: bold;
+font-size: 16px;
+cursor: pointer;
+width: 100%;
+}
 @media (max-width: 480px) {
 .loading-text { font-size: 20px; }
 .loading-bar-bg { width: 250px; }
@@ -1035,6 +1177,7 @@ margin: 5px 0;
 .char-select-grid { grid-template-columns: repeat(2, 1fr); }
 .countdown-number { font-size: 100px; }
 .victory-text { font-size: 48px; }
+.fight-button { font-size: 24px; padding: 15px 40px; }
 .slot-reel { width: 60px; height: 80px; font-size: 36px; }
 }
 @media (max-width: 360px) {
@@ -1043,13 +1186,15 @@ margin: 5px 0;
 .char-container { width: 200px; height: 240px; }
 .gold-display { font-size: 1rem; }
 .energy-text { font-size: 12px; }
+.countdown-number { font-size: 80px; }
+.fight-button { font-size: 20px; padding: 12px 30px; }
 .slot-reel { width: 50px; height: 70px; font-size: 28px; }
 }
 </style>
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
-<div class="version-badge" id="versionBadge">V1.0.03</div>
+<div class="version-badge" id="versionBadge">V1.1.1</div>
 <div class="loading-logo">⚔️</div>
 <div class="loading-text">Shadow Fight 2</div>
 <div class="loading-bar-bg">
@@ -1059,14 +1204,15 @@ margin: 5px 0;
 ⚠️ ДИСКЛЕЙМЕР: Игра является фанатским проектом и не связана с официальными разработчиками Shadow Fight 2. Все права на оригинальную игру принадлежат Nekki. Игра создана в образовательных целях.
 </div>
 </div>
-
-<!-- ЭКРАН ПОБЕДЫ С КНОПКОЙ -->
+<div class="countdown-screen" id="countdownScreen">
+<div class="countdown-number" id="countdownNumber">3</div>
+<div class="countdown-text" id="countdownText"></div>
+<button class="fight-button" id="fightButton" onclick="startFight()">⚔️ FIGHT!</button>
+</div>
 <div class="victory-screen" id="victoryScreen">
 <div class="victory-text">🏆 ПОБЕДА!</div>
 <div class="victory-enemy-name" id="victoryEnemyName">Шин повержен</div>
-<button class="victory-next-btn" id="victoryNextBtn" onclick="goToNextEnemy()">⚔️ Следующий противник</button>
 </div>
-
 <audio id="bgMusic" loop>
 <source src="audio/background.mp3" type="audio/mpeg">
 </audio>
@@ -1085,16 +1231,12 @@ margin: 5px 0;
 <audio id="fightSound">
 <source src="audio/fight.mp3" type="audio/mpeg">
 </audio>
-
 <div class="transition-effect" id="transitionEffect"></div>
-
 <div class="audio-controls">
 <button class="audio-btn" onclick="toggleMusic()" id="musicBtn">🎵</button>
 <button class="audio-btn" onclick="toggleSound()" id="soundBtn">🔊</button>
 </div>
-
 <div class="save-indicator" id="saveIndicator">💾 Сохранено</div>
-
 <div id="screen-battle" class="screen active">
 <div class="boss-info">
 <div class="enemy-name" id="enemyName">Шин</div>
@@ -1115,7 +1257,6 @@ margin: 5px 0;
 </div>
 </div>
 </div>
-
 <div id="screen-shop" class="screen">
 <h2 style="margin: 20px 0; text-align: center;">⚔️ Магазин</h2>
 <button class="ad-btn" onclick="watchAd()">
@@ -1169,12 +1310,19 @@ margin: 5px 0;
 </button>
 </div>
 </div>
-
 <div id="screen-profile" class="screen">
 <h2 style="margin: 20px 0; text-align: center;">📊 Профиль</h2>
+<div class="user-info" id="userInfo" style="display: none;">
+<div class="user-avatar" id="userAvatar">👤</div>
+<div class="user-details">
+<div class="user-name" id="userName">Игрок</div>
+</div>
+<button class="btn-buy" onclick="logout()" style="background: #f44336; min-width: 80px;">Выйти</button>
+</div>
 <div class="login-log">
 <h4>📜 Лог входа</h4>
 <p id="lastLoginLog">Последний вход: Никогда</p>
+<p id="userIdLog">ID игрока: ---</p>
 <p id="playTimeLog">Время в игре: 0 мин</p>
 </div>
 <div class="xp-container">
@@ -1207,7 +1355,6 @@ margin: 5px 0;
 +10% к урону за каждое очко престижа
 </p>
 </div>
-
 <div id="screen-promo" class="screen">
 <h2 style="margin: 20px 0; text-align: center;">🎁 Промо коды</h2>
 <div class="promo-input-container">
@@ -1288,7 +1435,6 @@ margin: 5px 0;
 </button>
 </div>
 </div>
-
 <div id="screen-roulette" class="screen">
 <h2 style="margin: 20px 0; text-align: center;">🎰 Казино Удачи</h2>
 <div class="roulette-container">
@@ -1312,7 +1458,19 @@ margin: 5px 0;
 </div>
 </div>
 </div>
-
+<div id="screen-leaderboard" class="screen">
+<h2 style="margin: 20px 0; text-align: center;">🏆 Топ Игроков</h2>
+<div class="leaderboard-container">
+<div class="leaderboard-tabs">
+<div class="leaderboard-tab active" onclick="switchLeaderboardTab('level')">📊 По уровню</div>
+<div class="leaderboard-tab" onclick="switchLeaderboardTab('clicks')">👆 По кликам</div>
+<div class="leaderboard-tab" onclick="switchLeaderboardTab('achievements')">🏆 По достижениям</div>
+</div>
+<div class="leaderboard-list" id="leaderboardList">
+<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>
+</div>
+</div>
+</div>
 <div id="screen-dev" class="screen">
 <h2 style="margin: 20px 0; text-align: center; color: var(--dev-accent);">🔧 Меню разработчика</h2>
 <div class="dev-section">
@@ -1338,7 +1496,6 @@ margin: 5px 0;
 🔒 Закрыть меню
 </button>
 </div>
-
 <div class="bottom-nav">
 <button class="nav-btn active" onclick="switchScreen('battle', this)">
 <span class="nav-icon">⚔️</span>
@@ -1356,12 +1513,15 @@ margin: 5px 0;
 <span class="nav-icon">🎰</span>
 <span>Казино</span>
 </button>
+<button class="nav-btn" onclick="switchScreen('leaderboard', this)">
+<span class="nav-icon">🏆</span>
+<span>Топ</span>
+</button>
 <button class="nav-btn" onclick="switchScreen('profile', this)">
 <span class="nav-icon">👤</span>
 <span>Профиль</span>
 </button>
 </div>
-
 <div class="top-bar">
 <div class="currency-display">
 <div class="gold-display">💰 <span id="uiGold">500</span></div>
@@ -1376,7 +1536,14 @@ margin: 5px 0;
 <div class="xp-display">⭐ <span id="uiLevel">1</span></div>
 <button class="dev-btn" onclick="openDevMenu()">⚙️</button>
 </div>
-
+<div class="registration-modal" id="registrationModal">
+<div class="registration-content">
+<h2 style="color: var(--accent); margin-bottom: 15px;">👤 Регистрация</h2>
+<p style="color: #ccc; margin-bottom: 20px;">Введите ваше имя для участия в рейтинге</p>
+<input type="text" class="registration-input" id="registrationUsername" placeholder="Ваше имя">
+<button class="registration-btn" onclick="registerUser()">Начать игру</button>
+</div>
+</div>
 <div class="modal" id="devPasswordModal" onclick="if(event.target===this) this.style.display='none'">
 <div class="modal-content" style="border-color: var(--dev-accent);">
 <h2 style="color: var(--dev-accent); margin-bottom: 15px;">🔐 Меню разработчика</h2>
@@ -1388,7 +1555,6 @@ margin: 5px 0;
 </div>
 </div>
 </div>
-
 <div class="prestige-chapter-modal" id="prestigeChapterModal">
 <div class="prestige-chapter-content">
 <div class="prestige-chapter-title">🏆 ГЛАВА 1 ПРОЙДЕНА!</div>
@@ -1403,10 +1569,20 @@ margin: 5px 0;
 </div>
 </div>
 </div>
-
 <div id="toast" class="toast">Сообщение</div>
-
 <script>
+// ================= FIREBASE КОНФИГУРАЦИЯ =================
+const firebaseConfig = {
+apiKey: "AIzaSyCiFH7xN-NoH0XjqlMFX_eLYoQXCm2FKs0",
+authDomain: "shadow-fight-2-30a24.firebaseapp.com",
+projectId: "shadow-fight-2-30a24",
+storageBucket: "shadow-fight-2-30a24.firebasestorage.app",
+messagingSenderId: "370402326490",
+appId: "1:370402326490:web:5f6212bbd7e24fc10ab2e3",
+measurementId: "G-74F5V4RP0Z"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 // ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
 const CHARACTERS = {
 shin: { name: 'Шин', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Я ШИН первый телохранитель Рыси.', achievementId: 1, order: 1, rounds: 2 },
@@ -1417,7 +1593,6 @@ dandy: { name: 'Щёголь', hp: 60000, img: 'images/dandy.png', bgImg: 'backg
 lynx: { name: 'Рысь', hp: 200000, img: 'images/lynx.png', bgImg: 'backgrounds/lynx.jpg', desc: 'Я РЫСЬ глава Ордена ассасинов.', achievementId: 6, isBoss: true, order: 6, rounds: 3 }
 };
 const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx'];
-
 let promoCodes = {
 'START2026': { gold: 1000, promo: 3, used: false, activations: 0 },
 'WELCOME': { gold: 1000, promo: 3, used: false, activations: 0 },
@@ -1435,52 +1610,61 @@ let promoCodes = {
 'FREEGOLD': { gold: 3000, promo: 0, used: false, activations: 0 },
 'POWERUP': { gold: 1000, promo: 5, used: false, activations: 0 }
 };
-
 let adSlots = [
 { id: 1, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Смотрите рекламу и получите золото!', reward: 500, timer: 10, views: 0 }
 ];
-
 let stats = { totalAdViews: 0, totalPromoActivations: 0 };
 let currentAdSlot = 0;
-let gameVersion = 'V1.0.03';
-
+let gameVersion = 'V1.1.1';
 const RANKS = [
-{ level: 1, name: 'Новичок', xpRequired: 100 },
-{ level: 2, name: 'Ученик', xpRequired: 250 },
-{ level: 3, name: 'Боец', xpRequired: 500 },
-{ level: 4, name: 'Воин', xpRequired: 1000 },
-{ level: 5, name: 'Ветеран', xpRequired: 2000 },
-{ level: 6, name: 'Мастер', xpRequired: 4000 },
-{ level: 7, name: 'Эксперт', xpRequired: 7000 },
-{ level: 8, name: 'Легенда', xpRequired: 11000 },
-{ level: 9, name: 'Герой', xpRequired: 16000 },
-{ level: 10, name: 'Чемпион', xpRequired: 22000 },
-{ level: 11, name: 'Тень', xpRequired: 30000 },
-{ level: 12, name: 'Бог Войны', xpRequired: 50000 }
+{ level: 1, name: 'Новичок', xpRequired: 100, reward: { gold: 0, diamonds: 0 } },
+{ level: 2, name: 'Ученик', xpRequired: 250, reward: { gold: 100, diamonds: 1 } },
+{ level: 3, name: 'Боец', xpRequired: 500, reward: { gold: 200, diamonds: 2 } },
+{ level: 4, name: 'Воин', xpRequired: 1000, reward: { gold: 300, diamonds: 3 } },
+{ level: 5, name: 'Ветеран', xpRequired: 2000, reward: { gold: 500, diamonds: 5 } },
+{ level: 6, name: 'Мастер', xpRequired: 4000, reward: { gold: 750, diamonds: 7 } },
+{ level: 7, name: 'Эксперт', xpRequired: 7000, reward: { gold: 1000, diamonds: 10 } },
+{ level: 8, name: 'Легенда', xpRequired: 11000, reward: { gold: 1500, diamonds: 15 } },
+{ level: 9, name: 'Герой', xpRequired: 16000, reward: { gold: 2000, diamonds: 20 } },
+{ level: 10, name: 'Чемпион', xpRequired: 22000, reward: { gold: 3000, diamonds: 25 } },
+{ level: 11, name: 'Тень', xpRequired: 30000, reward: { gold: 4000, diamonds: 30 } },
+{ level: 12, name: 'Бог Войны', xpRequired: 50000, reward: { gold: 5000, diamonds: 40 } },
+{ level: 13, name: 'Император', xpRequired: 75000, reward: { gold: 7500, diamonds: 50 } },
+{ level: 14, name: 'Властелин', xpRequired: 100000, reward: { gold: 10000, diamonds: 60 } },
+{ level: 15, name: 'Титан', xpRequired: 150000, reward: { gold: 15000, diamonds: 75 } },
+{ level: 16, name: 'Бессмертный', xpRequired: 200000, reward: { gold: 20000, diamonds: 100 } },
+{ level: 17, name: 'Демон', xpRequired: 300000, reward: { gold: 30000, diamonds: 150 } },
+{ level: 18, name: 'Ангел', xpRequired: 400000, reward: { gold: 40000, diamonds: 200 } },
+{ level: 19, name: 'Божество', xpRequired: 500000, reward: { gold: 50000, diamonds: 250 } },
+{ level: 20, name: 'Творец', xpRequired: 1000000, reward: { gold: 100000, diamonds: 500 } }
 ];
-
 const ACHIEVEMENTS = [
-{ id: 1, name: 'Победа над Шином', desc: 'Победите Шина', reward: 100, diamondReward: 1, current: 0, required: 1 },
-{ id: 2, name: 'Громила повержен', desc: 'Победите Кирпича', reward: 250, diamondReward: 1, current: 0, required: 1 },
-{ id: 3, name: 'Острая победа', desc: 'Победите Иглу', reward: 500, diamondReward: 1, current: 0, required: 1 },
-{ id: 4, name: 'Охотник на призраков', desc: 'Победите Призрака', reward: 1000, diamondReward: 1, current: 0, required: 1 },
-{ id: 5, name: 'Модный победитель', desc: 'Победите Щёголя', reward: 2000, diamondReward: 1, current: 0, required: 1 },
-{ id: 6, name: 'ЛЕГЕНДА', desc: 'Победите Рысь', reward: 10000, diamondReward: 1, current: 0, required: 1 },
-{ id: 7, name: 'Новичок', desc: '100 кликов', reward: 50, diamondReward: 1, current: 0, required: 100 },
-{ id: 8, name: 'Воин', desc: '1000 кликов', reward: 200, diamondReward: 1, current: 0, required: 1000 },
-{ id: 9, name: 'Богач', desc: '10000 золота', reward: 500, diamondReward: 1, current: 0, required: 10000 },
-{ id: 10, name: 'Глава 1', desc: 'Пройдите главу 1', reward: 5000, diamondReward: 1, current: 0, required: 1 },
-{ id: 11, name: 'Коллекционер', desc: '100000 золота', reward: 10000, diamondReward: 1, current: 0, required: 100000 },
-{ id: 12, name: 'Алмазный магнат', desc: '100 алмазов', reward: 5000, diamondReward: 1, current: 0, required: 100 },
-{ id: 13, name: 'Критический удар', desc: '100 критов', reward: 1000, diamondReward: 1, current: 0, required: 100 },
-{ id: 14, name: 'Непобедимый', desc: '50 побед', reward: 5000, diamondReward: 1, current: 0, required: 50 },
-{ id: 15, name: 'Уровень 10', desc: 'Достигните 10 уровня', reward: 10000, diamondReward: 1, current: 0, required: 10 },
-{ id: 16, name: 'Рекламный магнат', desc: '50 просмотров рекламы', reward: 5000, diamondReward: 1, current: 0, required: 50 },
-{ id: 17, name: 'Рулеточник', desc: '25 прокруток рулетки', reward: 3000, diamondReward: 1, current: 0, required: 25 },
-{ id: 18, name: 'Серийный боец', desc: '7 дней подряд', reward: 7000, diamondReward: 1, current: 0, required: 7 },
-{ id: 19, name: 'Первопроходец', desc: 'Первое достижение', reward: 100, diamondReward: 1, current: 0, required: 1 }
+{ id: 1, name: 'Победа над Шином', desc: 'Победите Шина', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 2, name: 'Громила повержен', desc: 'Победите Кирпича', reward: 250, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 3, name: 'Острая победа', desc: 'Победите Иглу', reward: 500, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 4, name: 'Охотник на призраков', desc: 'Победите Призрака', reward: 1000, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 5, name: 'Модный победитель', desc: 'Победите Щёголя', reward: 2000, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 6, name: 'ЛЕГЕНДА', desc: 'Победите Рысь', reward: 10000, diamondReward: 5, current: 0, required: 1, type: 'boss' },
+{ id: 7, name: 'Новичок', desc: '100 кликов', reward: 50, diamondReward: 1, current: 0, required: 100, type: 'click' },
+{ id: 8, name: 'Воин', desc: '1000 кликов', reward: 200, diamondReward: 1, current: 0, required: 1000, type: 'click' },
+{ id: 20, name: 'Мастер клика', desc: '10000 кликов', reward: 1000, diamondReward: 5, current: 0, required: 10000, type: 'click' },
+{ id: 21, name: 'Бог клика', desc: '100000 кликов', reward: 5000, diamondReward: 10, current: 0, required: 100000, type: 'click' },
+{ id: 9, name: 'Богач', desc: '10000 золота', reward: 500, diamondReward: 1, current: 0, required: 10000, type: 'gold' },
+{ id: 11, name: 'Коллекционер', desc: '100000 золота', reward: 10000, diamondReward: 5, current: 0, required: 100000, type: 'gold' },
+{ id: 22, name: 'Магнат', desc: '1000000 золота', reward: 50000, diamondReward: 25, current: 0, required: 1000000, type: 'gold' },
+{ id: 23, name: 'Первые шаги', desc: '1 час в игре', reward: 500, diamondReward: 2, current: 0, required: 60, type: 'time' },
+{ id: 24, name: 'Преданный', desc: '10 часов в игре', reward: 2000, diamondReward: 5, current: 0, required: 600, type: 'time' },
+{ id: 25, name: 'Легенда', desc: '100 часов в игре', reward: 10000, diamondReward: 20, current: 0, required: 6000, type: 'time' },
+{ id: 10, name: 'Глава 1', desc: 'Пройдите главу 1', reward: 5000, diamondReward: 5, current: 0, required: 1, type: 'progress' },
+{ id: 12, name: 'Алмазный магнат', desc: '100 алмазов', reward: 5000, diamondReward: 10, current: 0, required: 100, type: 'diamond' },
+{ id: 13, name: 'Критический удар', desc: '100 критов', reward: 1000, diamondReward: 2, current: 0, required: 100, type: 'crit' },
+{ id: 14, name: 'Непобедимый', desc: '50 побед', reward: 5000, diamondReward: 10, current: 0, required: 50, type: 'win' },
+{ id: 15, name: 'Уровень 10', desc: 'Достигните 10 уровня', reward: 10000, diamondReward: 10, current: 0, required: 10, type: 'level' },
+{ id: 16, name: 'Рекламный магнат', desc: '50 просмотров рекламы', reward: 5000, diamondReward: 10, current: 0, required: 50, type: 'ad' },
+{ id: 17, name: 'Рулеточник', desc: '25 прокруток рулетки', reward: 3000, diamondReward: 5, current: 0, required: 25, type: 'roulette' },
+{ id: 18, name: 'Серийный боец', desc: '7 дней подряд', reward: 7000, diamondReward: 10, current: 0, required: 7, type: 'streak' },
+{ id: 19, name: 'Первопроходец', desc: 'Первое достижение', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'achievement' }
 ];
-
 const DAILY_REWARDS = [
 { day: 1, gold: 100, promo: 1, text: '🎁 День 1: +100 💰 +1 💎' },
 { day: 2, gold: 200, promo: 2, text: '🎁 День 2: +200 💰 +2 💎' },
@@ -1490,10 +1674,8 @@ const DAILY_REWARDS = [
 { day: 6, gold: 1000, promo: 10, text: '🎁 День 6: +1000 💰 +10 💎' },
 { day: 7, gold: 2000, promo: 20, text: '🏆 День 7: +2000 💰 +20 💎 БОНУС!' }
 ];
-
 const tg = window.Telegram.WebApp;
 if(tg && tg.ready) tg.expand();
-
 let game = {
 gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200,
 energy: 100, maxEnergy: 100, prestige: 0, clicks: 0, totalCrits: 0, day: 1,
@@ -1507,19 +1689,19 @@ totalPlayTime: 0,
 autoClick: false,
 autoEnergy: false,
 freeSpinAvailable: true,
-lastFreeSpin: null
+lastFreeSpin: null,
+userId: null,
+username: null,
+lastClickTime: 0
 };
-
 let autoSaveInterval, energyRegenInterval, adTimerInterval, adTimeLeft = 0;
+let countdownInterval;
 let rouletteSpinning = false;
-let lastClickTime = 0;
-const CLICK_DELAY = 150;
 let autoClickInterval = null;
-
+let currentLeaderboardTab = 'level';
 window.onload = function() {
 showLoadingScreen();
 };
-
 function showLoadingScreen() {
 const loadingBar = document.getElementById('loadingBar');
 const loadingScreen = document.getElementById('loadingScreen');
@@ -1540,9 +1722,9 @@ initGame();
 loadingBar.style.width = progress + '%';
 }, 200);
 }
-
 function initGame() {
 loadGame();
+checkRegistration();
 checkDaily();
 checkDailyLoginReward();
 checkFreeSpin();
@@ -1553,7 +1735,7 @@ renderDevCharSelect();
 updateVersionBadge();
 updatePromoShopButtons();
 startAutoClicker();
-autoSaveInterval = setInterval(() => { saveGame(true); }, 10000);
+autoSaveInterval = setInterval(() => { saveGame(true); syncWithFirebase(); }, 10000);
 energyRegenInterval = setInterval(() => {
 if(game.energy < game.maxEnergy) {
 game.energy++;
@@ -1573,9 +1755,121 @@ charContainer.addEventListener('mousedown', function(e) {
 handleAttack(e.clientX, e.clientY);
 });
 document.addEventListener('click', initAudio, { once: true });
-window.addEventListener('beforeunload', () => { saveGame(true); });
+window.addEventListener('beforeunload', () => { saveGame(true); syncWithFirebase(); });
 }
-
+function checkRegistration() {
+const savedUser = localStorage.getItem('sf2_user');
+if (savedUser) {
+const user = JSON.parse(savedUser);
+game.userId = user.userId;
+game.username = user.username;
+showUserInfo();
+} else {
+document.getElementById('registrationModal').classList.add('active');
+}
+}
+function registerUser() {
+const username = document.getElementById('registrationUsername').value.trim();
+if (!username) {
+showToast('❌ Введите имя!');
+return;
+}
+const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+game.userId = userId;
+game.username = username;
+localStorage.setItem('sf2_user', JSON.stringify({ userId, username }));
+showUserInfo();
+document.getElementById('registrationModal').classList.remove('active');
+syncWithFirebase();
+showToast('✅ Регистрация успешна!');
+}
+function showUserInfo() {
+const userInfo = document.getElementById('userInfo');
+const userName = document.getElementById('userName');
+const userAvatar = document.getElementById('userAvatar');
+if (game.username) {
+userInfo.style.display = 'flex';
+userName.textContent = game.username;
+userAvatar.textContent = game.username.charAt(0).toUpperCase();
+}
+}
+function logout() {
+if (confirm('Выйти из аккаунта? Прогресс сохранится локально.')) {
+localStorage.removeItem('sf2_user');
+game.userId = null;
+game.username = null;
+document.getElementById('userInfo').style.display = 'none';
+showToast('👋 Вы вышли из аккаунта');
+}
+}
+function syncWithFirebase() {
+if (!game.userId || !db) return;
+db.collection('players').doc(game.userId).set({
+userId: game.userId,
+username: game.username,
+level: game.level,
+clicks: game.clicks,
+achievements: game.achievements.length,
+gold: game.gold,
+diamonds: game.promoCurrency,
+prestige: game.prestige,
+totalPlayTime: game.totalPlayTime,
+lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
+}, { merge: true }).catch(err => console.log('Firebase save error:', err));
+}
+function loadLeaderboard() {
+const leaderboardList = document.getElementById('leaderboardList');
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
+let query;
+switch(currentLeaderboardTab) {
+case 'level':
+query = db.collection('players').orderBy('level', 'desc').limit(10);
+break;
+case 'clicks':
+query = db.collection('players').orderBy('clicks', 'desc').limit(10);
+break;
+case 'achievements':
+query = db.collection('players').orderBy('achievements', 'desc').limit(10);
+break;
+}
+if (!query) return;
+query.get().then(snapshot => {
+leaderboardList.innerHTML = '';
+let rank = 1;
+snapshot.forEach(doc => {
+const player = doc.data();
+const isMe = player.userId === game.userId;
+leaderboardList.innerHTML += `
+<div class="leaderboard-item ${isMe ? 'leaderboard-me' : ''}">
+<div class="leaderboard-rank">#${rank}</div>
+<div class="leaderboard-name">${player.username || 'Аноним'}</div>
+<div class="leaderboard-value">${getValueByTab(player)}</div>
+</div>
+`;
+rank++;
+});
+if (snapshot.empty) {
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Пока нет игроков</div>';
+}
+}).catch(err => {
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Ошибка загрузки</div>';
+console.log('Leaderboard error:', err);
+});
+}
+function getValueByTab(player) {
+switch(currentLeaderboardTab) {
+case 'level': return `⭐ ${player.level}`;
+case 'clicks': return `👆 ${player.clicks}`;
+case 'achievements': return `🏆 ${player.achievements}`;
+default: return '-';
+}
+}
+function switchLeaderboardTab(tab) {
+currentLeaderboardTab = tab;
+document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
+event.target.classList.add('active');
+loadLeaderboard();
+}
 function startAutoClicker() {
 if (autoClickInterval) {
 clearInterval(autoClickInterval);
@@ -1588,14 +1882,13 @@ handleAttack(window.innerWidth / 2, window.innerHeight / 2);
 }, 1000);
 }
 }
-
 function updatePlayTime() {
 game.totalPlayTime++;
 updateUI();
 }
-
 function updateLoginLog() {
 const lastLoginEl = document.getElementById('lastLoginLog');
+const userIdEl = document.getElementById('userIdLog');
 const playTimeEl = document.getElementById('playTimeLog');
 if (game.lastLogin) {
 const lastLogin = new Date(game.lastLogin);
@@ -1603,11 +1896,15 @@ lastLoginEl.textContent = `Последний вход: ${lastLogin.toLocaleStri
 } else {
 lastLoginEl.textContent = 'Последний вход: Никогда';
 }
+if (game.userId) {
+userIdEl.textContent = `ID игрока: ${game.userId.substr(0, 12)}...`;
+} else {
+userIdEl.textContent = 'ID игрока: ---';
+}
 const hours = Math.floor(game.totalPlayTime / 60);
 const mins = game.totalPlayTime % 60;
 playTimeEl.textContent = `Время в игре: ${hours}ч ${mins}мин`;
 }
-
 function checkFreeSpin() {
 const now = Date.now();
 const oneDay = 24 * 60 * 60 * 1000;
@@ -1631,7 +1928,6 @@ freeSpinInfo.style.display = 'block';
 freeSpinInfo.innerHTML = '🎁 Бесплатный спин доступен!';
 }
 }
-
 function useFreeSpin() {
 if (!game.freeSpinAvailable) {
 return false;
@@ -1642,13 +1938,13 @@ checkFreeSpin();
 saveGame();
 return true;
 }
-
 function handleAttack(x, y) {
+// ЗАЩИТА ОТ БЫСТРОГО КЛИКА (300мс задержка - УМЕНЬШЕНА СКОРОСТЬ)
 const now = Date.now();
-if (now - lastClickTime < CLICK_DELAY) {
+if (now - game.lastClickTime < 300) {
 return;
 }
-lastClickTime = now;
+game.lastClickTime = now;
 if (game.energy <= 0) {
 if (game.autoEnergy && game.gold >= 100) {
 buyEnergy();
@@ -1696,14 +1992,12 @@ enemyDefeated();
 }
 updateUI();
 }
-
 function autoEnergyPurchase() {
 if (game.autoEnergy && game.energy <= 10 && game.gold >= 100) {
 buyEnergy();
 showToast('⚡ Авто-покупка энергии!');
 }
 }
-
 function enemyDefeated() {
 const char = CHARACTERS[game.currentEnemy];
 let bonus = Math.floor(char.hp / 20);
@@ -1726,22 +2020,17 @@ setTimeout(() => {
 showVictoryScreen(char.name);
 }, 500);
 }
-
 function showVictoryScreen(enemyName) {
 const victoryScreen = document.getElementById('victoryScreen');
 const victoryEnemyName = document.getElementById('victoryEnemyName');
-const victoryNextBtn = document.getElementById('victoryNextBtn');
 victoryEnemyName.textContent = `${enemyName} повержен`;
 victoryScreen.classList.add('active');
-// Кнопка уже есть в HTML, просто показываем экран
+setTimeout(() => {
+victoryScreen.classList.remove('active');
+nextEnemyWithCountdown();
+}, 2000);
 }
-
-function goToNextEnemy() {
-document.getElementById('victoryScreen').classList.remove('active');
-nextEnemy();
-}
-
-function nextEnemy() {
+function nextEnemyWithCountdown() {
 let currentIndex = CHARACTER_ORDER.indexOf(game.currentEnemy);
 const char = CHARACTERS[game.currentEnemy];
 // Проверка на следующий раунд ТОГО ЖЕ персонажа
@@ -1767,9 +2056,17 @@ game.enemyMaxHp = nextChar.hp;
 document.body.style.backgroundImage = `url('${nextChar.bgImg}')`;
 updateRoundInfo();
 updateCharacterDisplay();
-showToast(`⚔️ Новый противник: ${nextChar.name}!`);
-updateUI();
-saveGame();
+showCountdown(() => {
+const countdownScreen = document.getElementById('countdownScreen');
+const countdownNumber = document.getElementById('countdownNumber');
+const fightButton = document.getElementById('fightButton');
+countdownNumber.textContent = '⚔️';
+fightButton.classList.add('active');
+window.nextEnemyData = {
+key: nextEnemyKey,
+char: nextChar
+};
+});
 }
 // Глава пройдена - после Рыси
 else {
@@ -1801,12 +2098,55 @@ updateUI();
 updateUI();
 saveGame();
 }
-
 function updateRoundInfo() {
 const char = CHARACTERS[game.currentEnemy];
 document.getElementById('roundInfo').textContent = `Раунд ${game.currentRound} из ${char.rounds}`;
 }
-
+function showCountdown(callback) {
+const countdownScreen = document.getElementById('countdownScreen');
+const countdownNumber = document.getElementById('countdownNumber');
+const countdownText = document.getElementById('countdownText');
+const fightButton = document.getElementById('fightButton');
+fightButton.classList.remove('active');
+let count = 3;
+countdownScreen.classList.add('active');
+countdownNumber.textContent = count;
+countdownText.textContent = '';
+countdownNumber.style.animation = 'none';
+void countdownNumber.offsetWidth;
+countdownNumber.style.animation = 'countdownPop 1s ease-in-out';
+countdownInterval = setInterval(() => {
+count--;
+if (count >= 0) {
+countdownNumber.textContent = count;
+countdownNumber.style.animation = 'none';
+void countdownNumber.offsetWidth;
+countdownNumber.style.animation = 'countdownPop 1s ease-in-out';
+} else {
+clearInterval(countdownInterval);
+if (callback) callback();
+}
+}, 1000);
+}
+function startFight() {
+const countdownScreen = document.getElementById('countdownScreen');
+const fightButton = document.getElementById('fightButton');
+playSound('fightSound');
+countdownScreen.classList.remove('active');
+fightButton.classList.remove('active');
+if (window.nextEnemyData) {
+playSound('transitionSound');
+game.currentEnemy = window.nextEnemyData.key;
+game.enemyHp = window.nextEnemyData.char.hp;
+game.enemyMaxHp = window.nextEnemyData.char.hp;
+document.body.style.backgroundImage = `url('${window.nextEnemyData.char.bgImg}')`;
+updateCharacterDisplay();
+showToast(`⚔️ Новый противник: ${window.nextEnemyData.char.name}!`);
+updateUI();
+saveGame();
+window.nextEnemyData = null;
+}
+}
 function spinRoulette() {
 if (rouletteSpinning) return;
 let cost = 3;
@@ -1868,7 +2208,6 @@ updateUI();
 saveGame();
 }, 3000);
 }
-
 function getResultByType(type) {
 switch(type) {
 case 'gold':
@@ -1883,7 +2222,6 @@ default:
 return ['🍒', '🍋', '🍇'];
 }
 }
-
 function checkWin(results, resultType) {
 const resultEl = document.getElementById('rouletteResult');
 if (resultType === 'gold') {
@@ -1909,7 +2247,6 @@ resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!';
 addXP(10);
 updateUI();
 }
-
 function buyEnergy() {
 if (game.gold >= 100) {
 game.gold -= 100;
@@ -1922,7 +2259,6 @@ saveGame();
 showToast('❌ Недостаточно золота');
 }
 }
-
 function updateCharacterDisplay() {
 const char = CHARACTERS[game.currentEnemy];
 document.getElementById('charImg').src = char.img;
@@ -1935,7 +2271,6 @@ container.style.border = '3px solid #fff';
 container.innerHTML = `<div style="color:#fff; text-align:center; padding: 20px;"><div style="font-size: 24px; font-weight: bold;">${char.name}</div></div>`;
 };
 }
-
 function buyUpgrade(type, free = false) {
 let cost = game.costs[type];
 if (free || game.gold >= cost) {
@@ -1955,7 +2290,6 @@ saveGame();
 showToast('❌ Недостаточно золота');
 }
 }
-
 function activatePromoCode() {
 const input = document.getElementById('promoCodeInput');
 const code = input.value.trim().toUpperCase();
@@ -1978,7 +2312,6 @@ saveGame();
 showToast('❌ Неверный код!');
 }
 }
-
 function buyPromoItem(item) {
 const items = {
 'gold1000': { cost: 5, gold: 1000 },
@@ -2023,7 +2356,6 @@ saveGame();
 showToast('❌ Недостаточно промо валюты!');
 }
 }
-
 function updatePromoShopButtons() {
 const btnAutoClick = document.getElementById('btnAutoClick');
 const btnAutoEnergy = document.getElementById('btnAutoEnergy');
@@ -2042,7 +2374,6 @@ btnAutoEnergy.disabled = true;
 }
 }
 }
-
 function openDevMenu() { document.getElementById('devPasswordModal').style.display = 'flex'; }
 function closeDevPasswordModal() { document.getElementById('devPasswordModal').style.display = 'none'; document.getElementById('devPasswordInput').value = ''; }
 function checkDevPassword() {
@@ -2106,33 +2437,37 @@ function addXP(amount) {
 game.xp += amount;
 const nextRank = RANKS.find(r => r.level === game.level + 1);
 if (nextRank && game.xp >= nextRank.xpRequired) {
+const reward = nextRank.reward;
 game.level++;
 game.xp = 0;
-showToast(`⭐ Уровень повышен! Теперь вы ${RANKS.find(r => r.level === game.level)?.name || 'Бог Войны'}!`);
+if (reward.gold > 0 || reward.diamonds > 0) {
+game.gold += reward.gold;
+game.promoCurrency += reward.diamonds;
+showToast(`⭐ Уровень ${game.level}! ${reward.gold > 0 ? '+' + reward.gold + ' 💰 ' : ''}${reward.diamonds > 0 ? '+' + reward.diamonds + ' 💎' : ''}`);
+} else {
+showToast(`⭐ Уровень повышен! Теперь вы ${RANKS.find(r => r.level === game.level)?.name || 'Творец'}!`);
+}
 playSound('winSound');
 updateAchievementProgress(15, game.level);
+syncWithFirebase();
 }
 updateUI();
 saveGame();
 }
-
 function getRankName() {
 const rank = RANKS.find(r => r.level === game.level);
-return rank ? rank.name : 'Бог Войны';
+return rank ? rank.name : 'Творец';
 }
-
 function getNextLevelXP() {
 const rank = RANKS.find(r => r.level === game.level + 1);
-return rank ? rank.xpRequired : 50000;
+return rank ? rank.xpRequired : 1000000;
 }
-
 function updateAchievementProgress(id, value) {
 const ach = ACHIEVEMENTS.find(a => a.id === id);
 if (ach) {
 ach.current = value;
 }
 }
-
 function checkDailyLoginReward() {
 const today = new Date().toISOString().split('T')[0];
 const streakDay = Math.min(game.loginStreak, 7);
@@ -2150,7 +2485,6 @@ saveGame();
 }
 }
 }
-
 function watchAd() {
 if (typeof AdsGram !== 'undefined') {
 AdsGram.showAd({
@@ -2186,7 +2520,6 @@ saveGame();
 }, 3000);
 }
 }
-
 function watchAdForDiamond() {
 if (typeof AdsGram !== 'undefined') {
 AdsGram.showAd({
@@ -2214,7 +2547,6 @@ saveGame();
 }, 3000);
 }
 }
-
 function initAudio() {
 const music = document.getElementById('bgMusic');
 if (game.musicOn && music.paused) {
@@ -2222,7 +2554,6 @@ music.volume = 0.3;
 music.play().catch(e => console.log('Audio autoplay blocked'));
 }
 }
-
 function toggleMusic() {
 game.musicOn = !game.musicOn;
 const music = document.getElementById('bgMusic');
@@ -2231,7 +2562,6 @@ if (game.musicOn) { music.play(); btn.innerHTML = '🎵'; showToast('🎵 Муз
 else { music.pause(); btn.innerHTML = '🔇'; showToast('🔇 Музыка выключена'); }
 saveGame();
 }
-
 function toggleSound() {
 game.soundOn = !game.soundOn;
 const btn = document.getElementById('soundBtn');
@@ -2239,30 +2569,35 @@ btn.innerHTML = game.soundOn ? '🔊' : '🔇';
 showToast(game.soundOn ? '🔊 Звук включён' : '🔇 Звук выключен');
 saveGame();
 }
-
 function playSound(soundId) {
 if (!game.soundOn) return;
 const sound = document.getElementById(soundId);
 if (sound) { sound.currentTime = 0; sound.volume = 0.5; sound.play().catch(e => {}); }
 }
-
 function checkAchievements() {
 ACHIEVEMENTS.forEach((ach) => {
 if (!game.achievements.includes(ach.id)) {
 let unlocked = false;
-if (ach.id === 7 && game.clicks >= 100) unlocked = true;
-else if (ach.id === 8 && game.clicks >= 1000) unlocked = true;
-else if (ach.id === 9 && game.totalGold >= 10000) unlocked = true;
-else if (ach.id === 10 && game.chapter1Complete) unlocked = true;
-else if (ach.id === 11 && game.totalGold >= 100000) unlocked = true;
-else if (ach.id === 12 && game.promoCurrency >= 100) unlocked = true;
-else if (ach.id === 13 && game.totalCrits >= 100) unlocked = true;
-else if (ach.id === 14 && game.totalWins >= 50) unlocked = true;
-else if (ach.id === 15 && game.level >= 10) unlocked = true;
-else if (ach.id === 16 && stats.totalAdViews >= 50) unlocked = true;
-else if (ach.id === 17 && game.rouletteSpins >= 25) unlocked = true;
-else if (ach.id === 18 && game.loginStreak >= 7) unlocked = true;
-else if (ach.id === 19 && game.achievements.length >= 1) unlocked = true;
+if (ach.type === 'click' && ach.id === 7 && game.clicks >= 100) unlocked = true;
+else if (ach.type === 'click' && ach.id === 8 && game.clicks >= 1000) unlocked = true;
+else if (ach.type === 'click' && ach.id === 20 && game.clicks >= 10000) unlocked = true;
+else if (ach.type === 'click' && ach.id === 21 && game.clicks >= 100000) unlocked = true;
+else if (ach.type === 'gold' && ach.id === 9 && game.totalGold >= 10000) unlocked = true;
+else if (ach.type === 'gold' && ach.id === 11 && game.totalGold >= 100000) unlocked = true;
+else if (ach.type === 'gold' && ach.id === 22 && game.totalGold >= 1000000) unlocked = true;
+else if (ach.type === 'time' && ach.id === 23 && game.totalPlayTime >= 60) unlocked = true;
+else if (ach.type === 'time' && ach.id === 24 && game.totalPlayTime >= 600) unlocked = true;
+else if (ach.type === 'time' && ach.id === 25 && game.totalPlayTime >= 6000) unlocked = true;
+else if (ach.type === 'boss' && game.achievements.includes(ach.id)) unlocked = true;
+else if (ach.type === 'progress' && ach.id === 10 && game.chapter1Complete) unlocked = true;
+else if (ach.type === 'diamond' && ach.id === 12 && game.promoCurrency >= 100) unlocked = true;
+else if (ach.type === 'crit' && ach.id === 13 && game.totalCrits >= 100) unlocked = true;
+else if (ach.type === 'win' && ach.id === 14 && game.totalWins >= 50) unlocked = true;
+else if (ach.type === 'level' && ach.id === 15 && game.level >= 10) unlocked = true;
+else if (ach.type === 'ad' && ach.id === 16 && stats.totalAdViews >= 50) unlocked = true;
+else if (ach.type === 'roulette' && ach.id === 17 && game.rouletteSpins >= 25) unlocked = true;
+else if (ach.type === 'streak' && ach.id === 18 && game.loginStreak >= 7) unlocked = true;
+else if (ach.type === 'achievement' && ach.id === 19 && game.achievements.length >= 1) unlocked = true;
 if (unlocked) {
 game.achievements.push(ach.id);
 game.gold += ach.reward;
@@ -2270,12 +2605,12 @@ game.promoCurrency += ach.diamondReward;
 game.totalGold += ach.reward;
 showToast(`🏆 ${ach.name}! +${ach.reward} 💰 +${ach.diamondReward} 💎`);
 playSound('winSound');
+syncWithFirebase();
 }
 }
 });
 updateUI();
 }
-
 function checkDaily() {
 const today = new Date().toDateString();
 const todayISO = new Date().toISOString().split('T')[0];
@@ -2297,7 +2632,6 @@ updateAchievementProgress(18, game.loginStreak);
 saveGame();
 }
 }
-
 function switchScreen(screenId, btn) {
 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
 document.getElementById('screen-' + screenId).classList.add('active');
@@ -2307,8 +2641,10 @@ if (screenId === 'profile') {
 renderAchievements();
 updateLoginLog();
 }
+if (screenId === 'leaderboard') {
+loadLeaderboard();
 }
-
+}
 function updateUI() {
 const char = CHARACTERS[game.currentEnemy];
 document.getElementById('uiGold').innerText = Math.floor(game.gold);
@@ -2350,7 +2686,6 @@ const xpPct = (game.xp / nextLevelXP) * 100;
 document.getElementById('xpFill').style.width = xpPct + '%';
 document.getElementById('xpText').innerText = `${game.xp}/${nextLevelXP} XP`;
 }
-
 function renderAchievements() {
 const list = document.getElementById('achievementsList');
 list.innerHTML = '';
@@ -2365,7 +2700,6 @@ ${!unlocked && progress ? `<div class="achievement-progress">Прогресс: $
 </div>`;
 });
 }
-
 function showDamage(x, y, text, isCrit) {
 const el = document.createElement('div');
 el.className = `damage-popup ${isCrit ? 'crit' : ''}`;
@@ -2375,14 +2709,12 @@ el.style.top = (y - 80) + 'px';
 document.body.appendChild(el);
 setTimeout(() => el.remove(), 1000);
 }
-
 function showToast(msg) {
 const t = document.getElementById('toast');
 t.innerText = msg;
 t.classList.add('show');
 setTimeout(() => t.classList.remove('show'), 2500);
 }
-
 function saveGame(showIndicator = false) {
 game.lastSave = new Date().toISOString();
 localStorage.setItem('sf2_chapter1', JSON.stringify(game));
@@ -2397,7 +2729,6 @@ indicator.classList.add('show');
 setTimeout(() => indicator.classList.remove('show'), 2000);
 }
 }
-
 function loadGame() {
 const saved = localStorage.getItem('sf2_chapter1');
 const savedPromo = localStorage.getItem('sf2_promoCodes');
@@ -2420,11 +2751,9 @@ game.enemyMaxHp = char.hp;
 if (!game.musicOn) document.getElementById('musicBtn').innerHTML = '🔇';
 if (!game.soundOn) document.getElementById('soundBtn').innerHTML = '🔇';
 }
-
 function updateVersionBadge() {
 document.getElementById('versionBadge').textContent = `v${gameVersion}`;
 }
-
 function doPrestige() {
 let points = Math.floor(game.clicks / 1000);
 if (points < 1) points = 1;
@@ -2451,15 +2780,12 @@ saveGame();
 closePrestigeChapterModal();
 }
 }
-
 function doPrestigeFromModal() {
 doPrestige();
 }
-
 function closePrestigeChapterModal() {
 document.getElementById('prestigeChapterModal').classList.remove('active');
 }
-
 function confirmReset() {
 if (!confirm('☠️ Вы уверены? Весь прогресс будет удалён безвозвратно!')) return;
 game = {
@@ -2475,7 +2801,10 @@ totalPlayTime: 0,
 autoClick: false,
 autoEnergy: false,
 freeSpinAvailable: true,
-lastFreeSpin: null
+lastFreeSpin: null,
+userId: game.userId,
+username: game.username,
+lastClickTime: 0
 };
 stats = { totalAdViews: 0, totalPromoActivations: 0 };
 adSlots.forEach(slot => { slot.views = 0; });
@@ -2486,10 +2815,8 @@ showToast('☠️ Прогресс сброшен!');
 playSound('winSound');
 updateUI();
 saveGame();
+syncWithFirebase();
 }
 </script>
 </body>
 </html>
-
-
-
