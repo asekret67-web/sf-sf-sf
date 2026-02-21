@@ -9,7 +9,7 @@
 <title>Shadow Fight 2 - Глава 1</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <!-- AdsGram Script -->
-<script async src="https://api.adsgram.ai/adsgram.min.js"></script>
+<script src="https://api.adsgram.ai/adsgram.min.js"></script>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -1708,6 +1708,18 @@ measurementId: "G-74F5V4RP0Z"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// ================= ADSGRAM ПЕРЕМЕННАЯ =================
+let adsgramAvailable = false;
+
+// После загрузки страницы
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        adsgramAvailable = typeof AdsGram !== 'undefined';
+        console.log('📺 AdsGram доступен:', adsgramAvailable);
+    }, 2000);
+});
+
 // ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
 const CHARACTERS = {
 shin: { name: 'Шин', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Я ШИН первый телохранитель Рыси.', achievementId: 1, order: 1, rounds: 2 },
@@ -1881,6 +1893,25 @@ loadingBar.style.width = progress + '%';
 }, 200);
 }
 function initGame() {
+// ✅ ДИАГНОСТИКА ADSGRAM
+console.log('🔍 Проверка AdsGram...');
+console.log('🌐 URL:', window.location.href);
+console.log('📱 Telegram WebApp:', typeof window.Telegram !== 'undefined');
+console.log('📺 AdsGram объект:', typeof AdsGram);
+
+if (typeof AdsGram === 'undefined') {
+console.warn('⚠️ Скрипт AdsGram не найден в окне');
+setTimeout(() => {
+if (typeof AdsGram === 'undefined') {
+console.error('❌ AdsGram не загрузился после ожидания');
+} else {
+console.log('✅ AdsGram загрузился с задержкой');
+}
+}, 2000);
+} else {
+console.log('✅ AdsGram готов к работе');
+}
+
 // Инициализация Telegram
 if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
 game.telegramId = 'tg_' + tg.initDataUnsafe.user.id;
@@ -1888,6 +1919,7 @@ if (!game.username) {
 game.username = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || 'Игрок';
 }
 }
+
 loadGame();
 checkRegistration();
 checkDaily();
@@ -1913,7 +1945,9 @@ setInterval(updatePlayTime, 60000);
 setInterval(autoEnergyPurchase, 5000);
 const charContainer = document.getElementById('charContainer');
 charContainer.addEventListener('touchstart', function(e) {
+if (e.cancelable) {
 e.preventDefault();
+}
 handleAttack(e.touches[0].clientX, e.touches[0].clientY);
 }, { passive: false });
 charContainer.addEventListener('mousedown', function(e) {
@@ -2680,10 +2714,14 @@ saveGame();
 }
 }
 function watchAd() {
-if (typeof AdsGram !== 'undefined') {
+console.log('📺 Запрос рекламы...');
+console.log('AdsGram объект:', typeof AdsGram);
+
+if (typeof AdsGram !== 'undefined' && AdsGram.showAd) {
 AdsGram.showAd({
 blockId: '23308',
 onSuccess: function() {
+console.log('✅ Реклама успешна');
 const ad = adSlots[currentAdSlot];
 game.gold += ad.reward;
 game.totalGold += ad.reward;
@@ -2697,11 +2735,21 @@ updateUI();
 saveGame();
 },
 onError: function(error) {
-console.log('Ad error:', error);
+console.log('❌ Ошибка рекламы:', error);
 showToast('❌ Ошибка загрузки рекламы');
+setTimeout(() => {
+const ad = adSlots[currentAdSlot];
+game.gold += ad.reward;
+game.totalGold += ad.reward;
+showToast(`📺 +${ad.reward} 💰 (тест)`);
+currentAdSlot = (currentAdSlot + 1) % 5;
+updateUI();
+saveGame();
+}, 2000);
 }
 });
 } else {
+console.log('⚠️ AdsGram не доступен, тестовый режим');
 showToast('🧪 Тестовая реклама (нет AdsGram)');
 setTimeout(() => {
 const ad = adSlots[currentAdSlot];
@@ -2715,10 +2763,13 @@ saveGame();
 }
 }
 function watchAdForDiamond() {
-if (typeof AdsGram !== 'undefined') {
+console.log('💎 Запрос рекламы за алмазы...');
+
+if (typeof AdsGram !== 'undefined' && AdsGram.showAd) {
 AdsGram.showAd({
 blockId: '23308',
 onSuccess: function() {
+console.log('✅ Реклама за алмазы успешна');
 game.promoCurrency += 1;
 stats.totalAdViews++;
 showToast(`📺 +1 💎 за просмотр рекламы!`);
@@ -2727,11 +2778,18 @@ updateUI();
 saveGame();
 },
 onError: function(error) {
-console.log('Ad error:', error);
+console.log('❌ Ошибка рекламы:', error);
 showToast('❌ Ошибка загрузки рекламы');
+setTimeout(() => {
+game.promoCurrency += 1;
+showToast(`📺 +1 💎 (тест)`);
+updateUI();
+saveGame();
+}, 2000);
 }
 });
 } else {
+console.log('⚠️ AdsGram не доступен, тестовый режим');
 showToast('🧪 Тестовая реклама (нет AdsGram)');
 setTimeout(() => {
 game.promoCurrency += 1;
