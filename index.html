@@ -6,10 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a0a">
-<title>Shadow Fight 2 - Глава 1</title>
+<title>SHADOW STRIKE - Глава 1 & 2</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<!-- AdsGram Script -->
-<script src="https://api.adsgram.ai/adsgram.min.js"></script>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -88,6 +86,7 @@ color: var(--accent);
 margin-bottom: 30px;
 text-transform: uppercase;
 letter-spacing: 3px;
+font-weight: bold;
 }
 .loading-bar-bg {
 width: 300px;
@@ -102,20 +101,6 @@ background: linear-gradient(90deg, var(--accent), #ff6b6b);
 width: 0%;
 transition: width 0.3s ease;
 box-shadow: 0 0 20px rgba(255, 152, 0, 0.5);
-}
-.loading-disclaimer {
-position: absolute;
-bottom: 30px;
-left: 50%;
-transform: translateX(-50%);
-font-size: 11px;
-color: #666;
-text-align: center;
-max-width: 90%;
-line-height: 1.4;
-padding: 10px;
-background: rgba(0,0,0,0.3);
-border-radius: 8px;
 }
 .version-badge {
 position: absolute;
@@ -259,16 +244,18 @@ transition: all 0.3s;
 transform: scale(1.1);
 box-shadow: 0 0 30px rgba(255, 152, 0, 0.8);
 }
+/* === МЕНЮ (50% ЭКРАНА) === */
 .side-nav {
 position: fixed;
 top: 0;
-left: -280px;
-width: 280px;
+left: -50%;
+width: 50%;
+max-width: 320px;
 height: 100vh;
 background: rgba(26, 26, 46, 0.98);
 backdrop-filter: blur(15px);
 z-index: 200;
-transition: left 0.3s ease;
+transition: left 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 border-right: 2px solid var(--accent);
 box-shadow: 5px 0 30px rgba(0,0,0,0.5);
 display: flex;
@@ -294,14 +281,18 @@ color: var(--accent);
 background: none;
 border: none;
 color: #fff;
-font-size: 24px;
+font-size: 32px;
 cursor: pointer;
 padding: 5px;
+line-height: 1;
 }
 .side-nav-content {
 flex: 1;
 padding: 20px;
 overflow-y: auto;
+display: flex;
+flex-direction: column;
+align-items: stretch;
 }
 .side-nav-btn {
 background: rgba(255,255,255,0.05);
@@ -318,6 +309,7 @@ gap: 15px;
 transition: all 0.2s;
 width: 100%;
 text-align: left;
+justify-content: flex-start;
 }
 .side-nav-btn:hover {
 background: rgba(255, 152, 0, 0.2);
@@ -330,6 +322,8 @@ border-color: var(--accent);
 }
 .side-nav-icon {
 font-size: 24px;
+min-width: 30px;
+text-align: center;
 }
 .side-nav-overlay {
 position: fixed;
@@ -426,6 +420,12 @@ cursor: pointer;
 transition: transform 0.1s;
 margin-top: 10px;
 }
+/* Блокировка клика во время перехода */
+.char-container.disabled {
+pointer-events: none;
+filter: grayscale(0.5);
+opacity: 0.7;
+}
 .char-container:active {
 transform: scale(0.95);
 }
@@ -488,6 +488,80 @@ color: #ffeb3b;
 font-size: 48px;
 text-shadow: 0 0 30px #ff0, 3px 3px 0 #000;
 animation: critBounce 1s forwards;
+}
+/* Комбо счетчик */
+.combo-counter {
+position: fixed;
+top: 150px;
+right: 20px;
+background: rgba(255, 152, 0, 0.9);
+color: #fff;
+padding: 10px 20px;
+border-radius: 25px;
+font-weight: bold;
+font-size: 18px;
+z-index: 100;
+opacity: 0;
+transition: opacity 0.3s;
+pointer-events: none;
+}
+.combo-counter.active {
+opacity: 1;
+animation: comboPulse 0.5s infinite;
+}
+@keyframes comboPulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.1); }
+}
+/* Панель способностей */
+.abilities-bar {
+position: fixed;
+bottom: 90px;
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: 10px;
+z-index: 100;
+}
+.ability-btn {
+width: 60px;
+height: 60px;
+border-radius: 50%;
+border: 3px solid var(--accent);
+background: rgba(0,0,0,0.8);
+color: #fff;
+font-size: 24px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+position: relative;
+overflow: hidden;
+transition: all 0.2s;
+}
+.ability-btn:active {
+transform: scale(0.9);
+}
+.ability-btn.disabled {
+opacity: 0.5;
+cursor: not-allowed;
+filter: grayscale(1);
+}
+.ability-cooldown {
+position: absolute;
+bottom: 0;
+left: 0;
+width: 100%;
+height: 0%;
+background: rgba(0,0,0,0.7);
+transition: height 0.1s linear;
+}
+.ability-key {
+position: absolute;
+top: 2px;
+right: 5px;
+font-size: 10px;
+color: var(--accent);
 }
 @keyframes damageFloat {
 0% { opacity: 1; transform: translateY(0) scale(1); }
@@ -599,10 +673,47 @@ transition: opacity 0.3s;
 .transition-effect.active {
 opacity: 1;
 }
+/* Вкладки на весь экран */
 #screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard {
-background: rgba(26, 26, 46, 0.95);
-backdrop-filter: blur(10px);
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(26, 26, 46, 0.98);
+backdrop-filter: blur(15px);
+z-index: 300;
 padding-top: 80px;
+display: none;
+overflow-y: auto;
+}
+#screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active {
+display: block;
+animation: fadeIn 0.3s;
+}
+.close-tab-btn {
+position: fixed;
+top: 20px;
+right: 20px;
+background: rgba(244, 67, 54, 0.2);
+border: 2px solid var(--red);
+color: var(--red);
+width: 50px;
+height: 50px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+z-index: 310;
+backdrop-filter: blur(5px);
+transition: all 0.2s;
+}
+.close-tab-btn:hover {
+background: var(--red);
+color: #fff;
+transform: rotate(90deg);
 }
 .shop-item {
 background: rgba(255,255,255,0.05);
@@ -635,24 +746,6 @@ font-size: 16px;
 box-shadow: 0 4px 15px rgba(224, 64, 251, 0.4);
 }
 .btn-dev:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(224, 64, 251, 0.6); }
-.ad-btn {
-width: 100%;
-padding: 18px;
-background: linear-gradient(45deg, #2196F3, #21CBF3);
-color: white;
-border: none;
-border-radius: 12px;
-font-size: 16px;
-font-weight: bold;
-margin-bottom: 20px;
-cursor: pointer;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 10px;
-box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-}
-.ad-btn:active { transform: scale(0.98); }
 .stat-box {
 background: rgba(0,0,0,0.4);
 padding: 20px;
@@ -864,74 +957,6 @@ cursor: pointer;
 .btn-promo-buy.purchased {
 background: #4caf50;
 cursor: default;
-}
-.prestige-chapter-modal {
-display: none;
-position: fixed;
-top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(0,0,0,0.95);
-z-index: 3000;
-justify-content: center;
-align-items: center;
-padding: 20px;
-}
-.prestige-chapter-modal.active {
-display: flex;
-}
-.prestige-chapter-content {
-background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);
-padding: 40px;
-border-radius: 20px;
-max-width: 500px;
-width: 100%;
-text-align: center;
-border: 3px solid var(--dev-accent);
-box-shadow: 0 0 50px rgba(224, 64, 251, 0.5);
-}
-.prestige-chapter-title {
-font-size: 32px;
-color: var(--dev-accent);
-margin-bottom: 20px;
-text-shadow: 0 0 20px rgba(224, 64, 251, 0.8);
-}
-.prestige-chapter-subtitle {
-font-size: 24px;
-color: #ffd700;
-margin-bottom: 30px;
-text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
-}
-.prestige-chapter-text {
-font-size: 16px;
-color: #ccc;
-margin-bottom: 30px;
-line-height: 1.6;
-}
-.prestige-chapter-buttons {
-display: flex;
-gap: 15px;
-justify-content: center;
-}
-.prestige-chapter-btn {
-flex: 1;
-padding: 15px 30px;
-border: none;
-border-radius: 10px;
-font-weight: bold;
-font-size: 16px;
-cursor: pointer;
-transition: all 0.3s;
-}
-.prestige-chapter-btn.prestige {
-background: linear-gradient(135deg, #e040fb 0%, #aa00ff 100%);
-color: #fff;
-box-shadow: 0 4px 20px rgba(224, 64, 251, 0.5);
-}
-.prestige-chapter-btn.later {
-background: #444;
-color: #fff;
-}
-.prestige-chapter-btn:hover {
-transform: translateY(-3px);
 }
 .roulette-container {
 text-align: center;
@@ -1278,19 +1303,56 @@ cursor: pointer;
 margin-top: 10px;
 margin-left: 10px;
 }
+/* Офлайн заработок */
+.offline-earnings-modal {
+display: none;
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.9);
+z-index: 5000;
+justify-content: center;
+align-items: center;
+padding: 20px;
+}
+.offline-earnings-modal.active {
+display: flex;
+}
+.offline-earnings-content {
+background: linear-gradient(135deg, #1a1a2e, #2d1b4e);
+padding: 40px;
+border-radius: 20px;
+max-width: 400px;
+width: 100%;
+text-align: center;
+border: 3px solid var(--accent);
+box-shadow: 0 0 50px rgba(255, 152, 0, 0.5);
+}
+.offline-earnings-amount {
+font-size: 32px;
+color: #ffd700;
+margin: 20px 0;
+text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+}
 @media (max-width: 480px) {
 .loading-text { font-size: 20px; }
 .loading-bar-bg { width: 250px; }
 .char-container { width: 240px; height: 280px; }
 .top-bar { padding: 10px 15px; }
 .energy-container { max-width: 200px; }
-.side-nav { width: 250px; }
+.side-nav {
+width: 65%;
+max-width: none;
+left: -65%;
+}
+.side-nav.active { left: 0; }
 .dev-section { padding: 10px; }
 .char-select-grid { grid-template-columns: repeat(2, 1fr); }
 .countdown-number { font-size: 100px; }
 .victory-text { font-size: 48px; }
 .fight-button { font-size: 24px; padding: 15px 40px; }
 .slot-reel { width: 60px; height: 80px; font-size: 36px; }
+.abilities-bar { bottom: 80px; }
+.ability-btn { width: 50px; height: 50px; font-size: 20px; }
 }
 @media (max-width: 360px) {
 .loading-text { font-size: 18px; }
@@ -1306,14 +1368,11 @@ margin-left: 10px;
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
-<div class="version-badge" id="versionBadge">V1.1.3</div>
+<div class="version-badge" id="versionBadge">V2.2.0</div>
 <div class="loading-logo">⚔️</div>
-<div class="loading-text">Shadow Fight 2</div>
+<div class="loading-text">SHADOW STRIKE</div>
 <div class="loading-bar-bg">
 <div class="loading-bar-fill" id="loadingBar"></div>
-</div>
-<div class="loading-disclaimer">
-⚠️ ДИСКЛЕЙМЕР: Игра является фанатским проектом и не связана с официальными разработчиками Shadow Fight 2. Все права на оригинальную игру принадлежат Nekki. Игра создана в образовательных целях.
 </div>
 </div>
 <div class="countdown-screen" id="countdownScreen">
@@ -1323,7 +1382,38 @@ margin-left: 10px;
 </div>
 <div class="victory-screen" id="victoryScreen">
 <div class="victory-text">🏆 ПОБЕДА!</div>
-<div class="victory-enemy-name" id="victoryEnemyName">Шин повержен</div>
+<div class="victory-enemy-name" id="victoryEnemyName">Клинок Рассвета повержен</div>
+</div>
+<!-- Офлайн заработок -->
+<div class="offline-earnings-modal" id="offlineEarningsModal">
+<div class="offline-earnings-content">
+<h2 style="color: var(--accent);">💰 ОФФЛАЙН ЗАРАБОТОК</h2>
+<p style="color: #ccc; margin: 10px 0;">Пока вас не было, вы заработали:</p>
+<div class="offline-earnings-amount" id="offlineAmount">+0 💰</div>
+<button class="btn-buy" onclick="claimOfflineEarnings()" style="width: 100%; margin-top: 20px;">ЗАБРАТЬ</button>
+</div>
+</div>
+<!-- Комбо счетчик -->
+<div class="combo-counter" id="comboCounter">
+🔥 Комбо: <span id="comboCount">0</span>x
+</div>
+<!-- Панель способностей -->
+<div class="abilities-bar" id="abilitiesBar">
+<div class="ability-btn" id="ability1" onclick="useAbility(1)">
+⚡
+<div class="ability-key">1</div>
+<div class="ability-cooldown" id="cooldown1"></div>
+</div>
+<div class="ability-btn" id="ability2" onclick="useAbility(2)">
+💥
+<div class="ability-key">2</div>
+<div class="ability-cooldown" id="cooldown2"></div>
+</div>
+<div class="ability-btn" id="ability3" onclick="useAbility(3)">
+🛡️
+<div class="ability-key">3</div>
+<div class="ability-cooldown" id="cooldown3"></div>
+</div>
 </div>
 <audio id="bgMusic" loop>
 <source src="audio/background.mp3" type="audio/mpeg">
@@ -1343,14 +1433,16 @@ margin-left: 10px;
 <audio id="fightSound">
 <source src="audio/fight.mp3" type="audio/mpeg">
 </audio>
+<audio id="abilitySound">
+<source src="audio/ability.mp3" type="audio/mpeg">
+</audio>
 <div class="transition-effect" id="transitionEffect"></div>
 <div class="audio-controls">
 <button class="audio-btn" onclick="toggleMusic()" id="musicBtn">🎵</button>
 <button class="audio-btn" onclick="toggleSound()" id="soundBtn">🔊</button>
 </div>
 <div class="save-indicator" id="saveIndicator">💾 Сохранено</div>
-
-<!-- Левая навигационная панель -->
+<!-- Левая навигационная панель (50% экрана) -->
 <div class="side-nav-overlay" id="sideNavOverlay" onclick="toggleSideNav()"></div>
 <div class="side-nav" id="sideNav">
 <div class="side-nav-header">
@@ -1385,11 +1477,11 @@ margin-left: 10px;
 </div>
 </div>
 <button class="menu-toggle-btn" onclick="toggleSideNav()">☰</button>
-
+<!-- Экран боя -->
 <div id="screen-battle" class="screen active">
 <div class="boss-info">
-<div class="enemy-name" id="enemyName">Шин</div>
-<div class="round-info" id="roundInfo">Раунд 1 из 2</div>
+<div class="enemy-name" id="enemyName">Клинок Рассвета</div>
+<div class="round-info" id="roundInfo">Раунд 1 из 1</div>
 <div class="hp-bar-bg">
 <div class="hp-bar-fill" id="hpFill"></div>
 <div class="hp-text"><span id="hpText">3000/3000</span></div>
@@ -1401,18 +1493,15 @@ margin-left: 10px;
 </div>
 <div class="char-description">
 <div class="char-desc-text" id="charDesc">
-Мастер боевых искусств. Быстрый и ловкий противник.
+Ловкий и стремительный боец, мастер быстрых атак и уклонений. Его стиль напоминает первые лучи солнца — внезапный и ослепляющий.
 </div>
 </div>
 </div>
 </div>
+<!-- Вкладки на весь экран с кнопкой закрытия -->
 <div id="screen-shop" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">⚔️ Магазин</h2>
-<button class="ad-btn" onclick="watchAd()">
-📺 Реклама (+500 💰)
-</button>
-<button class="ad-btn" onclick="watchAdForDiamond()" style="background: linear-gradient(45deg, #00bcd4, #0097a7);">
-💎 Реклама (+1 💎)</button>
 <div class="shop-item">
 <div>
 <div style="font-weight: bold;">⚡ +50 Энергии</div>
@@ -1428,7 +1517,7 @@ margin-left: 10px;
 <small style="color:#888">Текущий: <span id="shopDmg">1</span></small>
 </div>
 <button class="btn-buy" id="btnBuyDmg" onclick="buyUpgrade('damage')">
-<span id="costDmg">15</span> 💰
+<span id="costDmg">25</span> 💰
 </button>
 </div>
 <div class="shop-item">
@@ -1437,7 +1526,7 @@ margin-left: 10px;
 <small style="color:#888">Текущий: <span id="shopCrit">5</span>%</small>
 </div>
 <button class="btn-buy" id="btnBuyCrit" onclick="buyUpgrade('critChance')">
-<span id="costCrit">75</span> 💰
+<span id="costCrit">100</span> 💰
 </button>
 </div>
 <div class="shop-item">
@@ -1446,7 +1535,7 @@ margin-left: 10px;
 <small style="color:#888">Текущий: <span id="shopCritDmg">200</span>%</small>
 </div>
 <button class="btn-buy" id="btnBuyCritDmg" onclick="buyUpgrade('critDamage')">
-<span id="costCritDmg">150</span> 💰
+<span id="costCritDmg">200</span> 💰
 </button>
 </div>
 <div class="shop-item">
@@ -1455,11 +1544,22 @@ margin-left: 10px;
 <small style="color:#888">Текущий: <span id="shopEnergy">100</span></small>
 </div>
 <button class="btn-buy" id="btnBuyEnergy" onclick="buyUpgrade('maxEnergy')">
-<span id="costEnergy">300</span> 💰
+<span id="costEnergy">400</span> 💰
+</button>
+</div>
+<!-- НОВОЕ УЛУЧШЕНИЕ -->
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">💰 Золотой Удар</div>
+<small style="color:#888">+5% золота за клик</small>
+</div>
+<button class="btn-buy" id="btnBuyGold" onclick="buyUpgrade('goldBonus')">
+<span id="costGold">500</span> 💰
 </button>
 </div>
 </div>
 <div id="screen-profile" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">📊 Профиль</h2>
 <div class="user-info" id="userInfo" style="display: none;">
 <div class="user-avatar" id="userAvatar" onclick="uploadAvatar()">👤</div>
@@ -1483,24 +1583,21 @@ margin-left: 10px;
 <div class="stat-box">
 <div class="stat-row"><span>💀 Убито врагов:</span> <span id="statKills">0</span></div>
 <div class="stat-row"><span>👆 Всего кликов:</span> <span id="statClicks">0</span></div>
-<div class="stat-row"><span>🏆 Престиж:</span> <span id="statPrestige">0</span></div>
 <div class="stat-row"><span>📅 День:</span> <span id="statDay">1</span></div>
 <div class="stat-row"><span>🔥 Серия входов:</span> <span id="statStreak">0</span>/7</div>
+<div class="stat-row"><span>🎁 След. награда:</span> <span id="statNextReward">24ч</span></div>
 <div class="stat-row"><span>🎯 Критов:</span> <span id="statCrits">0</span></div>
 <div class="stat-row"><span>💰 Всего золота:</span> <span id="statTotalGold">0</span></div>
 <div class="stat-row"><span>💎 Промо алмазы:</span> <span id="statDiamonds">0</span></div>
 <div class="stat-row"><span>🎰 Прокруток рулетки:</span> <span id="statRoulette">0</span></div>
+<div class="stat-row"><span>🔥 Макс комбо:</span> <span id="statMaxCombo">0</span></div>
 </div>
 <h3 style="margin: 20px 0 10px; text-align: center;">🏆 Достижения</h3>
 <div id="achievementsList"></div>
-<button class="btn-buy" style="width:100%; margin-top:10px; background:#ff9800; padding: 15px;" onclick="doPrestige()">
-🔄 ПРЕСТИЖ (сохраняет бонусы)
-</button>
-<p style="font-size:11px; color:#888; margin-top:10px; text-align:center;">
-+10% к урону за каждое очко престижа
-</p>
+<!-- Кнопка престижа удалена -->
 </div>
 <div id="screen-promo" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">🎁 Промо коды</h2>
 <div class="promo-input-container">
 <input type="text" class="promo-input" id="promoCodeInput" placeholder="Введите промо код">
@@ -1540,7 +1637,7 @@ margin-left: 10px;
 <small style="color:#888">Постоянное улучшение</small>
 </div>
 <button class="btn-promo-buy" onclick="buyPromoItem('damage5')">
-10 💎
+15 💎
 </button>
 </div>
 <div class="promo-shop-item">
@@ -1549,7 +1646,7 @@ margin-left: 10px;
 <small style="color:#888">Постоянное улучшение</small>
 </div>
 <button class="btn-promo-buy" onclick="buyPromoItem('crit5')">
-15 💎
+20 💎
 </button>
 </div>
 <div class="promo-shop-item">
@@ -1558,29 +1655,49 @@ margin-left: 10px;
 <small style="color:#888">Постоянное улучшение</small>
 </div>
 <button class="btn-promo-buy" onclick="buyPromoItem('critDmg50')">
-25 💎
+30 💎
+</button>
+</div>
+<!-- НОВЫЕ УЛУЧШЕНИЯ В ПРОМО -->
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">⚡ Энергетик</div>
+<small style="color:#888">Мгновенно +100 энергии</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('stamina_boost')">
+3 💎
 </button>
 </div>
 <div class="promo-shop-item">
 <div>
-<div style="font-weight: bold;">🤖 Авто-клик (навсегда)</div>
-<small style="color:#888">Единоразовая покупка</small>
+<div style="font-weight: bold;">🎯 Критический Мастер</div>
+<small style="color:#888">+10% шанс крита</small>
 </div>
-<button class="btn-promo-buy" id="btnAutoClick" onclick="buyPromoItem('autoclick')">
-100 💎
+<button class="btn-promo-buy" onclick="buyPromoItem('crit_master')">
+20 💎
 </button>
 </div>
 <div class="promo-shop-item">
 <div>
-<div style="font-weight: bold;">⚡ Авто-покупка энергии</div>
-<small style="color:#888">Автоматически за золото</small>
+<div style="font-weight: bold;">💥 Разрушитель</div>
+<small style="color:#888">+25% крит. урон</small>
 </div>
-<button class="btn-promo-buy" id="btnAutoEnergy" onclick="buyPromoItem('autoenergy')">
-50 💎
+<button class="btn-promo-buy" onclick="buyPromoItem('destroyer')">
+30 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">⚔️ Божественный Удар</div>
+<small style="color:#888">+10 к урону сразу</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('divine_strike')">
+40 💎
 </button>
 </div>
 </div>
 <div id="screen-roulette" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">🎰 Казино Удачи</h2>
 <div class="roulette-container">
 <div class="free-spin-info" id="freeSpinInfo">
@@ -1604,6 +1721,7 @@ margin-left: 10px;
 </div>
 </div>
 <div id="screen-leaderboard" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">🏆 Топ Игроков</h2>
 <div class="leaderboard-container">
 <div class="leaderboard-tabs">
@@ -1617,6 +1735,7 @@ margin-left: 10px;
 </div>
 </div>
 <div id="screen-dev" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center; color: var(--dev-accent);">🔧 Меню разработчика</h2>
 <div class="dev-section">
 <h3>👤 Выбор персонажа</h3>
@@ -1680,20 +1799,6 @@ margin-left: 10px;
 </div>
 </div>
 </div>
-<div class="prestige-chapter-modal" id="prestigeChapterModal">
-<div class="prestige-chapter-content">
-<div class="prestige-chapter-title">🏆 ГЛАВА 1 ПРОЙДЕНА!</div>
-<div class="prestige-chapter-subtitle">🔄 СБРОСИТЬ ЧЕРЕЗ ПРЕСТИЖ?</div>
-<div class="prestige-chapter-text">
-Поздравляем! Вы победили Рысь и завершили первую главу!<br><br>
-Хотите сбросить прогресс через престиж и получить бонусы к урону?
-</div>
-<div class="prestige-chapter-buttons">
-<button class="prestige-chapter-btn later" onclick="closePrestigeChapterModal()">Позже</button>
-<button class="prestige-chapter-btn prestige" onclick="doPrestigeFromModal()">🔄 Престиж</button>
-</div>
-</div>
-</div>
 <div id="toast" class="toast">Сообщение</div>
 <script>
 // ================= FIREBASE КОНФИГУРАЦИЯ =================
@@ -1708,28 +1813,22 @@ measurementId: "G-74F5V4RP0Z"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-// ================= ADSGRAM ПЕРЕМЕННАЯ =================
-let adsgramAvailable = false;
-
-// После загрузки страницы
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        adsgramAvailable = typeof AdsGram !== 'undefined';
-        console.log('📺 AdsGram доступен:', adsgramAvailable);
-    }, 2000);
-});
-
-// ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
+// ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ (ГЛАВА 1 И 2) =================
 const CHARACTERS = {
-shin: { name: 'Шин', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Я ШИН первый телохранитель Рыси.', achievementId: 1, order: 1, rounds: 2 },
-brick: { name: 'Кирпич', hp: 8000, img: 'images/brick.png', bgImg: 'backgrounds/brick.jpg', desc: 'Я КИРПИЧ второй телохранитель Рыси.', achievementId: 2, order: 2, rounds: 2 },
-needle: { name: 'Игла', hp: 18000, img: 'images/needle.png', bgImg: 'backgrounds/needle.jpg', desc: 'Я ИГЛА третий телохранитель Рыси.', achievementId: 3, order: 3, rounds: 2 },
-ghost: { name: 'Призрак', hp: 35000, img: 'images/ghost.png', bgImg: 'backgrounds/ghost.jpg', desc: 'Я ПРИЗРАК, четвертый телохранитель.', achievementId: 4, order: 4, rounds: 2 },
-dandy: { name: 'Щёголь', hp: 60000, img: 'images/dandy.png', bgImg: 'backgrounds/dandy.jpg', desc: 'Я ЩЕГОЛЬ, пятый телохранитель.', achievementId: 5, order: 5, rounds: 2 },
-lynx: { name: 'Рысь', hp: 200000, img: 'images/lynx.png', bgImg: 'backgrounds/lynx.jpg', desc: 'Я РЫСЬ глава Ордена ассасинов.', achievementId: 6, isBoss: true, order: 6, rounds: 3 }
+shin: { name: 'Клинок Рассвета', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Ловкий и стремительный боец, мастер быстрых атак и уклонений. Его стиль напоминает первые лучи солнца — внезапный и ослепляющий.', achievementId: 1, order: 1, rounds: 1, chapter: 1 },
+brick: { name: 'Стальная Стена', hp: 8000, img: 'images/brick.png', bgImg: 'backgrounds/brick.jpg', desc: 'Массивный и выносливый воин с невероятной физической силой. Движется неторопливо, но каждый его удар способен сбить с ног.', achievementId: 2, order: 2, rounds: 1, chapter: 1 },
+needle: { name: 'Теневой Шип', hp: 18000, img: 'images/needle.png', bgImg: 'backgrounds/needle.jpg', desc: 'Скрытный и точный боец, специализирующийся на колющих ударах и дальних атаках. Действует бесшумно, предпочитает засады и неожиданные выпады.', achievementId: 3, order: 3, rounds: 1, chapter: 1 },
+ghost: { name: 'Сумрачный Вестник', hp: 35000, img: 'images/ghost.png', bgImg: 'backgrounds/ghost.jpg', desc: 'Загадочный воин, чьё появление вызывает тревогу. Движется почти бесшумно, использует обманные манёвры и дымовые завесы. Владеет техникой иллюзий.', achievementId: 4, order: 4, rounds: 1, chapter: 1 },
+dandy: { name: 'Алый Дуэлянт', hp: 60000, img: 'images/dandy.png', bgImg: 'backgrounds/dandy.jpg', desc: 'Элегантный и самоуверенный боец, превращающий сражение в спектакль. Любит провоцировать насмешками, но за бравадой скрывается смертельная точность.', achievementId: 5, order: 5, rounds: 1, chapter: 1 },
+lynx: { name: 'Лунная Пантера', hp: 200000, img: 'images/lynx.png', bgImg: 'backgrounds/lynx.jpg', desc: 'Опытный наставник и опасный противник. Сочетает ловкость и силу, двигается плавно, как хищник. Считает, что истинная сила — в балансе тела и духа.', achievementId: 6, isBoss: true, order: 6, rounds: 2, chapter: 1 },
+guardian: { name: 'Огненный Страж', hp: 300000, img: 'images/guardian.png', bgImg: 'backgrounds/guardian.jpg', desc: 'Считает себя избранным наследником силы Мастера Безмолвия. Уверен, что достоин учиться у мастера и мечтает основать собственную школу боевых искусств.', achievementId: 7, order: 7, rounds: 1, chapter: 2 },
+bull: { name: 'Каменный Бык', hp: 450000, img: 'images/bull.png', bgImg: 'backgrounds/bull.jpg', desc: 'Могучий воин с неистовым нравом. Винит Мастера Безмолвия в разрушении родного города и жаждет заполучить его тайную силу, чтобы восстановить справедливость.', achievementId: 8, order: 8, rounds: 1, chapter: 2 },
+keeper: { name: 'Теневой Хранитель', hp: 600000, img: 'images/keeper.png', bgImg: 'backgrounds/keeper.jpg', desc: 'Мудрый и скрытный боец, убеждённый, что абсолютная сила не должна принадлежать никому. Его цель — узнать секрет и навсегда скрыть его от мира.', achievementId: 9, order: 9, rounds: 1, chapter: 2 },
+tiger: { name: 'Яростный Тигр', hp: 800000, img: 'images/tiger.png', bgImg: 'backgrounds/tiger.jpg', desc: 'Холодный и расчётливый воин, для которого война — мерило всего. Верит, что с помощью тайны сможет подчинить любого противника и установить новый порядок.', achievementId: 10, order: 10, rounds: 1, chapter: 2 },
+crane: { name: 'Белый Журавль', hp: 1000000, img: 'images/crane.png', bgImg: 'backgrounds/crane.jpg', desc: 'Бывший ученик древнего мастера, отвергший проверенные учения ради запретной тайны. Его путь — драма души: борьба между долгом и жаждой неизведанного.', achievementId: 11, order: 11, rounds: 1, chapter: 2 },
+master: { name: 'Мастер Безмолвия', hp: 3000000, img: 'images/master.png', bgImg: 'backgrounds/master.jpg', desc: 'Загадочный и могущественный наставник, обитающий в руинах разрушенного города. Владеет древней тайной, которую скрывает за маской спокойствия.', achievementId: 12, isBoss: true, order: 12, rounds: 2, chapter: 2 }
 };
-const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx'];
+const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx', 'guardian', 'bull', 'keeper', 'tiger', 'crane', 'master'];
 let promoCodes = {
 'START2026': { gold: 1000, promo: 3, used: false, activations: 0 },
 'WELCOME': { gold: 1000, promo: 3, used: false, activations: 0 },
@@ -1747,12 +1846,9 @@ let promoCodes = {
 'FREEGOLD': { gold: 3000, promo: 0, used: false, activations: 0 },
 'POWERUP': { gold: 1000, promo: 5, used: false, activations: 0 }
 };
-let adSlots = [
-{ id: 1, imageUrl: '', videoUrl: '', linkUrl: '', text: 'Смотрите рекламу и получите золото!', reward: 500, timer: 10, views: 0 }
-];
 let stats = { totalAdViews: 0, totalPromoActivations: 0, energyPurchases: 0, jackpotWins: 0 };
-let currentAdSlot = 0;
-let gameVersion = 'V1.1.3';
+let gameVersion = 'V2.2.0';
+// === ИЗМЕНЕНО: 20 УРОВНЕЙ ===
 const RANKS = [
 { level: 1, name: 'Новичок', xpRequired: 100, reward: { gold: 0, diamonds: 0 } },
 { level: 2, name: 'Ученик', xpRequired: 250, reward: { gold: 100, diamonds: 1 } },
@@ -1764,53 +1860,48 @@ const RANKS = [
 { level: 8, name: 'Легенда', xpRequired: 11000, reward: { gold: 1500, diamonds: 15 } },
 { level: 9, name: 'Герой', xpRequired: 16000, reward: { gold: 2000, diamonds: 20 } },
 { level: 10, name: 'Чемпион', xpRequired: 22000, reward: { gold: 3000, diamonds: 25 } },
-{ level: 11, name: 'Тень', xpRequired: 30000, reward: { gold: 4000, diamonds: 30 } },
-{ level: 12, name: 'Бог Войны', xpRequired: 50000, reward: { gold: 5000, diamonds: 40 } },
-{ level: 13, name: 'Император', xpRequired: 75000, reward: { gold: 7500, diamonds: 50 } },
-{ level: 14, name: 'Властелин', xpRequired: 100000, reward: { gold: 10000, diamonds: 60 } },
-{ level: 15, name: 'Титан', xpRequired: 150000, reward: { gold: 15000, diamonds: 75 } },
-{ level: 16, name: 'Бессмертный', xpRequired: 200000, reward: { gold: 20000, diamonds: 100 } },
-{ level: 17, name: 'Демон', xpRequired: 300000, reward: { gold: 30000, diamonds: 150 } },
-{ level: 18, name: 'Ангел', xpRequired: 400000, reward: { gold: 40000, diamonds: 200 } },
-{ level: 19, name: 'Божество', xpRequired: 500000, reward: { gold: 50000, diamonds: 250 } },
-{ level: 20, name: 'Творец', xpRequired: 1000000, reward: { gold: 100000, diamonds: 500 } },
-{ level: 21, name: 'Феникс', xpRequired: 1500000, reward: { gold: 150000, diamonds: 600 } },
-{ level: 22, name: 'Дракон', xpRequired: 2000000, reward: { gold: 200000, diamonds: 700 } },
-{ level: 23, name: 'Бессмертный', xpRequired: 3000000, reward: { gold: 300000, diamonds: 800 } },
-{ level: 24, name: 'Повелитель', xpRequired: 5000000, reward: { gold: 500000, diamonds: 900 } },
-{ level: 25, name: 'Создатель Мира', xpRequired: 10000000, reward: { gold: 1000000, diamonds: 1000 } }
+{ level: 11, name: 'Страж', xpRequired: 30000, reward: { gold: 4000, diamonds: 30 } },
+{ level: 12, name: 'Паладин', xpRequired: 40000, reward: { gold: 5000, diamonds: 35 } },
+{ level: 13, name: 'Ронин', xpRequired: 55000, reward: { gold: 6500, diamonds: 40 } },
+{ level: 14, name: 'Сёгун', xpRequired: 75000, reward: { gold: 8000, diamonds: 45 } },
+{ level: 15, name: 'Император', xpRequired: 100000, reward: { gold: 10000, diamonds: 50 } },
+{ level: 16, name: 'Бессмертный', xpRequired: 150000, reward: { gold: 15000, diamonds: 60 } },
+{ level: 17, name: 'Демон', xpRequired: 250000, reward: { gold: 25000, diamonds: 75 } },
+{ level: 18, name: 'Ангел', xpRequired: 400000, reward: { gold: 40000, diamonds: 90 } },
+{ level: 19, name: 'Божество', xpRequired: 500000, reward: { gold: 50000, diamonds: 120 } },
+{ level: 20, name: 'Повелитель Теней', xpRequired: 1200000, reward: { gold: 120000, diamonds: 150 } }
 ];
+// === ИЗМЕНЕНО: 26 ДОСТИЖЕНИЙ ===
 const ACHIEVEMENTS = [
-{ id: 1, name: 'Победа над Шином', desc: 'Победите Шина', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'boss' },
-{ id: 2, name: 'Громила повержен', desc: 'Победите Кирпича', reward: 250, diamondReward: 1, current: 0, required: 1, type: 'boss' },
-{ id: 3, name: 'Острая победа', desc: 'Победите Иглу', reward: 500, diamondReward: 1, current: 0, required: 1, type: 'boss' },
-{ id: 4, name: 'Охотник на призраков', desc: 'Победите Призрака', reward: 1000, diamondReward: 1, current: 0, required: 1, type: 'boss' },
-{ id: 5, name: 'Модный победитель', desc: 'Победите Щёголя', reward: 2000, diamondReward: 1, current: 0, required: 1, type: 'boss' },
-{ id: 6, name: 'ЛЕГЕНДА', desc: 'Победите Рысь', reward: 10000, diamondReward: 5, current: 0, required: 1, type: 'boss' },
-{ id: 7, name: 'Новичок', desc: '100 кликов', reward: 50, diamondReward: 1, current: 0, required: 100, type: 'click' },
-{ id: 8, name: 'Воин', desc: '1000 кликов', reward: 200, diamondReward: 1, current: 0, required: 1000, type: 'click' },
-{ id: 20, name: 'Мастер клика', desc: '10000 кликов', reward: 1000, diamondReward: 5, current: 0, required: 10000, type: 'click' },
-{ id: 21, name: 'Бог клика', desc: '100000 кликов', reward: 5000, diamondReward: 10, current: 0, required: 100000, type: 'click' },
-{ id: 9, name: 'Богач', desc: '10000 золота', reward: 500, diamondReward: 1, current: 0, required: 10000, type: 'gold' },
-{ id: 11, name: 'Коллекционер', desc: '100000 золота', reward: 10000, diamondReward: 5, current: 0, required: 100000, type: 'gold' },
-{ id: 22, name: 'Магнат', desc: '1000000 золота', reward: 50000, diamondReward: 25, current: 0, required: 1000000, type: 'gold' },
-{ id: 23, name: 'Первые шаги', desc: '1 час в игре', reward: 500, diamondReward: 2, current: 0, required: 60, type: 'time' },
-{ id: 24, name: 'Преданный', desc: '10 часов в игре', reward: 2000, diamondReward: 5, current: 0, required: 600, type: 'time' },
-{ id: 25, name: 'Легенда', desc: '100 часов в игре', reward: 10000, diamondReward: 20, current: 0, required: 6000, type: 'time' },
-{ id: 10, name: 'Глава 1', desc: 'Пройдите главу 1', reward: 5000, diamondReward: 5, current: 0, required: 1, type: 'progress' },
-{ id: 12, name: 'Алмазный магнат', desc: '100 алмазов', reward: 5000, diamondReward: 10, current: 0, required: 100, type: 'diamond' },
-{ id: 13, name: 'Критический удар', desc: '100 критов', reward: 1000, diamondReward: 2, current: 0, required: 100, type: 'crit' },
-{ id: 14, name: 'Непобедимый', desc: '50 побед', reward: 5000, diamondReward: 10, current: 0, required: 50, type: 'win' },
-{ id: 15, name: 'Уровень 10', desc: 'Достигните 10 уровня', reward: 10000, diamondReward: 10, current: 0, required: 10, type: 'level' },
-{ id: 16, name: 'Рекламный магнат', desc: '50 просмотров рекламы', reward: 5000, diamondReward: 10, current: 0, required: 50, type: 'ad' },
-{ id: 17, name: 'Рулеточник', desc: '25 прокруток рулетки', reward: 3000, diamondReward: 5, current: 0, required: 25, type: 'roulette' },
-{ id: 18, name: 'Серийный боец', desc: '7 дней подряд', reward: 7000, diamondReward: 10, current: 0, required: 7, type: 'streak' },
-{ id: 19, name: 'Первопроходец', desc: 'Первое достижение', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'achievement' },
-{ id: 26, name: 'Убийца боссов', desc: 'Победить всех 6 боссов', reward: 25000, diamondReward: 50, current: 0, required: 6, type: 'bosses' },
-{ id: 27, name: 'Золотая лихорадка', desc: '1,000,000 золота', reward: 100000, diamondReward: 100, current: 0, required: 1000000, type: 'gold_total' },
-{ id: 28, name: 'Энергетик', desc: '500 покупок энергии', reward: 50000, diamondReward: 50, current: 0, required: 500, type: 'energy_buy' },
-{ id: 29, name: 'Счастливчик', desc: 'Выиграть джекпот в рулетке', reward: 75000, diamondReward: 75, current: 0, required: 1, type: 'jackpot' },
-{ id: 30, name: 'Легендарный воин', desc: 'Достичь 25 уровня', reward: 500000, diamondReward: 500, current: 0, required: 25, type: 'level_25' }
+// Глава 1
+{ id: 1, name: 'Победа над Клинком', desc: 'Победите Клинка Рассвета', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 2, name: 'Стена разрушена', desc: 'Победите Стальную Стену', reward: 250, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 3, name: 'Шип удалён', desc: 'Победите Теневого Шипа', reward: 500, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 4, name: 'Рассвет после тьмы', desc: 'Победите Сумрачного Вестника', reward: 1000, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 5, name: 'Дуэль окончена', desc: 'Победите Алого Дуэлянта', reward: 2000, diamondReward: 1, current: 0, required: 1, type: 'boss' },
+{ id: 6, name: 'ЛЕГЕНДА ГЛАВЫ 1', desc: 'Победите Лунную Пантеру', reward: 10000, diamondReward: 5, current: 0, required: 1, type: 'boss' },
+// Глава 2
+{ id: 7, name: 'Страж пал', desc: 'Победите Огненного Стража', reward: 5000, diamondReward: 2, current: 0, required: 1, type: 'boss' },
+{ id: 8, name: 'Бык усмирён', desc: 'Победите Каменного Быка', reward: 7500, diamondReward: 3, current: 0, required: 1, type: 'boss' },
+{ id: 9, name: 'Тень раскрыта', desc: 'Победите Теневого Хранителя', reward: 10000, diamondReward: 4, current: 0, required: 1, type: 'boss' },
+{ id: 10, name: 'Тигр пойман', desc: 'Победите Яростного Тигра', reward: 15000, diamondReward: 5, current: 0, required: 1, type: 'boss' },
+{ id: 11, name: 'Журавль приземлился', desc: 'Победите Белого Журавля', reward: 20000, diamondReward: 6, current: 0, required: 1, type: 'boss' },
+{ id: 12, name: 'МАСТЕР БЕЗМОЛВИЯ', desc: 'Победите Мастера Безмолвия', reward: 50000, diamondReward: 20, current: 0, required: 1, type: 'boss' },
+// Общие
+{ id: 13, name: 'Новичок', desc: '100 кликов', reward: 50, diamondReward: 1, current: 0, required: 100, type: 'click' },
+{ id: 14, name: 'Воин', desc: '1000 кликов', reward: 200, diamondReward: 1, current: 0, required: 1000, type: 'click' },
+{ id: 15, name: 'Богач', desc: '10000 золота', reward: 500, diamondReward: 1, current: 0, required: 10000, type: 'gold' },
+{ id: 16, name: 'Критический удар', desc: '100 критов', reward: 1000, diamondReward: 2, current: 0, required: 100, type: 'crit' },
+{ id: 17, name: 'Непобедимый', desc: '50 побед', reward: 5000, diamondReward: 10, current: 0, required: 50, type: 'win' },
+{ id: 18, name: 'Уровень 10', desc: 'Достигните 10 уровня', reward: 10000, diamondReward: 10, current: 0, required: 10, type: 'level' },
+{ id: 19, name: 'Рулеточник', desc: '25 прокруток рулетки', reward: 3000, diamondReward: 5, current: 0, required: 25, type: 'roulette' },
+{ id: 20, name: 'Серийный боец', desc: '7 дней подряд', reward: 7000, diamondReward: 10, current: 0, required: 7, type: 'streak' },
+{ id: 21, name: 'Первопроходец', desc: 'Первое достижение', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'achievement' },
+{ id: 22, name: 'Гроза Главы 2', desc: 'Победить Мастера Безмолвия', reward: 100000, diamondReward: 50, current: 0, required: 1, type: 'boss_master' },
+{ id: 23, name: 'Король Критов', desc: '500 критических ударов', reward: 20000, diamondReward: 20, current: 0, required: 500, type: 'crit_total' },
+{ id: 24, name: 'Золотой Дождь', desc: 'Накопить 500,000 золота', reward: 50000, diamondReward: 30, current: 0, required: 500000, type: 'gold_total_new' },
+{ id: 25, name: 'Марафонец', desc: '100 часов в игре', reward: 30000, diamondReward: 25, current: 0, required: 6000, type: 'time_marathon' },
+{ id: 26, name: 'Легенда Арены', desc: '200 побед', reward: 40000, diamondReward: 35, current: 0, required: 200, type: 'win_legend' }
 ];
 const DAILY_REWARDS = [
 { day: 1, gold: 100, promo: 1, text: '🎁 День 1: +100 💰 +1 💎' },
@@ -1825,15 +1916,14 @@ const tg = window.Telegram.WebApp;
 if(tg && tg.ready) tg.expand();
 let game = {
 gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200,
-energy: 100, maxEnergy: 100, prestige: 0, clicks: 0, totalCrits: 0, day: 1,
-lastLogin: null, lastSave: null, achievements: [], chapter1Complete: false, usedPromoCodes: [],
-costs: { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 },
+energy: 100, maxEnergy: 100, clicks: 0, totalCrits: 0, day: 1,
+lastLogin: null, lastSave: null, achievements: [], chapter1Complete: false, chapter2Complete: false, usedPromoCodes: [],
+costs: { damage: 25, critChance: 100, critDamage: 200, maxEnergy: 400, goldBonus: 500 },
 currentEnemy: 'shin', enemyHp: 3000, musicOn: true, soundOn: true,
 loginStreak: 0, lastLoginDate: null, claimedDaily: [],
 xp: 0, level: 1, totalWins: 0, rouletteSpins: 0,
-currentRound: 1, maxRounds: 2, enemyMaxHp: 3000,
+currentRound: 1, maxRounds: 1, enemyMaxHp: 3000,
 totalPlayTime: 0,
-autoClick: false,
 autoEnergy: false,
 freeSpinAvailable: true,
 lastFreeSpin: null,
@@ -1841,13 +1931,27 @@ userId: null,
 username: null,
 avatar: null,
 lastClickTime: 0,
-telegramId: null
+telegramId: null,
+goldBonusPercent: 0, // Новый параметр
+isTransitioning: false, // Флаг защиты от проклика
+comboCount: 0, // Комбо счетчик
+maxCombo: 0,
+lastComboTime: 0,
+offlineEarnings: 0, // Офлайн заработок
+lastOfflineTime: Date.now(),
+// Способности
+abilities: {
+1: { cooldown: 0, maxCooldown: 30000, name: 'Ускорение' },
+2: { cooldown: 0, maxCooldown: 60000, name: 'Ярость' },
+3: { cooldown: 0, maxCooldown: 90000, name: 'Защита' }
+}
 };
 let autoSaveInterval, energyRegenInterval, adTimerInterval, adTimeLeft = 0;
 let countdownInterval;
 let rouletteSpinning = false;
 let autoClickInterval = null;
 let currentLeaderboardTab = 'level';
+let abilityInterval = null;
 // ================= ФУНКЦИИ НАВИГАЦИИ =================
 function toggleSideNav() {
 const sideNav = document.getElementById('sideNav');
@@ -1856,11 +1960,24 @@ sideNav.classList.toggle('active');
 overlay.classList.toggle('active');
 }
 function switchScreen(screenId, btn) {
+toggleSideNav();
+if (screenId === 'battle') {
+closeAllTabs();
 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+document.getElementById('screen-battle').classList.add('active');
+if(btn) {
+document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+}
+return;
+}
+if (['shop', 'profile', 'promo', 'roulette', 'leaderboard', 'dev'].includes(screenId)) {
+document.querySelectorAll('.screen').forEach(s => {
+if(s.id !== 'screen-' + screenId) s.classList.remove('active');
+});
 document.getElementById('screen-' + screenId).classList.add('active');
 document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
 if(btn) btn.classList.add('active');
-toggleSideNav();
 if (screenId === 'profile') {
 renderAchievements();
 updateUserInfo();
@@ -1868,6 +1985,15 @@ updateUserInfo();
 if (screenId === 'leaderboard') {
 loadLeaderboard();
 }
+}
+}
+function closeAllTabs() {
+document.querySelectorAll('#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard').forEach(s => {
+s.classList.remove('active');
+});
+document.getElementById('screen-battle').classList.add('active');
+document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
+document.querySelector('.side-nav-btn:first-child').classList.add('active');
 }
 window.onload = function() {
 showLoadingScreen();
@@ -1893,34 +2019,14 @@ loadingBar.style.width = progress + '%';
 }, 200);
 }
 function initGame() {
-// ✅ ДИАГНОСТИКА ADSGRAM
-console.log('🔍 Проверка AdsGram...');
-console.log('🌐 URL:', window.location.href);
-console.log('📱 Telegram WebApp:', typeof window.Telegram !== 'undefined');
-console.log('📺 AdsGram объект:', typeof AdsGram);
-
-if (typeof AdsGram === 'undefined') {
-console.warn('⚠️ Скрипт AdsGram не найден в окне');
-setTimeout(() => {
-if (typeof AdsGram === 'undefined') {
-console.error('❌ AdsGram не загрузился после ожидания');
-} else {
-console.log('✅ AdsGram загрузился с задержкой');
-}
-}, 2000);
-} else {
-console.log('✅ AdsGram готов к работе');
-}
-
-// Инициализация Telegram
 if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
 game.telegramId = 'tg_' + tg.initDataUnsafe.user.id;
 if (!game.username) {
 game.username = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_name || 'Игрок';
 }
 }
-
 loadGame();
+checkOfflineEarnings(); // Проверка офлайн заработка
 checkRegistration();
 checkDaily();
 checkDailyLoginReward();
@@ -1931,7 +2037,7 @@ updateUserInfo();
 renderDevCharSelect();
 updateVersionBadge();
 updatePromoShopButtons();
-startAutoClicker();
+startAbilityTimer(); // Запуск таймера способностей
 autoSaveInterval = setInterval(() => { saveGame(true); syncWithFirebase(); }, 10000);
 energyRegenInterval = setInterval(() => {
 if(game.energy < game.maxEnergy) {
@@ -1943,18 +2049,53 @@ updateUI();
 setInterval(checkAchievements, 2000);
 setInterval(updatePlayTime, 60000);
 setInterval(autoEnergyPurchase, 5000);
+// Сброс комбо если долго не кликаешь
+setInterval(() => {
+if(Date.now() - game.lastComboTime > 3000 && game.comboCount > 0) {
+game.comboCount = 0;
+updateComboUI();
+}
+}, 1000);
 const charContainer = document.getElementById('charContainer');
 charContainer.addEventListener('touchstart', function(e) {
-if (e.cancelable) {
-e.preventDefault();
-}
+if (e.cancelable) { e.preventDefault(); }
 handleAttack(e.touches[0].clientX, e.touches[0].clientY);
 }, { passive: false });
 charContainer.addEventListener('mousedown', function(e) {
 handleAttack(e.clientX, e.clientY);
 });
 document.addEventListener('click', initAudio, { once: true });
+document.addEventListener('keydown', function(e) {
+if(e.key === '1') useAbility(1);
+if(e.key === '2') useAbility(2);
+if(e.key === '3') useAbility(3);
+});
 window.addEventListener('beforeunload', () => { saveGame(true); syncWithFirebase(); });
+}
+// Проверка офлайн заработка
+function checkOfflineEarnings() {
+const now = Date.now();
+const timeDiff = now - game.lastOfflineTime;
+const hoursOffline = Math.floor(timeDiff / (1000 * 60 * 60));
+if(hoursOffline > 0 && game.totalGold > 0) {
+// 10% от общего золота за каждый час офлайн (макс 10000)
+game.offlineEarnings = Math.min(Math.floor(game.totalGold * 0.1 * hoursOffline), 10000);
+if(game.offlineEarnings > 0) {
+document.getElementById('offlineAmount').innerText = `+${game.offlineEarnings} 💰`;
+document.getElementById('offlineEarningsModal').classList.add('active');
+}
+}
+}
+function claimOfflineEarnings() {
+if(game.offlineEarnings > 0) {
+game.gold += game.offlineEarnings;
+game.totalGold += game.offlineEarnings;
+showToast(`💰 Получено ${game.offlineEarnings} золота!`);
+game.offlineEarnings = 0;
+document.getElementById('offlineEarningsModal').classList.remove('active');
+updateUI();
+saveGame();
+}
 }
 function checkRegistration() {
 const savedUser = localStorage.getItem('sf2_user');
@@ -1971,10 +2112,7 @@ document.getElementById('registrationModal').classList.add('active');
 }
 function registerUser() {
 const username = document.getElementById('registrationUsername').value.trim();
-if (!username) {
-showToast('❌ Введите имя!');
-return;
-}
+if (!username) { showToast('❌ Введите имя!'); return; }
 const userId = game.telegramId || ('user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
 game.userId = userId;
 game.username = username;
@@ -1992,30 +2130,20 @@ const userIdDisplay = document.getElementById('userIdDisplay');
 if (game.username) {
 userInfo.style.display = 'flex';
 userName.textContent = game.username;
-if (game.avatar) {
-userAvatar.innerHTML = `<img src="${game.avatar}" alt="Avatar">`;
-} else {
-userAvatar.textContent = game.username.charAt(0).toUpperCase();
-}
+if (game.avatar) { userAvatar.innerHTML = `<img src="${game.avatar}" alt="Avatar">`; }
+else { userAvatar.textContent = game.username.charAt(0).toUpperCase(); }
 userIdDisplay.textContent = `ID: ${game.userId.substr(0, 15)}...`;
 }
 }
-function updateUserInfo() {
-showUserInfo();
-}
+function updateUserInfo() { showUserInfo(); }
 function editNickname() {
 document.getElementById('editNicknameInput').value = game.username;
 document.getElementById('editNicknameModal').style.display = 'flex';
 }
-function closeEditNicknameModal() {
-document.getElementById('editNicknameModal').style.display = 'none';
-}
+function closeEditNicknameModal() { document.getElementById('editNicknameModal').style.display = 'none'; }
 function saveNickname() {
 const newNickname = document.getElementById('editNicknameInput').value.trim();
-if (!newNickname) {
-showToast('❌ Введите никнейм!');
-return;
-}
+if (!newNickname) { showToast('❌ Введите никнейм!'); return; }
 game.username = newNickname;
 localStorage.setItem('sf2_user', JSON.stringify({ userId: game.userId, username: game.username, avatar: game.avatar, telegramId: game.telegramId }));
 showUserInfo();
@@ -2053,7 +2181,6 @@ clicks: game.clicks,
 achievements: game.achievements.length,
 gold: game.gold,
 diamonds: game.promoCurrency,
-prestige: game.prestige,
 totalPlayTime: game.totalPlayTime,
 telegramId: game.telegramId,
 lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
@@ -2064,15 +2191,9 @@ const leaderboardList = document.getElementById('leaderboardList');
 leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
 let query;
 switch(currentLeaderboardTab) {
-case 'level':
-query = db.collection('players').orderBy('level', 'desc').limit(10);
-break;
-case 'clicks':
-query = db.collection('players').orderBy('clicks', 'desc').limit(10);
-break;
-case 'achievements':
-query = db.collection('players').orderBy('achievements', 'desc').limit(10);
-break;
+case 'level': query = db.collection('players').orderBy('level', 'desc').limit(10); break;
+case 'clicks': query = db.collection('players').orderBy('clicks', 'desc').limit(10); break;
+case 'achievements': query = db.collection('players').orderBy('achievements', 'desc').limit(10); break;
 }
 if (!query) return;
 query.get().then(snapshot => {
@@ -2090,13 +2211,10 @@ leaderboardList.innerHTML += `
 <div class="leaderboard-name">${player.username || 'Аноним'}</div>
 </div>
 <div class="leaderboard-value">${getValueByTab(player)}</div>
-</div>
-`;
+</div>`;
 rank++;
 });
-if (snapshot.empty) {
-leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Пока нет игроков</div>';
-}
+if (snapshot.empty) { leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Пока нет игроков</div>'; }
 }).catch(err => {
 leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Ошибка загрузки</div>';
 console.log('Leaderboard error:', err);
@@ -2115,18 +2233,6 @@ currentLeaderboardTab = tab;
 document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
 event.target.classList.add('active');
 loadLeaderboard();
-}
-function startAutoClicker() {
-if (autoClickInterval) {
-clearInterval(autoClickInterval);
-}
-if (game.autoClick) {
-autoClickInterval = setInterval(() => {
-if (game.energy > 0) {
-handleAttack(window.innerWidth / 2, window.innerHeight / 2);
-}
-}, 1000);
-}
 }
 function updatePlayTime() {
 game.totalPlayTime++;
@@ -2156,18 +2262,86 @@ freeSpinInfo.innerHTML = '🎁 Бесплатный спин доступен!';
 }
 }
 function useFreeSpin() {
-if (!game.freeSpinAvailable) {
-return false;
-}
+if (!game.freeSpinAvailable) return false;
 game.freeSpinAvailable = false;
 game.lastFreeSpin = Date.now();
 checkFreeSpin();
 saveGame();
 return true;
 }
-function handleAttack(x, y) {
+// === СИСТЕМА КОМБО ===
+function checkCombo() {
 const now = Date.now();
-if (now - game.lastClickTime < 300) {
+if(now - game.lastComboTime > 2000 && game.comboCount > 0) {
+game.comboCount = 0;
+updateComboUI();
+}
+}
+function updateComboUI() {
+const comboCounter = document.getElementById('comboCounter');
+const comboCount = document.getElementById('comboCount');
+if(game.comboCount > 1) {
+comboCounter.classList.add('active');
+comboCount.innerText = game.comboCount;
+} else {
+comboCounter.classList.remove('active');
+}
+}
+// === СПОСОБНОСТИ ===
+function startAbilityTimer() {
+if(abilityInterval) clearInterval(abilityInterval);
+abilityInterval = setInterval(() => {
+const now = Date.now();
+for(let i = 1; i <= 3; i++) {
+if(game.abilities[i].cooldown > 0) {
+game.abilities[i].cooldown = Math.max(0, game.abilities[i].cooldown - 100);
+const cooldownPercent = (game.abilities[i].cooldown / game.abilities[i].maxCooldown) * 100;
+document.getElementById(`cooldown${i}`).style.height = `${cooldownPercent}%`;
+if(game.abilities[i].cooldown <= 0) {
+document.getElementById(`ability${i}`).classList.remove('disabled');
+}
+}
+}
+}, 100);
+}
+function useAbility(id) {
+if(game.abilities[id].cooldown > 0 || game.isTransitioning) return;
+playSound('abilitySound');
+if(id === 1) {
+// Ускорение - +50% урона на 10 секунд
+const originalDamage = game.damage;
+game.damage = Math.floor(game.damage * 1.5);
+showToast('⚡ Ускорение! +50% урона');
+setTimeout(() => {
+game.damage = originalDamage;
+showToast('Ускорение закончилось');
+}, 10000);
+} else if(id === 2) {
+// Ярость - крит 100% на 5 секунд
+const originalCrit = game.critChance;
+game.critChance = 100;
+showToast('💥 Ярость! 100% крит');
+setTimeout(() => {
+game.critChance = originalCrit;
+showToast('Ярость закончилась');
+}, 5000);
+} else if(id === 3) {
+// Защита - восстановить 50 энергии
+game.energy = Math.min(game.energy + 50, game.maxEnergy);
+showToast('🛡️ Защита! +50 энергии');
+updateUI();
+}
+game.abilities[id].cooldown = game.abilities[id].maxCooldown;
+document.getElementById(`ability${id}`).classList.add('disabled');
+saveGame();
+}
+// === ИСПРАВЛЕНИЕ БАГА С ПРОКЛИКОМ ===
+function handleAttack(x, y) {
+// Если идет переход между врагами, клики игнорируются
+if (game.isTransitioning) return;
+const now = Date.now();
+// УВЕЛИЧЕНА ЗАДЕРЖКА КЛИКА (100мс вместо 50мс)
+if (now - game.lastClickTime < 100) {
 return;
 }
 game.lastClickTime = now;
@@ -2181,10 +2355,21 @@ return;
 }
 game.energy--;
 game.clicks++;
+// Комбо система
+game.comboCount++;
+game.lastComboTime = now;
+if(game.comboCount > game.maxCombo) {
+game.maxCombo = game.comboCount;
+}
+updateComboUI();
 playSound('clickSound');
 const char = CHARACTERS[game.currentEnemy];
-let dmg = game.damage * (1 + (game.prestige * 0.1));
+let dmg = game.damage;
 let isCrit = Math.random() * 100 < game.critChance;
+// Бонус от комбо (каждые 10 ударов +10% урона)
+if(game.comboCount >= 10) {
+dmg = Math.floor(dmg * 1.1);
+}
 if (isCrit) {
 dmg = Math.floor(dmg * (game.critDamage / 100));
 game.totalCrits++;
@@ -2204,15 +2389,18 @@ img.classList.add('hit');
 }
 game.enemyHp -= dmg;
 if (game.enemyHp < 0) game.enemyHp = 0;
+// Расчет золота с учетом бонуса
 let goldGain = Math.floor(dmg / 3);
+if (game.goldBonusPercent > 0) {
+goldGain = Math.floor(goldGain * (1 + game.goldBonusPercent / 100));
+}
 game.gold += goldGain;
 game.totalGold += goldGain;
 addXP(1);
-updateAchievementProgress(7, game.clicks);
-updateAchievementProgress(8, game.clicks);
-updateAchievementProgress(9, game.totalGold);
-updateAchievementProgress(11, game.totalGold);
-updateAchievementProgress(13, game.totalCrits);
+updateAchievementProgress(13, game.clicks);
+updateAchievementProgress(14, game.clicks);
+updateAchievementProgress(15, game.totalGold);
+updateAchievementProgress(16, game.totalCrits);
 if (game.enemyHp <= 0) {
 enemyDefeated();
 }
@@ -2229,6 +2417,12 @@ const char = CHARACTERS[game.currentEnemy];
 let bonus = Math.floor(char.hp / 20);
 game.gold += bonus;
 game.totalGold += bonus;
+// Бонус за комбо
+if(game.comboCount >= 20) {
+const comboBonus = Math.floor(bonus * 0.1 * (game.comboCount / 20));
+game.gold += comboBonus;
+showToast(`🔥 Комбо бонус: +${comboBonus} 💰`);
+}
 showToast(`💀 ${char.name} повержен! +${bonus} 💰`);
 if (!game.achievements.includes(char.achievementId)) {
 game.achievements.push(char.achievementId);
@@ -2241,7 +2435,7 @@ updateAchievementProgress(char.achievementId, 1);
 }
 }
 game.totalWins++;
-updateAchievementProgress(14, game.totalWins);
+updateAchievementProgress(17, game.totalWins);
 setTimeout(() => {
 showVictoryScreen(char.name);
 }, 500);
@@ -2257,6 +2451,10 @@ nextEnemyWithCountdown();
 }, 2000);
 }
 function nextEnemyWithCountdown() {
+// БЛОКИРОВКА КЛИКОВ ВО ВРЕМЯ ПЕРЕХОДА
+game.isTransitioning = true;
+const charContainer = document.getElementById('charContainer');
+if(charContainer) charContainer.classList.add('disabled');
 let currentIndex = CHARACTER_ORDER.indexOf(game.currentEnemy);
 const char = CHARACTERS[game.currentEnemy];
 if (game.currentRound < char.rounds) {
@@ -2268,10 +2466,18 @@ updateCharacterDisplay();
 updateUI();
 saveGame();
 showToast(`⚔️ Раунд ${game.currentRound} из ${char.rounds}`);
+// Разблокировка после короткой паузы
+setTimeout(() => {
+game.isTransitioning = false;
+if(charContainer) charContainer.classList.remove('disabled');
+}, 1500);
 }
 else if (currentIndex < CHARACTER_ORDER.length - 1) {
 const nextEnemyKey = CHARACTER_ORDER[currentIndex + 1];
 const nextChar = CHARACTERS[nextEnemyKey];
+if (char.chapter === 1 && nextChar.chapter === 2) {
+showToast('🎉 ГЛАВА 1 ПРОЙДЕНА! НАЧИНАЕТСЯ ГЛАВА 2!');
+}
 game.currentEnemy = nextEnemyKey;
 game.currentRound = 1;
 game.maxRounds = nextChar.rounds;
@@ -2286,36 +2492,29 @@ const countdownNumber = document.getElementById('countdownNumber');
 const fightButton = document.getElementById('fightButton');
 countdownNumber.textContent = '⚔️';
 fightButton.classList.add('active');
-window.nextEnemyData = {
-key: nextEnemyKey,
-char: nextChar
-};
+window.nextEnemyData = { key: nextEnemyKey, char: nextChar };
+// Разблокировка только после появления кнопки FIGHT
+game.isTransitioning = false;
+if(charContainer) charContainer.classList.remove('disabled');
 });
 }
 else {
-if (!game.chapter1Complete) {
-game.chapter1Complete = true;
-if (!game.achievements.includes(10)) {
-game.achievements.push(10);
-const ach = ACHIEVEMENTS.find(a => a.id === 10);
-game.gold += ach.reward;
-game.promoCurrency += ach.diamondReward;
-updateAchievementProgress(10, 1);
-setTimeout(() => {
-document.getElementById('prestigeChapterModal').classList.add('active');
-}, 1000);
+if (!game.chapter2Complete) {
+game.chapter2Complete = true;
+showToast('🏆 ГЛАВА 2 ПРОЙДЕНА! ВЫ ПОБЕДИЛИ МАСТЕРА БЕЗМОЛВИЯ!');
 }
-}
-showToast('🏆 Глава 1 пройдена! Заново...');
+showToast('🏆 Игра пройдена! Заново...');
 setTimeout(() => {
 game.currentEnemy = 'shin';
 game.currentRound = 1;
-game.maxRounds = 2;
+game.maxRounds = 1;
 game.enemyHp = CHARACTERS.shin.hp;
 game.enemyMaxHp = CHARACTERS.shin.hp;
 document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
 updateCharacterDisplay();
 updateUI();
+game.isTransitioning = false;
+if(charContainer) charContainer.classList.remove('disabled');
 }, 2000);
 }
 updateUI();
@@ -2376,50 +2575,28 @@ let cost = 3;
 let isFree = false;
 if (game.freeSpinAvailable) {
 if (!confirm('Использовать бесплатный спин?')) {
-if (game.promoCurrency < cost) {
-showToast('❌ Недостаточно алмазов! Нужно 3 💎');
-return;
-}
-} else {
-isFree = true;
-useFreeSpin();
-}
-} else if (game.promoCurrency < cost) {
-showToast('❌ Недостаточно алмазов! Нужно 3 💎');
-return;
-}
-if (!isFree) {
-game.promoCurrency -= cost;
-}
+if (game.promoCurrency < cost) { showToast('❌ Недостаточно алмазов! Нужно 3 💎'); return; }
+} else { isFree = true; useFreeSpin(); }
+} else if (game.promoCurrency < cost) { showToast('❌ Недостаточно алмазов! Нужно 3 💎'); return; }
+if (!isFree) game.promoCurrency -= cost;
 game.rouletteSpins++;
-updateAchievementProgress(17, game.rouletteSpins);
+updateAchievementProgress(19, game.rouletteSpins);
 rouletteSpinning = true;
 document.getElementById('rouletteBtn').disabled = true;
-const reels = [
-document.getElementById('reel1'),
-document.getElementById('reel2'),
-document.getElementById('reel3')
-];
+const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
 reels.forEach(reel => reel.classList.add('spinning'));
 let spinInterval = setInterval(() => {
-reels.forEach(reel => {
-reel.textContent = ['🍒', '🍋', '🍇', '💎', '7️⃣', '⚔️'][Math.floor(Math.random() * 6)];
-});
+reels.forEach(reel => { reel.textContent = ['🍒', '🍋', '🍇', '💎', '7️⃣', '⚔️'][Math.floor(Math.random() * 6)]; });
 }, 100);
 setTimeout(() => {
 clearInterval(spinInterval);
 reels.forEach(reel => reel.classList.remove('spinning'));
 const rand = Math.random() * 100;
 let result;
-if (rand < 50) {
-result = 'gold';
-} else if (rand < 75) {
-result = 'upgrade';
-} else if (rand < 95) {
-result = 'gold_diamond';
-} else {
-result = 'jackpot';
-}
+if (rand < 50) result = 'gold';
+else if (rand < 75) result = 'upgrade';
+else if (rand < 95) result = 'gold_diamond';
+else result = 'jackpot';
 const results = getResultByType(result);
 reels[0].textContent = results[0];
 reels[1].textContent = results[1];
@@ -2433,16 +2610,11 @@ saveGame();
 }
 function getResultByType(type) {
 switch(type) {
-case 'gold':
-return ['🍒', '🍒', '🍋'];
-case 'upgrade':
-return ['⚔️', '⚔️', '🍇'];
-case 'gold_diamond':
-return ['💎', '💎', '🍇'];
-case 'jackpot':
-return ['7️⃣', '7️⃣', '7️⃣'];
-default:
-return ['🍒', '🍋', '🍇'];
+case 'gold': return ['🍒', '🍒', '🍋'];
+case 'upgrade': return ['⚔️', '⚔️', '🍇'];
+case 'gold_diamond': return ['💎', '💎', '🍇'];
+case 'jackpot': return ['7️⃣', '7️⃣', '7️⃣'];
+default: return ['🍒', '🍋', '🍇'];
 }
 }
 function checkWin(results, resultType) {
@@ -2452,7 +2624,7 @@ const amount = Math.floor(Math.random() * 500) + 500;
 game.gold += amount;
 resultEl.textContent = `💰 Золото: +${amount} 💰`;
 } else if (resultType === 'upgrade') {
-const upgrades = ['damage', 'critChance', 'critDamage', 'maxEnergy'];
+const upgrades = ['damage', 'critChance', 'critDamage', 'maxEnergy', 'goldBonus'];
 const randomUpgrade = upgrades[Math.floor(Math.random() * upgrades.length)];
 buyUpgrade(randomUpgrade, true);
 resultEl.textContent = '⚔️ Случайное улучшение!';
@@ -2467,7 +2639,6 @@ game.gold += 10000;
 game.promoCurrency += 20;
 stats.jackpotWins++;
 resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!';
-updateAchievementProgress(29, stats.jackpotWins);
 }
 addXP(10);
 updateUI();
@@ -2477,14 +2648,11 @@ if (game.gold >= 100) {
 game.gold -= 100;
 game.energy = Math.min(game.energy + 50, game.maxEnergy);
 stats.energyPurchases++;
-updateAchievementProgress(28, stats.energyPurchases);
 showToast('⚡ +50 Энергии!');
 playSound('clickSound');
 updateUI();
 saveGame();
-} else {
-showToast('❌ Недостаточно золота');
-}
+} else { showToast('❌ Недостаточно золота'); }
 }
 function updateCharacterDisplay() {
 const char = CHARACTERS[game.currentEnemy];
@@ -2506,16 +2674,18 @@ if (type === 'damage') game.damage++;
 if (type === 'critChance') game.critChance = Math.min(game.critChance + 1, 50);
 if (type === 'critDamage') game.critDamage += 10;
 if (type === 'maxEnergy') { game.maxEnergy += 10; game.energy = game.maxEnergy; }
-if (!free) {
+if (type === 'goldBonus') {
+game.goldBonusPercent += 5;
+game.costs.goldBonus = Math.floor(cost * 1.8);
+}
+if (!free && type !== 'goldBonus') {
 game.costs[type] = Math.floor(cost * 1.6);
 }
 showToast('✅ Улучшено!');
 playSound('clickSound');
 updateUI();
 saveGame();
-} else {
-showToast('❌ Недостаточно золота');
-}
+} else { showToast('❌ Недостаточно золота'); }
 }
 function activatePromoCode() {
 const input = document.getElementById('promoCodeInput');
@@ -2535,71 +2705,38 @@ playSound('winSound');
 input.value = '';
 updateUI();
 saveGame();
-} else {
-showToast('❌ Неверный код!');
-}
+} else { showToast('❌ Неверный код!'); }
 }
 function buyPromoItem(item) {
 const items = {
 'gold1000': { cost: 5, gold: 1000 },
 'gold5000': { cost: 20, gold: 5000 },
 'energy': { cost: 3, energy: 100 },
-'damage5': { cost: 10, damage: 5 },
-'crit5': { cost: 15, critChance: 5 },
-'critDmg50': { cost: 25, critDamage: 50 },
-'autoclick': { cost: 100, autoClick: true, oneTime: true },
-'autoenergy': { cost: 50, autoEnergy: true, oneTime: true }
+'damage5': { cost: 15, damage: 5 },
+'crit5': { cost: 20, critChance: 5 },
+'critDmg50': { cost: 30, critDamage: 50 },
+'stamina_boost': { cost: 3, energy: 100 },
+'crit_master': { cost: 20, critChance: 10 },
+'destroyer': { cost: 30, critDamage: 25 },
+'divine_strike': { cost: 40, damage: 10 }
 };
 const purchase = items[item];
 if (!purchase) return;
-if (purchase.oneTime) {
-if (purchase.autoClick && game.autoClick) {
-showToast('❌ Уже куплено!');
-return;
-}
-if (purchase.autoEnergy && game.autoEnergy) {
-showToast('❌ Уже куплено!');
-return;
-}
-}
 if (game.promoCurrency >= purchase.cost) {
 game.promoCurrency -= purchase.cost;
 if (purchase.gold) { game.gold += purchase.gold; game.totalGold += purchase.gold; }
-if (purchase.energy) { game.energy = game.maxEnergy; }
+if (purchase.energy) { game.energy = Math.min(game.energy + purchase.energy, game.maxEnergy); }
 if (purchase.damage) { game.damage += purchase.damage; }
 if (purchase.critChance) { game.critChance = Math.min(game.critChance + purchase.critChance, 50); }
 if (purchase.critDamage) { game.critDamage += purchase.critDamage; }
-if (purchase.autoClick) {
-game.autoClick = true;
-startAutoClicker();
-}
-if (purchase.autoEnergy) { game.autoEnergy = true; }
 showToast('✅ Покупка успешна!');
 playSound('winSound');
 updateUI();
-updatePromoShopButtons();
 saveGame();
-} else {
-showToast('❌ Недостаточно промо валюты!');
-}
+} else { showToast('❌ Недостаточно промо валюты!'); }
 }
 function updatePromoShopButtons() {
-const btnAutoClick = document.getElementById('btnAutoClick');
-const btnAutoEnergy = document.getElementById('btnAutoEnergy');
-if (btnAutoClick) {
-if (game.autoClick) {
-btnAutoClick.classList.add('purchased');
-btnAutoClick.textContent = 'Куплено ✓';
-btnAutoClick.disabled = true;
-}
-}
-if (btnAutoEnergy) {
-if (game.autoEnergy) {
-btnAutoEnergy.classList.add('purchased');
-btnAutoEnergy.textContent = 'Куплено ✓';
-btnAutoEnergy.disabled = true;
-}
-}
+// Логика кнопок промо (если нужны состояния "куплено")
 }
 function openDevMenu() { document.getElementById('devPasswordModal').style.display = 'flex'; }
 function closeDevPasswordModal() { document.getElementById('devPasswordModal').style.display = 'none'; document.getElementById('devPasswordInput').value = ''; }
@@ -2612,7 +2749,7 @@ renderDevCharSelect();
 showToast('🔧 Меню разработчика открыто');
 } else { showToast('❌ Неверный пароль!'); document.getElementById('devPasswordInput').value = ''; }
 }
-function closeDevMenu() { switchScreen('battle', document.querySelectorAll('.side-nav-btn')[0]); }
+function closeDevMenu() { closeAllTabs(); }
 function renderDevCharSelect() {
 const container = document.getElementById('devCharSelect');
 container.innerHTML = '';
@@ -2672,11 +2809,10 @@ game.gold += reward.gold;
 game.promoCurrency += reward.diamonds;
 showToast(`⭐ Уровень ${game.level}! ${reward.gold > 0 ? '+' + reward.gold + ' 💰 ' : ''}${reward.diamonds > 0 ? '+' + reward.diamonds + ' 💎' : ''}`);
 } else {
-showToast(`⭐ Уровень повышен! Теперь вы ${RANKS.find(r => r.level === game.level)?.name || 'Создатель Мира'}!`);
+showToast(`⭐ Уровень повышен! Теперь вы ${RANKS.find(r => r.level === game.level)?.name || 'Повелитель Теней'}!`);
 }
 playSound('winSound');
-updateAchievementProgress(15, game.level);
-updateAchievementProgress(30, game.level);
+updateAchievementProgress(18, game.level);
 syncWithFirebase();
 }
 updateUI();
@@ -2684,17 +2820,15 @@ saveGame();
 }
 function getRankName() {
 const rank = RANKS.find(r => r.level === game.level);
-return rank ? rank.name : 'Создатель Мира';
+return rank ? rank.name : 'Повелитель Теней';
 }
 function getNextLevelXP() {
 const rank = RANKS.find(r => r.level === game.level + 1);
-return rank ? rank.xpRequired : 10000000;
+return rank ? rank.xpRequired : 1200000;
 }
 function updateAchievementProgress(id, value) {
 const ach = ACHIEVEMENTS.find(a => a.id === id);
-if (ach) {
-ach.current = value;
-}
+if (ach) ach.current = value;
 }
 function checkDailyLoginReward() {
 const today = new Date().toISOString().split('T')[0];
@@ -2711,92 +2845,6 @@ playSound('winSound');
 updateUI();
 saveGame();
 }
-}
-}
-function watchAd() {
-console.log('📺 Запрос рекламы...');
-console.log('AdsGram объект:', typeof AdsGram);
-
-if (typeof AdsGram !== 'undefined' && AdsGram.showAd) {
-AdsGram.showAd({
-blockId: '23308',
-onSuccess: function() {
-console.log('✅ Реклама успешна');
-const ad = adSlots[currentAdSlot];
-game.gold += ad.reward;
-game.totalGold += ad.reward;
-ad.views++;
-stats.totalAdViews++;
-showToast(`📺 +${ad.reward} 💰 за просмотр рекламы!`);
-playSound('winSound');
-currentAdSlot = (currentAdSlot + 1) % 5;
-updateAchievementProgress(16, stats.totalAdViews);
-updateUI();
-saveGame();
-},
-onError: function(error) {
-console.log('❌ Ошибка рекламы:', error);
-showToast('❌ Ошибка загрузки рекламы');
-setTimeout(() => {
-const ad = adSlots[currentAdSlot];
-game.gold += ad.reward;
-game.totalGold += ad.reward;
-showToast(`📺 +${ad.reward} 💰 (тест)`);
-currentAdSlot = (currentAdSlot + 1) % 5;
-updateUI();
-saveGame();
-}, 2000);
-}
-});
-} else {
-console.log('⚠️ AdsGram не доступен, тестовый режим');
-showToast('🧪 Тестовая реклама (нет AdsGram)');
-setTimeout(() => {
-const ad = adSlots[currentAdSlot];
-game.gold += ad.reward;
-game.totalGold += ad.reward;
-showToast(`📺 +${ad.reward} 💰`);
-currentAdSlot = (currentAdSlot + 1) % 5;
-updateUI();
-saveGame();
-}, 3000);
-}
-}
-function watchAdForDiamond() {
-console.log('💎 Запрос рекламы за алмазы...');
-
-if (typeof AdsGram !== 'undefined' && AdsGram.showAd) {
-AdsGram.showAd({
-blockId: '23308',
-onSuccess: function() {
-console.log('✅ Реклама за алмазы успешна');
-game.promoCurrency += 1;
-stats.totalAdViews++;
-showToast(`📺 +1 💎 за просмотр рекламы!`);
-playSound('winSound');
-updateUI();
-saveGame();
-},
-onError: function(error) {
-console.log('❌ Ошибка рекламы:', error);
-showToast('❌ Ошибка загрузки рекламы');
-setTimeout(() => {
-game.promoCurrency += 1;
-showToast(`📺 +1 💎 (тест)`);
-updateUI();
-saveGame();
-}, 2000);
-}
-});
-} else {
-console.log('⚠️ AdsGram не доступен, тестовый режим');
-showToast('🧪 Тестовая реклама (нет AdsGram)');
-setTimeout(() => {
-game.promoCurrency += 1;
-showToast(`📺 +1 💎`);
-updateUI();
-saveGame();
-}, 3000);
 }
 }
 function initAudio() {
@@ -2830,31 +2878,21 @@ function checkAchievements() {
 ACHIEVEMENTS.forEach((ach) => {
 if (!game.achievements.includes(ach.id)) {
 let unlocked = false;
-if (ach.type === 'click' && ach.id === 7 && game.clicks >= 100) unlocked = true;
-else if (ach.type === 'click' && ach.id === 8 && game.clicks >= 1000) unlocked = true;
-else if (ach.type === 'click' && ach.id === 20 && game.clicks >= 10000) unlocked = true;
-else if (ach.type === 'click' && ach.id === 21 && game.clicks >= 100000) unlocked = true;
-else if (ach.type === 'gold' && ach.id === 9 && game.totalGold >= 10000) unlocked = true;
-else if (ach.type === 'gold' && ach.id === 11 && game.totalGold >= 100000) unlocked = true;
-else if (ach.type === 'gold' && ach.id === 22 && game.totalGold >= 1000000) unlocked = true;
-else if (ach.type === 'time' && ach.id === 23 && game.totalPlayTime >= 60) unlocked = true;
-else if (ach.type === 'time' && ach.id === 24 && game.totalPlayTime >= 600) unlocked = true;
-else if (ach.type === 'time' && ach.id === 25 && game.totalPlayTime >= 6000) unlocked = true;
+if (ach.type === 'click' && ach.id === 13 && game.clicks >= 100) unlocked = true;
+else if (ach.type === 'click' && ach.id === 14 && game.clicks >= 1000) unlocked = true;
+else if (ach.type === 'gold' && ach.id === 15 && game.totalGold >= 10000) unlocked = true;
+else if (ach.type === 'crit' && ach.id === 16 && game.totalCrits >= 100) unlocked = true;
+else if (ach.type === 'win' && ach.id === 17 && game.totalWins >= 50) unlocked = true;
+else if (ach.type === 'level' && ach.id === 18 && game.level >= 10) unlocked = true;
+else if (ach.type === 'roulette' && ach.id === 19 && game.rouletteSpins >= 25) unlocked = true;
+else if (ach.type === 'streak' && ach.id === 20 && game.loginStreak >= 7) unlocked = true;
+else if (ach.type === 'achievement' && ach.id === 21 && game.achievements.length >= 1) unlocked = true;
 else if (ach.type === 'boss' && game.achievements.includes(ach.id)) unlocked = true;
-else if (ach.type === 'progress' && ach.id === 10 && game.chapter1Complete) unlocked = true;
-else if (ach.type === 'diamond' && ach.id === 12 && game.promoCurrency >= 100) unlocked = true;
-else if (ach.type === 'crit' && ach.id === 13 && game.totalCrits >= 100) unlocked = true;
-else if (ach.type === 'win' && ach.id === 14 && game.totalWins >= 50) unlocked = true;
-else if (ach.type === 'level' && ach.id === 15 && game.level >= 10) unlocked = true;
-else if (ach.type === 'ad' && ach.id === 16 && stats.totalAdViews >= 50) unlocked = true;
-else if (ach.type === 'roulette' && ach.id === 17 && game.rouletteSpins >= 25) unlocked = true;
-else if (ach.type === 'streak' && ach.id === 18 && game.loginStreak >= 7) unlocked = true;
-else if (ach.type === 'achievement' && ach.id === 19 && game.achievements.length >= 1) unlocked = true;
-else if (ach.type === 'bosses' && ach.id === 26 && game.achievements.filter(id => id >= 1 && id <= 6).length >= 6) unlocked = true;
-else if (ach.type === 'gold_total' && ach.id === 27 && game.totalGold >= 1000000) unlocked = true;
-else if (ach.type === 'energy_buy' && ach.id === 28 && stats.energyPurchases >= 500) unlocked = true;
-else if (ach.type === 'jackpot' && ach.id === 29 && stats.jackpotWins >= 1) unlocked = true;
-else if (ach.type === 'level_25' && ach.id === 30 && game.level >= 25) unlocked = true;
+else if (ach.type === 'boss_master' && game.chapter2Complete) unlocked = true;
+else if (ach.type === 'crit_total' && game.totalCrits >= 500) unlocked = true;
+else if (ach.type === 'gold_total_new' && game.totalGold >= 500000) unlocked = true;
+else if (ach.type === 'time_marathon' && game.totalPlayTime >= 6000) unlocked = true;
+else if (ach.type === 'win_legend' && game.totalWins >= 200) unlocked = true;
 if (unlocked) {
 game.achievements.push(ach.id);
 game.gold += ach.reward;
@@ -2885,7 +2923,7 @@ game.lastLogin = today;
 game.lastLoginDate = todayISO;
 game.energy = game.maxEnergy;
 showToast(`📅 День ${game.day}! Серия входов: ${game.loginStreak}/7`);
-updateAchievementProgress(18, game.loginStreak);
+updateAchievementProgress(20, game.loginStreak);
 saveGame();
 }
 }
@@ -2910,19 +2948,30 @@ document.getElementById('costDmg').innerText = game.costs.damage;
 document.getElementById('costCrit').innerText = game.costs.critChance;
 document.getElementById('costCritDmg').innerText = game.costs.critDamage;
 document.getElementById('costEnergy').innerText = game.costs.maxEnergy;
+document.getElementById('costGold').innerText = game.costs.goldBonus;
 document.getElementById('btnBuyDmg').disabled = game.gold < game.costs.damage;
 document.getElementById('btnBuyCrit').disabled = game.gold < game.costs.critChance;
 document.getElementById('btnBuyCritDmg').disabled = game.gold < game.costs.critDamage;
 document.getElementById('btnBuyEnergy').disabled = game.gold < game.costs.maxEnergy;
-document.getElementById('statKills').innerText = game.achievements.filter(id => id <= 6).length;
+document.getElementById('btnBuyGold').disabled = game.gold < game.costs.goldBonus;
+document.getElementById('statKills').innerText = game.achievements.filter(id => id <= 12).length;
 document.getElementById('statClicks').innerText = game.clicks;
-document.getElementById('statPrestige').innerText = game.prestige;
 document.getElementById('statDay').innerText = game.day;
 document.getElementById('statCrits').innerText = game.totalCrits;
 document.getElementById('statTotalGold').innerText = Math.floor(game.totalGold);
 document.getElementById('statStreak').innerText = Math.min(game.loginStreak, 7);
 document.getElementById('statDiamonds').innerText = Math.floor(game.promoCurrency);
 document.getElementById('statRoulette').innerText = game.rouletteSpins;
+document.getElementById('statMaxCombo').innerText = game.maxCombo;
+// Расчет времени до следующей награды
+const now = new Date();
+const tomorrow = new Date(now);
+tomorrow.setDate(tomorrow.getDate() + 1);
+tomorrow.setHours(0, 0, 0, 0);
+const diffMs = tomorrow - now;
+const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+document.getElementById('statNextReward').innerText = `${diffHrs}ч ${diffMins}м`;
 document.getElementById('rankBadge').innerText = getRankName();
 document.getElementById('levelDisplay').innerText = game.level;
 const nextLevelXP = getNextLevelXP();
@@ -2961,11 +3010,10 @@ setTimeout(() => t.classList.remove('show'), 2500);
 }
 function saveGame(showIndicator = false) {
 game.lastSave = new Date().toISOString();
+game.lastOfflineTime = Date.now(); // Сохраняем время для офлайн заработка
 localStorage.setItem('sf2_chapter1', JSON.stringify(game));
 localStorage.setItem('sf2_promoCodes', JSON.stringify(promoCodes));
-localStorage.setItem('sf2_adSlots', JSON.stringify(adSlots));
 localStorage.setItem('sf2_version', gameVersion);
-localStorage.setItem('sf2_currentAdSlot', currentAdSlot);
 localStorage.setItem('sf2_stats', JSON.stringify(stats));
 if (showIndicator) {
 const indicator = document.getElementById('saveIndicator');
@@ -2976,15 +3024,11 @@ setTimeout(() => indicator.classList.remove('show'), 2000);
 function loadGame() {
 const saved = localStorage.getItem('sf2_chapter1');
 const savedPromo = localStorage.getItem('sf2_promoCodes');
-const savedAdSlots = localStorage.getItem('sf2_adSlots');
 const savedVersion = localStorage.getItem('sf2_version');
-const savedCurrentAdSlot = localStorage.getItem('sf2_currentAdSlot');
 const savedStats = localStorage.getItem('sf2_stats');
 if (saved) { const parsed = JSON.parse(saved); game = { ...game, ...parsed }; }
 if (savedPromo) promoCodes = { ...promoCodes, ...JSON.parse(savedPromo) };
-if (savedAdSlots) adSlots = JSON.parse(savedAdSlots);
 if (savedVersion) gameVersion = savedVersion;
-if (savedCurrentAdSlot) currentAdSlot = parseInt(savedCurrentAdSlot);
 if (savedStats) stats = JSON.parse(savedStats);
 const char = CHARACTERS[game.currentEnemy];
 if (char) {
@@ -2997,38 +3041,6 @@ if (!game.soundOn) document.getElementById('soundBtn').innerHTML = '🔇';
 }
 function updateVersionBadge() {
 document.getElementById('versionBadge').textContent = `v${gameVersion}`;
-}
-function doPrestige() {
-let points = Math.floor(game.clicks / 1000);
-if (points < 1) points = 1;
-if (confirm(`Престиж: ${points} очков?
-+${points * 10}% к урону навсегда`)) {
-game.prestige += points;
-game.gold = 500;
-game.damage = 1;
-game.critChance = 5;
-game.critDamage = 200;
-game.maxEnergy = 100;
-game.energy = 100;
-game.currentEnemy = 'shin';
-game.currentRound = 1;
-game.enemyHp = CHARACTERS.shin.hp;
-game.enemyMaxHp = CHARACTERS.shin.hp;
-game.costs = { damage: 15, critChance: 75, critDamage: 150, maxEnergy: 300 };
-document.body.style.backgroundImage = `url('${CHARACTERS.shin.bgImg}')`;
-updateCharacterDisplay();
-showToast(`🔄 Престиж! +${points} очков`);
-playSound('winSound');
-updateUI();
-saveGame();
-closePrestigeChapterModal();
-}
-}
-function doPrestigeFromModal() {
-doPrestige();
-}
-function closePrestigeChapterModal() {
-document.getElementById('prestigeChapterModal').classList.remove('active');
 }
 </script>
 </body>
