@@ -50,6 +50,7 @@ background-position: center;
 background-repeat: no-repeat;
 background-attachment: fixed;
 -webkit-overflow-scrolling: touch;
+overscroll-behavior: none; /* Запрет свайпа для обновления */
 }
 body::before {
 content: '';
@@ -58,6 +59,11 @@ top: 0; left: 0; width: 100%; height: 100%;
 background: rgba(0, 0, 0, 0.75);
 z-index: -1;
 pointer-events: none;
+}
+/* Блокировка pull-to-refresh */
+html, body {
+overscroll-behavior-y: none;
+touch-action: pan-x pan-y;
 }
 .loading-screen {
 position: fixed;
@@ -126,6 +132,7 @@ padding: 20px;
 padding-bottom: 80px;
 animation: fadeIn 0.3s;
 -webkit-overflow-scrolling: touch;
+overscroll-behavior: none;
 }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -563,6 +570,15 @@ right: 5px;
 font-size: 10px;
 color: var(--accent);
 }
+.ability-level-indicator {
+position: absolute;
+bottom: 2px;
+left: 50%;
+transform: translateX(-50%);
+font-size: 8px;
+color: var(--green);
+font-weight: bold;
+}
 @keyframes damageFloat {
 0% { opacity: 1; transform: translateY(0) scale(1); }
 100% { opacity: 0; transform: translateY(-120px) scale(1.3); }
@@ -686,6 +702,7 @@ z-index: 300;
 padding-top: 80px;
 display: none;
 overflow-y: auto;
+overscroll-behavior: none;
 }
 #screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active {
 display: block;
@@ -725,6 +742,15 @@ justify-content: space-between;
 align-items: center;
 border: 1px solid rgba(255,255,255,0.1);
 }
+.shop-section-title {
+color: var(--accent);
+font-size: 18px;
+font-weight: bold;
+margin: 20px 0 10px 0;
+text-align: center;
+text-transform: uppercase;
+letter-spacing: 2px;
+}
 .btn-buy {
 background: var(--green); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; min-width: 100px;
 transition: all 0.2s;
@@ -737,6 +763,13 @@ cursor: default;
 }
 .btn-buy.purchased::after {
 content: ' ✓';
+}
+.btn-buy.max-level {
+background: var(--purple);
+cursor: default;
+}
+.btn-buy.max-level::after {
+content: ' MAX';
 }
 .btn-dev {
 background: linear-gradient(135deg, #e040fb 0%, #aa00ff 100%);
@@ -1368,7 +1401,7 @@ left: -65%;
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
-<div class="version-badge" id="versionBadge">V2.2.0</div>
+<div class="version-badge" id="versionBadge">V2.3.0</div>
 <div class="loading-logo">⚔️</div>
 <div class="loading-text">SHADOW STRIKE</div>
 <div class="loading-bar-bg">
@@ -1403,16 +1436,19 @@ left: -65%;
 ⚡
 <div class="ability-key">1</div>
 <div class="ability-cooldown" id="cooldown1"></div>
+<div class="ability-level-indicator" id="abilityLevel1">Lv.1</div>
 </div>
 <div class="ability-btn" id="ability2" onclick="useAbility(2)">
 💥
 <div class="ability-key">2</div>
 <div class="ability-cooldown" id="cooldown2"></div>
+<div class="ability-level-indicator" id="abilityLevel2">Lv.1</div>
 </div>
 <div class="ability-btn" id="ability3" onclick="useAbility(3)">
 🛡️
 <div class="ability-key">3</div>
 <div class="ability-cooldown" id="cooldown3"></div>
+<div class="ability-level-indicator" id="abilityLevel3">Lv.1</div>
 </div>
 </div>
 <audio id="bgMusic" loop>
@@ -1547,7 +1583,6 @@ left: -65%;
 <span id="costEnergy">400</span> 💰
 </button>
 </div>
-<!-- НОВОЕ УЛУЧШЕНИЕ -->
 <div class="shop-item">
 <div>
 <div style="font-weight: bold;">💰 Золотой Удар</div>
@@ -1555,6 +1590,36 @@ left: -65%;
 </div>
 <button class="btn-buy" id="btnBuyGold" onclick="buyUpgrade('goldBonus')">
 <span id="costGold">500</span> 💰
+</button>
+</div>
+
+<!-- НОВЫЙ РАЗДЕЛ: УЛУЧШЕНИЯ СПОСОБНОСТЕЙ -->
+<h3 class="shop-section-title">⚡ Улучшения Способностей</h3>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">⚡ Ускорение (Ур. <span id="ability1LevelDisplay">1</span>/10)</div>
+<small style="color:#888">Длительность: <span id="ability1Duration">10</span> сек</small>
+</div>
+<button class="btn-buy" id="btnUpgradeAbility1" onclick="upgradeAbility(1)">
+<span id="costAbility1">1000</span> 💰
+</button>
+</div>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">💥 Ярость (Ур. <span id="ability2LevelDisplay">1</span>/10)</div>
+<small style="color:#888">Длительность: <span id="ability2Duration">5</span> сек</small>
+</div>
+<button class="btn-buy" id="btnUpgradeAbility2" onclick="upgradeAbility(2)">
+<span id="costAbility2">1000</span> 💰
+</button>
+</div>
+<div class="shop-item">
+<div>
+<div style="font-weight: bold;">🛡️ Защита (Ур. <span id="ability3LevelDisplay">1</span>/10)</div>
+<small style="color:#888">Энергия: <span id="ability3Energy">50</span></small>
+</div>
+<button class="btn-buy" id="btnUpgradeAbility3" onclick="upgradeAbility(3)">
+<span id="costAbility3">1000</span> 💰
 </button>
 </div>
 </div>
@@ -1594,7 +1659,6 @@ left: -65%;
 </div>
 <h3 style="margin: 20px 0 10px; text-align: center;">🏆 Достижения</h3>
 <div id="achievementsList"></div>
-<!-- Кнопка престижа удалена -->
 </div>
 <div id="screen-promo" class="screen">
 <button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
@@ -1658,7 +1722,6 @@ left: -65%;
 30 💎
 </button>
 </div>
-<!-- НОВЫЕ УЛУЧШЕНИЯ В ПРОМО -->
 <div class="promo-shop-item">
 <div>
 <div style="font-weight: bold;">⚡ Энергетик</div>
@@ -1693,6 +1756,36 @@ left: -65%;
 </div>
 <button class="btn-promo-buy" onclick="buyPromoItem('divine_strike')">
 40 💎
+</button>
+</div>
+
+<!-- НОВЫЕ ТОВАРЫ: УЛУЧШЕНИЯ СПОСОБНОСТЕЙ ЗА АЛМАЗЫ -->
+<h3 style="margin: 20px 0 10px; text-align: center; color: var(--purple);">⚡ Улучшения Способностей</h3>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">⚡ Улучшение Ускорения</div>
+<small style="color:#888">+1 уровень способности</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('ability1_upgrade')">
+5 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">💥 Улучшение Ярости</div>
+<small style="color:#888">+1 уровень способности</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('ability2_upgrade')">
+5 💎
+</button>
+</div>
+<div class="promo-shop-item">
+<div>
+<div style="font-weight: bold;">🛡️ Улучшение Защиты</div>
+<small style="color:#888">+1 уровень способности</small>
+</div>
+<button class="btn-promo-buy" onclick="buyPromoItem('ability3_upgrade')">
+5 💎
 </button>
 </div>
 </div>
@@ -1847,7 +1940,7 @@ let promoCodes = {
 'POWERUP': { gold: 1000, promo: 5, used: false, activations: 0 }
 };
 let stats = { totalAdViews: 0, totalPromoActivations: 0, energyPurchases: 0, jackpotWins: 0 };
-let gameVersion = 'V2.2.0';
+let gameVersion = 'V2.3.0';
 // === ИЗМЕНЕНО: 20 УРОВНЕЙ ===
 const RANKS = [
 { level: 1, name: 'Новичок', xpRequired: 100, reward: { gold: 0, diamonds: 0 } },
@@ -1932,19 +2025,22 @@ username: null,
 avatar: null,
 lastClickTime: 0,
 telegramId: null,
-goldBonusPercent: 0, // Новый параметр
-isTransitioning: false, // Флаг защиты от проклика
-comboCount: 0, // Комбо счетчик
+goldBonusPercent: 0,
+isTransitioning: false,
+comboCount: 0,
 maxCombo: 0,
 lastComboTime: 0,
-offlineEarnings: 0, // Офлайн заработок
+offlineEarnings: 0,
 lastOfflineTime: Date.now(),
 // Способности
 abilities: {
 1: { cooldown: 0, maxCooldown: 30000, name: 'Ускорение' },
 2: { cooldown: 0, maxCooldown: 60000, name: 'Ярость' },
 3: { cooldown: 0, maxCooldown: 90000, name: 'Защита' }
-}
+},
+// НОВЫЕ ПАРАМЕТРЫ: Уровни способностей
+abilityLevels: { 1: 1, 2: 1, 3: 1 },
+abilityUpgradeCosts: { 1: 1000, 2: 1000, 3: 1000 }
 };
 let autoSaveInterval, energyRegenInterval, adTimerInterval, adTimeLeft = 0;
 let countdownInterval;
@@ -1952,6 +2048,20 @@ let rouletteSpinning = false;
 let autoClickInterval = null;
 let currentLeaderboardTab = 'level';
 let abilityInterval = null;
+// ================= БЛОКИРОВКА PULL-TO-REFRESH =================
+document.addEventListener('touchmove', function(e) {
+if (e.scale !== 1) { e.preventDefault(); }
+}, { passive: false });
+
+document.addEventListener('scroll', function(e) {
+e.preventDefault();
+}, { passive: false });
+
+// Запрет обновления страницы свайпом
+window.addEventListener('beforeunload', function(e) {
+e.preventDefault();
+e.returnValue = '';
+});
 // ================= ФУНКЦИИ НАВИГАЦИИ =================
 function toggleSideNav() {
 const sideNav = document.getElementById('sideNav');
@@ -2026,7 +2136,7 @@ game.username = tg.initDataUnsafe.user.username || tg.initDataUnsafe.user.first_
 }
 }
 loadGame();
-checkOfflineEarnings(); // Проверка офлайн заработка
+checkOfflineEarnings();
 checkRegistration();
 checkDaily();
 checkDailyLoginReward();
@@ -2037,7 +2147,7 @@ updateUserInfo();
 renderDevCharSelect();
 updateVersionBadge();
 updatePromoShopButtons();
-startAbilityTimer(); // Запуск таймера способностей
+startAbilityTimer();
 autoSaveInterval = setInterval(() => { saveGame(true); syncWithFirebase(); }, 10000);
 energyRegenInterval = setInterval(() => {
 if(game.energy < game.maxEnergy) {
@@ -2049,7 +2159,6 @@ updateUI();
 setInterval(checkAchievements, 2000);
 setInterval(updatePlayTime, 60000);
 setInterval(autoEnergyPurchase, 5000);
-// Сброс комбо если долго не кликаешь
 setInterval(() => {
 if(Date.now() - game.lastComboTime > 3000 && game.comboCount > 0) {
 game.comboCount = 0;
@@ -2078,7 +2187,6 @@ const now = Date.now();
 const timeDiff = now - game.lastOfflineTime;
 const hoursOffline = Math.floor(timeDiff / (1000 * 60 * 60));
 if(hoursOffline > 0 && game.totalGold > 0) {
-// 10% от общего золота за каждый час офлайн (макс 10000)
 game.offlineEarnings = Math.min(Math.floor(game.totalGold * 0.1 * hoursOffline), 10000);
 if(game.offlineEarnings > 0) {
 document.getElementById('offlineAmount').innerText = `+${game.offlineEarnings} 💰`;
@@ -2307,40 +2415,61 @@ document.getElementById(`ability${i}`).classList.remove('disabled');
 function useAbility(id) {
 if(game.abilities[id].cooldown > 0 || game.isTransitioning) return;
 playSound('abilitySound');
+const level = game.abilityLevels[id];
 if(id === 1) {
-// Ускорение - +50% урона на 10 секунд
+// Ускорение - длительность зависит от уровня (база 10 сек + 2 сек за уровень)
+const duration = 10000 + (level - 1) * 2000;
 const originalDamage = game.damage;
 game.damage = Math.floor(game.damage * 1.5);
-showToast('⚡ Ускорение! +50% урона');
+showToast(`⚡ Ускорение! +50% урона на ${duration/1000} сек`);
 setTimeout(() => {
 game.damage = originalDamage;
 showToast('Ускорение закончилось');
-}, 10000);
+}, duration);
 } else if(id === 2) {
-// Ярость - крит 100% на 5 секунд
+// Ярость - длительность зависит от уровня (база 5 сек + 1 сек за уровень)
+const duration = 5000 + (level - 1) * 1000;
 const originalCrit = game.critChance;
 game.critChance = 100;
-showToast('💥 Ярость! 100% крит');
+showToast(`💥 Ярость! 100% крит на ${duration/1000} сек`);
 setTimeout(() => {
 game.critChance = originalCrit;
 showToast('Ярость закончилась');
-}, 5000);
+}, duration);
 } else if(id === 3) {
-// Защита - восстановить 50 энергии
-game.energy = Math.min(game.energy + 50, game.maxEnergy);
-showToast('🛡️ Защита! +50 энергии');
+// Защита - энергия зависит от уровня (база 50 + 10 за уровень)
+const energyRestore = 50 + (level - 1) * 10;
+game.energy = Math.min(game.energy + energyRestore, game.maxEnergy);
+showToast(`🛡️ Защита! +${energyRestore} энергии`);
 updateUI();
 }
 game.abilities[id].cooldown = game.abilities[id].maxCooldown;
 document.getElementById(`ability${id}`).classList.add('disabled');
 saveGame();
 }
+// === УЛУЧШЕНИЕ СПОСОБНОСТЕЙ ===
+function upgradeAbility(id) {
+const level = game.abilityLevels[id];
+const cost = game.abilityUpgradeCosts[id];
+if(level >= 10) { 
+showToast('❌ Максимальный уровень способности!'); 
+return; 
+}
+if(game.gold >= cost) {
+game.gold -= cost;
+game.abilityLevels[id]++;
+game.abilityUpgradeCosts[id] = Math.floor(cost * 1.5);
+showToast(`✅ Способность ${id} улучшена до уровня ${game.abilityLevels[id]}!`);
+updateUI();
+saveGame();
+} else { 
+showToast('❌ Недостаточно золота!'); 
+}
+}
 // === ИСПРАВЛЕНИЕ БАГА С ПРОКЛИКОМ ===
 function handleAttack(x, y) {
-// Если идет переход между врагами, клики игнорируются
 if (game.isTransitioning) return;
 const now = Date.now();
-// УВЕЛИЧЕНА ЗАДЕРЖКА КЛИКА (100мс вместо 50мс)
 if (now - game.lastClickTime < 100) {
 return;
 }
@@ -2355,7 +2484,6 @@ return;
 }
 game.energy--;
 game.clicks++;
-// Комбо система
 game.comboCount++;
 game.lastComboTime = now;
 if(game.comboCount > game.maxCombo) {
@@ -2366,7 +2494,6 @@ playSound('clickSound');
 const char = CHARACTERS[game.currentEnemy];
 let dmg = game.damage;
 let isCrit = Math.random() * 100 < game.critChance;
-// Бонус от комбо (каждые 10 ударов +10% урона)
 if(game.comboCount >= 10) {
 dmg = Math.floor(dmg * 1.1);
 }
@@ -2389,7 +2516,6 @@ img.classList.add('hit');
 }
 game.enemyHp -= dmg;
 if (game.enemyHp < 0) game.enemyHp = 0;
-// Расчет золота с учетом бонуса
 let goldGain = Math.floor(dmg / 3);
 if (game.goldBonusPercent > 0) {
 goldGain = Math.floor(goldGain * (1 + game.goldBonusPercent / 100));
@@ -2417,7 +2543,6 @@ const char = CHARACTERS[game.currentEnemy];
 let bonus = Math.floor(char.hp / 20);
 game.gold += bonus;
 game.totalGold += bonus;
-// Бонус за комбо
 if(game.comboCount >= 20) {
 const comboBonus = Math.floor(bonus * 0.1 * (game.comboCount / 20));
 game.gold += comboBonus;
@@ -2451,7 +2576,6 @@ nextEnemyWithCountdown();
 }, 2000);
 }
 function nextEnemyWithCountdown() {
-// БЛОКИРОВКА КЛИКОВ ВО ВРЕМЯ ПЕРЕХОДА
 game.isTransitioning = true;
 const charContainer = document.getElementById('charContainer');
 if(charContainer) charContainer.classList.add('disabled');
@@ -2466,7 +2590,6 @@ updateCharacterDisplay();
 updateUI();
 saveGame();
 showToast(`⚔️ Раунд ${game.currentRound} из ${char.rounds}`);
-// Разблокировка после короткой паузы
 setTimeout(() => {
 game.isTransitioning = false;
 if(charContainer) charContainer.classList.remove('disabled');
@@ -2493,7 +2616,6 @@ const fightButton = document.getElementById('fightButton');
 countdownNumber.textContent = '⚔️';
 fightButton.classList.add('active');
 window.nextEnemyData = { key: nextEnemyKey, char: nextChar };
-// Разблокировка только после появления кнопки FIGHT
 game.isTransitioning = false;
 if(charContainer) charContainer.classList.remove('disabled');
 });
@@ -2718,7 +2840,11 @@ const items = {
 'stamina_boost': { cost: 3, energy: 100 },
 'crit_master': { cost: 20, critChance: 10 },
 'destroyer': { cost: 30, critDamage: 25 },
-'divine_strike': { cost: 40, damage: 10 }
+'divine_strike': { cost: 40, damage: 10 },
+// НОВЫЕ ТОВАРЫ: УЛУЧШЕНИЯ СПОСОБНОСТЕЙ
+'ability1_upgrade': { cost: 5, abilityId: 1 },
+'ability2_upgrade': { cost: 5, abilityId: 2 },
+'ability3_upgrade': { cost: 5, abilityId: 3 }
 };
 const purchase = items[item];
 if (!purchase) return;
@@ -2729,6 +2855,19 @@ if (purchase.energy) { game.energy = Math.min(game.energy + purchase.energy, gam
 if (purchase.damage) { game.damage += purchase.damage; }
 if (purchase.critChance) { game.critChance = Math.min(game.critChance + purchase.critChance, 50); }
 if (purchase.critDamage) { game.critDamage += purchase.critDamage; }
+// УЛУЧШЕНИЕ СПОСОБНОСТИ
+if (purchase.abilityId) {
+const abilityId = purchase.abilityId;
+if (game.abilityLevels[abilityId] < 10) {
+game.abilityLevels[abilityId]++;
+game.abilityUpgradeCosts[abilityId] = Math.floor(game.abilityUpgradeCosts[abilityId] * 1.5);
+showToast(`✅ Способность ${abilityId} улучшена до уровня ${game.abilityLevels[abilityId]}!`);
+} else {
+showToast('❌ Максимальный уровень способности!');
+game.promoCurrency += purchase.cost;
+return;
+}
+}
 showToast('✅ Покупка успешна!');
 playSound('winSound');
 updateUI();
@@ -2954,6 +3093,33 @@ document.getElementById('btnBuyCrit').disabled = game.gold < game.costs.critChan
 document.getElementById('btnBuyCritDmg').disabled = game.gold < game.costs.critDamage;
 document.getElementById('btnBuyEnergy').disabled = game.gold < game.costs.maxEnergy;
 document.getElementById('btnBuyGold').disabled = game.gold < game.costs.goldBonus;
+// Обновление UI улучшений способностей
+for(let i = 1; i <= 3; i++) {
+const level = game.abilityLevels[i];
+const cost = game.abilityUpgradeCosts[i];
+document.getElementById(`ability${i}LevelDisplay`).innerText = level;
+document.getElementById(`costAbility${i}`).innerText = cost;
+document.getElementById(`abilityLevel${i}`).innerText = `Lv.${level}`;
+if(i === 1) {
+const duration = 10 + (level - 1) * 2;
+document.getElementById(`ability${i}Duration`).innerText = duration;
+} else if(i === 2) {
+const duration = 5 + (level - 1) * 1;
+document.getElementById(`ability${i}Duration`).innerText = duration;
+} else if(i === 3) {
+const energy = 50 + (level - 1) * 10;
+document.getElementById(`ability${i}Energy`).innerText = energy;
+}
+const btn = document.getElementById(`btnUpgradeAbility${i}`);
+if(level >= 10) {
+btn.classList.add('max-level');
+btn.disabled = true;
+btn.innerHTML = 'MAX 💰';
+} else {
+btn.classList.remove('max-level');
+btn.disabled = game.gold < cost;
+}
+}
 document.getElementById('statKills').innerText = game.achievements.filter(id => id <= 12).length;
 document.getElementById('statClicks').innerText = game.clicks;
 document.getElementById('statDay').innerText = game.day;
@@ -2963,7 +3129,6 @@ document.getElementById('statStreak').innerText = Math.min(game.loginStreak, 7);
 document.getElementById('statDiamonds').innerText = Math.floor(game.promoCurrency);
 document.getElementById('statRoulette').innerText = game.rouletteSpins;
 document.getElementById('statMaxCombo').innerText = game.maxCombo;
-// Расчет времени до следующей награды
 const now = new Date();
 const tomorrow = new Date(now);
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -3010,7 +3175,7 @@ setTimeout(() => t.classList.remove('show'), 2500);
 }
 function saveGame(showIndicator = false) {
 game.lastSave = new Date().toISOString();
-game.lastOfflineTime = Date.now(); // Сохраняем время для офлайн заработка
+game.lastOfflineTime = Date.now();
 localStorage.setItem('sf2_chapter1', JSON.stringify(game));
 localStorage.setItem('sf2_promoCodes', JSON.stringify(promoCodes));
 localStorage.setItem('sf2_version', gameVersion);
