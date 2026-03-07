@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>SHADOW STRIKE - Глава 1 & 2</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<!-- Yandex Mobile Ads SDK -->
-<script src="https://yandex.ru/ads/system/sdk.js"></script>
+<!-- Yandex Mobile Ads SDK - ДОЛЖЕН БЫТЬ ПЕРВЫМ -->
+<script src="https://yandex.ru/ads/system/sdk.js" async></script>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -1412,7 +1412,7 @@ text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
 </div>
 
 <!-- Rewarded Video Ad Button -->
-<button class="reward-ad-btn" id="rewardAdBtn" onclick="showRewardedAd()" title="Смотреть рекламу за награду">
+<button class="reward-ad-btn" id="rewardAdBtn" onclick="showRewardedAd()" title="Смотреть рекламу за награду" disabled>
     🎁
 </button>
 <div class="reward-tooltip" id="rewardTooltip">
@@ -1768,6 +1768,20 @@ text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
 </div>
 <div id="toast" class="toast">Сообщение</div>
 <script>
+// ================= ПРОВЕРКА AD BLOCK =================
+(function() {
+    const testAd = document.createElement('div');
+    testAd.innerHTML = '&nbsp;';
+    testAd.className = 'adsbox';
+    document.body.appendChild(testAd);
+    
+    if (testAd.offsetHeight === 0) {
+        console.warn('🚫 Обнаружен AdBlock! Реклама может не работать.');
+        window.adsBlocked = true;
+    }
+    document.body.removeChild(testAd);
+})();
+
 // ================= FIREBASE КОНФИГУРАЦИЯ =================
 const firebaseConfig = {
 apiKey: "AIzaSyCiFH7xN-NoH0XjqlMFX_eLYoQXCm2FKs0",
@@ -1784,48 +1798,107 @@ const db = firebase.firestore();
 // ================= YANDEX ADS INTEGRATION =================
 let yandexAdsInitialized = false;
 let rewardedAd = null;
-let canShowRewardAd = true;
+let canShowRewardAd = false; // ОТКЛЮЧЕНО: нет тестового режима
 let rewardAdCooldown = false;
 let rewardAdLoading = false;
+let sdkLoadAttempts = 0;
+const MAX_SDK_ATTEMPTS = 5;
 
-// Инициализация Яндекс Рекламы
+// Инициализация Яндекс Рекламы с улучшенной обработкой ошибок
 function initYandexAds() {
-    if (yandexAdsInitialized) return;
-    
-    if (typeof window.yads === 'undefined') {
-        console.error('❌ Yandex Ads SDK not loaded!');
+    if (yandexAdsInitialized) {
+        console.log('✅ Yandex Ads уже инициализирован');
         return;
     }
     
-    // ✅ ВАШИ ОДОБРЕННЫЕ ID БЛОКОВ
+    sdkLoadAttempts++;
+    console.log(`🔄 Попытка #${sdkLoadAttempts} загрузки Yandex Ads SDK`);
+    
+    // === ПРОВЕРКА 1: Протокол ===
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
+        console.warn('⚠️ Требуется HTTPS для работы рекламы!');
+        console.warn('📝 Текущий протокол:', window.location.protocol);
+    }
+    
+    // === ПРОВЕРКА 2: Загрузка SDK ===
+    if (typeof window.yads === 'undefined' || window.yads === null) {
+        console.warn(`⚠️ SDK не загружен (попытка ${sdkLoadAttempts}/${MAX_SDK_ATTEMPTS})`);
+        
+        // Проверяем, блокируется ли скрипт
+        if (sdkLoadAttempts === 1) {
+            console.log('🔍 Проверка доступности yandex.ru...');
+            fetch('https://yandex.ru/ads/system/sdk.js', { method: 'HEAD', mode: 'no-cors' })
+                .then(() => console.log('✅ yandex.ru доступен'))
+                .catch(() => console.error('❌ yandex.ru недоступен - возможно блокировка'));
+        }
+        
+        if (sdkLoadAttempts < MAX_SDK_ATTEMPTS) {
+            // Увеличиваем интервал между попытками
+            const delay = 2000 + (sdkLoadAttempts * 1000);
+            console.log(`⏳ Следующая попытка через ${delay/1000} сек...`);
+            setTimeout(() => {
+                initYandexAds();
+            }, delay);
+        } else {
+            console.error('❌ Не удалось загрузить Yandex Ads SDK');
+            console.error('📋 Возможные причины:');
+            console.error('   1. AdBlock/uBlock Origin блокирует рекламу');
+            console.error('   2. Сайт работает на HTTP вместо HTTPS');
+            console.error('   3. Домен yandex.ru заблокирован (VPN/фаервол)');
+            console.error('   4. Проблемы с интернет-соединением');
+            
+            // === ТЕСТОВЫЙ РЕЖИМ ОТКЛЮЧЁН ===
+            console.log('❌ Тестовый режим отключён - реклама не будет показываться');
+            document.getElementById('rewardAdBtn').disabled = true;
+            showToast('⚠️ Реклама недоступна');
+        }
+        return;
+    }
+    
+    // === SDK ЗАГРУЖЕН - ИНИЦИАЛИЗАЦИЯ ===
     const AD_BLOCK_ID = 'R-M-18865101-1';
     const REWARDED_AD_ID = 'R-M-18865101-3';
     
-    yads.init({
-        blockId: AD_BLOCK_ID,
-        onInit: function() {
-            yandexAdsInitialized = true;
-            console.log('✅ Yandex Ads initialized');
-            loadRewardedAd();
-        },
-        onError: function(error) {
-            console.error('❌ Yandex Ads init error:', error);
-        }
-    });
+    console.log('🔧 Инициализация Yandex Ads...');
+    
+    try {
+        yads.init({
+            blockId: AD_BLOCK_ID,
+            onInit: function() {
+                yandexAdsInitialized = true;
+                console.log('✅ Yandex Ads успешно инициализирован!');
+                loadRewardedAd();
+                setTimeout(() => {
+                    document.getElementById('yandexBannerContainer').classList.add('active');
+                }, 1000);
+            },
+            onError: function(error) {
+                console.error('❌ Ошибка инициализации:', error);
+                yandexAdsInitialized = true;
+                document.getElementById('rewardAdBtn').disabled = true;
+                showToast('⚠️ Ошибка рекламы');
+            }
+        });
+    } catch (e) {
+        console.error('❌ Исключение при инициализации:', e);
+        yandexAdsInitialized = true;
+        document.getElementById('rewardAdBtn').disabled = true;
+    }
 }
 
 // Загрузка рекламы за вознаграждение
 function loadRewardedAd() {
-    if (!yandexAdsInitialized || rewardAdLoading) return;
-    
-    if (typeof window.yads === 'undefined') {
-        console.error('❌ Yandex Ads SDK not available');
+    if (!yandexAdsInitialized || rewardAdLoading) {
+        console.log('⏳ Ожидание инициализации рекламы...');
         return;
     }
-    
+    if (typeof window.yads === 'undefined') {
+        console.error('❌ Yandex Ads SDK не доступен');
+        return;
+    }
     rewardAdLoading = true;
     const REWARDED_AD_ID = 'R-M-18865101-3';
-    
+    console.log('🔄 Загрузка rewarded рекламы...');
     yads.loadRewardedAd({
         blockId: REWARDED_AD_ID,
         onLoad: function(ad) {
@@ -1833,13 +1906,14 @@ function loadRewardedAd() {
             canShowRewardAd = true;
             rewardAdLoading = false;
             document.getElementById('rewardAdBtn').disabled = false;
-            console.log('✅ Rewarded ad loaded');
+            console.log('✅ Rewarded реклама загружена и готова!');
         },
         onError: function(error) {
-            console.error('❌ Rewarded ad load error:', error);
+            console.error('❌ Ошибка загрузки rewarded рекламы:', error);
             canShowRewardAd = false;
             rewardAdLoading = false;
             document.getElementById('rewardAdBtn').disabled = true;
+            console.log('⏳ Повторная попытка через 30 секунд...');
             setTimeout(loadRewardedAd, 30000);
         }
     });
@@ -1847,52 +1921,50 @@ function loadRewardedAd() {
 
 // Показ рекламы за вознаграждение
 function showRewardedAd() {
+    console.log('🎁 Клик по кнопке рекламы');
+    
+    // === ТЕСТОВЫЙ РЕЖИМ ОТКЛЮЧЁН ===
     if (!canShowRewardAd || rewardAdCooldown) {
         showToast('⏳ Реклама скоро будет доступна');
         return;
     }
-    
     if (!rewardedAd) {
         showToast('🔄 Загрузка рекламы...');
         loadRewardedAd();
         return;
     }
-    
+    console.log('▶️ Показ рекламы...');
     rewardAdCooldown = true;
     document.getElementById('rewardAdBtn').disabled = true;
-    
     rewardedAd.show({
         onShow: function() {
-            console.log('Rewarded ad shown');
+            console.log('📺 Реклама показана');
         },
         onReward: function(reward) {
-            // ✅ НАГРАДА ЗА ПРОСМОТР: 1000 золота + 2 алмаза
+            console.log('💰 Награда получена!');
             const goldReward = 1000;
             const diamondReward = 2;
-            
             game.gold += goldReward;
             game.totalGold += goldReward;
             game.promoCurrency += diamondReward;
             stats.totalAdViews++;
-            
             showToast(`🎁 Награда: +${goldReward} 💰 +${diamondReward} 💎`);
             playSound('winSound');
             updateUI();
             saveGame();
-            
             setTimeout(() => {
                 loadRewardedAd();
             }, 1000);
         },
         onClose: function() {
-            console.log('Rewarded ad closed');
+            console.log('❌ Реклама закрыта');
             rewardAdCooldown = false;
             if (rewardedAd) {
                 document.getElementById('rewardAdBtn').disabled = false;
             }
         },
         onError: function(error) {
-            console.error('Rewarded ad error:', error);
+            console.error('❌ Ошибка показа рекламы:', error);
             showToast('❌ Ошибка показа рекламы');
             rewardAdCooldown = false;
             document.getElementById('rewardAdBtn').disabled = false;
