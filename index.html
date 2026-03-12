@@ -1,4 +1,4 @@
-<!DOCTYPhtml>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -26,6 +26,7 @@
 --diamond: #00bcd4;
 --xp-gold: #ffd700;
 --prestige: #9c27b0;
+--quest: #00e5ff;
 }
 * {
 margin: 0;
@@ -507,6 +508,22 @@ font-size: 48px;
 text-shadow: 0 0 30px #ff0, 3px 3px 0 #000;
 animation: critBounce 1s forwards;
 }
+.damage-popup.auto {
+color: #00e5ff;
+font-size: 24px;
+text-shadow: 0 0 15px #00e5ff, 2px 2px 0 #000;
+}
+.damage-popup.raid {
+color: #f44336;
+font-size: 36px;
+text-shadow: 0 0 25px #f44336, 3px 3px 0 #000;
+animation: raidDamage 1.2s forwards;
+}
+@keyframes raidDamage {
+0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+50% { transform: translateY(-80px) scale(1.2) rotate(5deg); }
+100% { opacity: 0; transform: translateY(-150px) scale(0.8) rotate(-5deg); }
+}
 .combo-counter {
 position: fixed;
 top: 150px;
@@ -677,7 +694,7 @@ pointer-events: none;
 transition: opacity 0.3s;
 }
 .transition-effect.active { opacity: 1; }
-#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-online, #screen-messages, #screen-raid {
+#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-online, #screen-messages, #screen-raid, #screen-quests {
 position: fixed;
 top: 0;
 left: 0;
@@ -692,7 +709,7 @@ overflow-y: auto;
 overscroll-behavior-y: contain;
 -webkit-overflow-scrolling: touch;
 }
-#screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-online.active, #screen-messages.active, #screen-raid.active {
+#screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-online.active, #screen-messages.active, #screen-raid.active, #screen-quests.active {
 display: block;
 animation: fadeIn 0.3s;
 }
@@ -1718,7 +1735,6 @@ text-align: center;
 }
 .raid-boss-info {
 background: rgba(244, 67, 54, 0.2);
-border: 2px solid var(--red);
 padding: 20px;
 border-radius: 15px;
 margin-bottom: 20px;
@@ -1744,7 +1760,6 @@ background: #222;
 border-radius: 15px;
 overflow: hidden;
 margin: 15px 0;
-border: 2px solid var(--red);
 }
 .raid-hp-bar-fill {
 height: 100%;
@@ -1829,6 +1844,95 @@ padding: 15px;
 border-radius: 10px;
 margin-top: 20px;
 }
+/* Quests Screen */
+.quests-container {
+padding: 20px;
+}
+.quest-item {
+background: rgba(255,255,255,0.05);
+padding: 15px;
+border-radius: 10px;
+margin-bottom: 10px;
+border-left: 4px solid #444;
+transition: all 0.3s;
+}
+.quest-item.completed {
+border-left-color: var(--green);
+background: rgba(76, 175, 80, 0.1);
+}
+.quest-item.claimed {
+border-left-color: #888;
+opacity: 0.6;
+}
+.quest-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 10px;
+}
+.quest-name {
+font-weight: bold;
+font-size: 16px;
+color: #fff;
+}
+.quest-status {
+font-size: 12px;
+padding: 4px 10px;
+border-radius: 12px;
+background: #444;
+}
+.quest-status.completed {
+background: var(--green);
+}
+.quest-status.claimed {
+background: #888;
+}
+.quest-progress {
+background: rgba(0,0,0,0.3);
+height: 8px;
+border-radius: 4px;
+overflow: hidden;
+margin-bottom: 10px;
+}
+.quest-progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(--quest), var(--accent));
+width: 0%;
+transition: width 0.3s ease;
+}
+.quest-desc {
+font-size: 13px;
+color: #888;
+margin-bottom: 10px;
+}
+.quest-reward {
+font-size: 14px;
+color: var(--xp-gold);
+}
+.btn-claim-quest {
+background: var(--green);
+color: #fff;
+border: none;
+padding: 8px 20px;
+border-radius: 8px;
+font-weight: bold;
+cursor: pointer;
+font-size: 14px;
+}
+.btn-claim-quest:disabled {
+background: #444;
+cursor: not-allowed;
+opacity: 0.5;
+}
+.quest-timer {
+background: rgba(0,0,0,0.3);
+padding: 10px;
+border-radius: 8px;
+margin-bottom: 15px;
+text-align: center;
+color: var(--accent);
+font-weight: bold;
+}
 @media (max-width: 480px) {
 .loading-text { font-size: 20px; }
 .loading-bar-bg { width: 250px; }
@@ -1865,7 +1969,7 @@ margin-top: 20px;
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
-<div class="version-badge" id="versionBadge">V2.9.0</div>
+<div class="version-badge" id="versionBadge">V3.0.1</div>
 <div class="loading-logo">⚔️</div>
 <div class="loading-text">SHADOW STRIKE</div>
 <div class="loading-bar-bg">
@@ -1959,6 +2063,10 @@ margin-top: 20px;
 <button class="side-nav-btn" onclick="switchScreen('shop', this)">
 <span class="side-nav-icon">🛒</span><span>Магазин</span>
 </button>
+<button class="side-nav-btn" onclick="switchScreen('quests', this)">
+<span class="side-nav-icon">📋</span><span>Квесты</span>
+<span class="badge" id="questBadge" style="display:none;">!</span>
+</button>
 <button class="side-nav-btn" onclick="switchScreen('promo', this)">
 <span class="side-nav-icon">🎁</span><span>Промо</span>
 </button>
@@ -2032,6 +2140,14 @@ margin-top: 20px;
 <div class="shop-item">
 <div><div style="font-weight: bold;">💰 Золотой Удар</div><small style="color:#888">+5% золота за клик</small></div>
 <button class="btn-buy" id="btnBuyGold" onclick="buyUpgrade('goldBonus')"><span id="costGold">500</span> 💰</button>
+</div>
+</div>
+<div id="screen-quests" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
+<h2 style="margin: 20px 0; text-align: center;">📋 Ежедневные Квесты</h2>
+<div class="quests-container">
+<div class="quest-timer" id="questTimer">⏳ До обновления: 00:00:00</div>
+<div id="questsList"></div>
 </div>
 </div>
 <div id="screen-profile" class="screen">
@@ -2284,11 +2400,9 @@ margin-top: 20px;
 <h2 style="margin: 20px 0; text-align: center;">👹 РЕЙД БОСС</h2>
 <div class="raid-container">
 <div class="raid-timer" id="raidTimer">Следующий рейд через: --:--:--</div>
-<!-- Обратный отсчет до начала рейда -->
 <div class="raid-countdown" id="raidCountdown" style="display:none;">⏳ До начала рейда: <span id="raidCountdownText">00:00:00</span></div>
 <div class="raid-boss-info" id="raidBossInfo" style="display:none;">
 <div class="raid-boss-name" id="raidBossName">Тёмный Властелин</div>
-<!-- Картинка босса рейда -->
 <img id="raidBossImg" src="" class="raid-boss-img" alt="Raid Boss" style="display:none;">
 <div class="raid-hp-bar-bg">
 <div class="raid-hp-bar-fill" id="raidHpFill"></div>
@@ -2306,7 +2420,7 @@ margin-top: 20px;
 <div id="raidNotActive" style="padding: 40px; color: #888;">
 👹 Рейд босс появится через некоторое время.<br>Проверьте позже!
 <br><br>
-<button class="btn-raid-summon" id="btnRaidSummon" onclick="summonRaidBoss()">💎 Вызвать за 50 алмазов</button>
+<button class="btn-raid-summon" id="btnRaidSummon" onclick="summonRaidBoss()">🆓 Вызвать бесплатно</button>
 </div>
 </div>
 </div>
@@ -2405,28 +2519,33 @@ measurementId: "G-74F5V4RP0Z"
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
+
+// ✅ ИЗМЕНЕНО: Рейд босс теперь бесплатный (0 алмазов)
+const RAID_SUMMON_COST = 0;
+const RAID_COOLDOWN = 3 * 60 * 60 * 1000;
+
 // ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
 const CHARACTERS = {
-shin: { name: 'Клинок Рассвета', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Ловкий и стремительный боец, мастер быстрых атак и уклонений.', achievementId: 1, order: 1, rounds: 1, chapter: 1, prestigeValue: 10 },
-brick: { name: 'Стальная Стена', hp: 8000, img: 'images/brick.png', bgImg: 'backgrounds/brick.jpg', desc: 'Массивный и выносливый воин с невероятной физической силой.', achievementId: 2, order: 2, rounds: 1, chapter: 1, prestigeValue: 20 },
-needle: { name: 'Теневой Шип', hp: 18000, img: 'images/needle.png', bgImg: 'backgrounds/needle.jpg', desc: 'Скрытный и точный боец, специализирующийся на колющих ударах.', achievementId: 3, order: 3, rounds: 1, chapter: 1, prestigeValue: 30 },
-ghost: { name: 'Сумрачный Вестник', hp: 35000, img: 'images/ghost.png', bgImg: 'backgrounds/ghost.jpg', desc: 'Загадочный воин, чьё появление вызывает тревогу.', achievementId: 4, order: 4, rounds: 1, chapter: 1, prestigeValue: 50 },
-dandy: { name: 'Алый Дуэлянт', hp: 60000, img: 'images/dandy.png', bgImg: 'backgrounds/dandy.jpg', desc: 'Элегантный и самоуверенный боец.', achievementId: 5, order: 5, rounds: 1, chapter: 1, prestigeValue: 75 },
-lynx: { name: 'Лунная Пантера', hp: 200000, img: 'images/lynx.png', bgImg: 'backgrounds/lynx.jpg', desc: 'Опытный наставник и опасный противник.', achievementId: 6, isBoss: true, order: 6, rounds: 2, chapter: 1, prestigeValue: 100 },
-guardian: { name: 'Огненный Страж', hp: 300000, img: 'images/guardian.png', bgImg: 'backgrounds/guardian.jpg', desc: 'Наследник силы Мастера Безмолвия.', achievementId: 7, order: 7, rounds: 1, chapter: 2, prestigeValue: 150 },
-bull: { name: 'Каменный Бык', hp: 450000, img: 'images/bull.png', bgImg: 'backgrounds/bull.jpg', desc: 'Могучий воин с неистовым нравом.', achievementId: 8, order: 8, rounds: 1, chapter: 2, prestigeValue: 200 },
-keeper: { name: 'Теневой Хранитель', hp: 600000, img: 'images/keeper.png', bgImg: 'backgrounds/keeper.jpg', desc: 'Мудрый и скрытный боец.', achievementId: 9, order: 9, rounds: 1, chapter: 2, prestigeValue: 250 },
-tiger: { name: 'Яростный Тигр', hp: 800000, img: 'images/tiger.png', bgImg: 'backgrounds/tiger.jpg', desc: 'Холодный и расчётливый воин.', achievementId: 10, order: 10, rounds: 1, chapter: 2, prestigeValue: 350 },
-crane: { name: 'Белый Журавль', hp: 1000000, img: 'images/crane.png', bgImg: 'backgrounds/crane.jpg', desc: 'Бывший ученик древнего мастера.', achievementId: 11, order: 11, rounds: 1, chapter: 2, prestigeValue: 400 },
-master: { name: 'Мастер Безмолвия', hp: 3000000, img: 'images/master.png', bgImg: 'backgrounds/master.jpg', desc: 'Загадочный и могущественный наставник.', achievementId: 12, isBoss: true, order: 12, rounds: 2, chapter: 2, prestigeValue: 500 }
+shin: { name: 'Клинок Рассвета', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Ловкий и стремительный боец, мастер быстрых атак и уклонений. Его стиль напоминает первые лучи солнца — внезапный и ослепляющий.', achievementId: 1, order: 1, rounds: 1, chapter: 1, prestigeValue: 10 },
+brick: { name: 'Стальная Стена', hp: 8000, img: 'images/brick.png', bgImg: 'backgrounds/brick.jpg', desc: 'Массивный и выносливый воин с невероятной физической силой. Его защита непробиваема, как стальная крепость.', achievementId: 2, order: 2, rounds: 1, chapter: 1, prestigeValue: 20 },
+needle: { name: 'Теневой Шип', hp: 18000, img: 'images/needle.png', bgImg: 'backgrounds/needle.jpg', desc: 'Скрытный и точный боец, специализирующийся на колющих ударах. Его атаки быстры как молния.', achievementId: 3, order: 3, rounds: 1, chapter: 1, prestigeValue: 30 },
+ghost: { name: 'Сумрачный Вестник', hp: 35000, img: 'images/ghost.png', bgImg: 'backgrounds/ghost.jpg', desc: 'Загадочный воин, чьё появление вызывает тревогу. Он словно призрак, неуловимый и опасный.', achievementId: 4, order: 4, rounds: 1, chapter: 1, prestigeValue: 50 },
+dandy: { name: 'Алый Дуэлянт', hp: 60000, img: 'images/dandy.png', bgImg: 'backgrounds/dandy.jpg', desc: 'Элегантный и самоуверенный боец. Его стиль боя изящен как танец смерти.', achievementId: 5, order: 5, rounds: 1, chapter: 1, prestigeValue: 75 },
+lynx: { name: 'Лунная Пантера', hp: 200000, img: 'images/lynx.png', bgImg: 'backgrounds/lynx.jpg', desc: 'Опытный наставник и опасный противник. Её грация и сила не имеют равных.', achievementId: 6, isBoss: true, order: 6, rounds: 2, chapter: 1, prestigeValue: 100 },
+guardian: { name: 'Огненный Страж', hp: 300000, img: 'images/guardian.png', bgImg: 'backgrounds/guardian.jpg', desc: 'Наследник силы Мастера Безмолвия. Его пламя очищает всё на своём пути.', achievementId: 7, order: 7, rounds: 1, chapter: 2, prestigeValue: 150 },
+bull: { name: 'Каменный Бык', hp: 450000, img: 'images/bull.png', bgImg: 'backgrounds/bull.jpg', desc: 'Могучий воин с неистовым нравом. Его ярость сокрушает любую защиту.', achievementId: 8, order: 8, rounds: 1, chapter: 2, prestigeValue: 200 },
+keeper: { name: 'Теневой Хранитель', hp: 600000, img: 'images/keeper.png', bgImg: 'backgrounds/keeper.jpg', desc: 'Мудрый и скрытный боец. Он хранит древние секреты боевых искусств.', achievementId: 9, order: 9, rounds: 1, chapter: 2, prestigeValue: 250 },
+tiger: { name: 'Яростный Тигр', hp: 800000, img: 'images/tiger.png', bgImg: 'backgrounds/tiger.jpg', desc: 'Холодный и расчётливый воин. Его атаки точны как удар хищника.', achievementId: 10, order: 10, rounds: 1, chapter: 2, prestigeValue: 350 },
+crane: { name: 'Белый Журавль', hp: 1000000, img: 'images/crane.png', bgImg: 'backgrounds/crane.jpg', desc: 'Бывший ученик древнего мастера. Его техника совершенна.', achievementId: 11, order: 11, rounds: 1, chapter: 2, prestigeValue: 400 },
+master: { name: 'Мастер Безмолвия', hp: 3000000, img: 'images/master.png', bgImg: 'backgrounds/master.jpg', desc: 'Загадочный и могущественный наставник. Его сила безгранична.', achievementId: 12, isBoss: true, order: 12, rounds: 2, chapter: 2, prestigeValue: 500 }
 };
 const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx', 'guardian', 'bull', 'keeper', 'tiger', 'crane', 'master'];
-// ================= НАСТРОЙКИ РЕЙД БОССА (1 БОСС, КАЖДЫЕ 3 ЧАСА) =================
+
+// ================= НАСТРОЙКИ РЕЙД БОССА =================
 const RAID_BOSSES = [
 { name: 'Тёмный Властелин', hp: 3000000, img: 'images/raid_boss.png', bgImg: 'backgrounds/raid_bg.jpg' }
 ];
-const RAID_COOLDOWN = 3 * 60 * 60 * 1000; // 3 часа
-const RAID_SUMMON_COST = 50; // Стоимость вызова в алмазах
+
 // 🔢 15 ПРОМО КОДОВ
 let promoCodes = {
 'START2026': { gold: 1000, promo: 3, used: false },
@@ -2446,7 +2565,8 @@ let promoCodes = {
 'POWERUP': { gold: 1000, promo: 5, used: false }
 };
 let stats = { totalPromoActivations: 0, energyPurchases: 0, jackpotWins: 0 };
-let gameVersion = 'V2.9.0';
+let gameVersion = 'V3.0.1';
+
 // 📊 20 УРОВНЕЙ РАНГОВ
 const RANKS = [
 { level: 1, name: 'Новичок', xpRequired: 100, reward: { gold: 0, diamonds: 0 } },
@@ -2470,7 +2590,8 @@ const RANKS = [
 { level: 19, name: 'Божество', xpRequired: 500000, reward: { gold: 50000, diamonds: 120 } },
 { level: 20, name: 'Повелитель Теней', xpRequired: 1200000, reward: { gold: 120000, diamonds: 150 } }
 ];
-// 🏆 29 ДОСТИЖЕНИЙ (ДОБАВЛЕНЫ 3 НОВЫХ ДЛЯ РЕЙДА)
+
+// 🏆 29 ДОСТИЖЕНИЙ
 const ACHIEVEMENTS = [
 { id: 1, name: 'Победа над Клинком', desc: 'Победите Клинка Рассвета', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'boss' },
 { id: 2, name: 'Стена разрушена', desc: 'Победите Стальную Стену', reward: 250, diamondReward: 1, current: 0, required: 1, type: 'boss' },
@@ -2502,6 +2623,7 @@ const ACHIEVEMENTS = [
 { id: 28, name: 'Победитель Рейдов', desc: 'Победить в 5 рейдах', reward: 20000, diamondReward: 20, current: 0, required: 5, type: 'raid_wins' },
 { id: 29, name: 'Легенда Рейда', desc: 'Нанести 1,000,000 урона в рейдах', reward: 50000, diamondReward: 50, current: 0, required: 1000000, type: 'raid_damage' }
 ];
+
 const DAILY_REWARDS = [
 { day: 1, gold: 100, promo: 1 },
 { day: 2, gold: 200, promo: 2 },
@@ -2511,6 +2633,19 @@ const DAILY_REWARDS = [
 { day: 6, gold: 1000, promo: 10 },
 { day: 7, gold: 2000, promo: 20 }
 ];
+
+// 📋 ЕЖЕДНЕВНЫЕ КВЕСТЫ
+const QUEST_TEMPLATES = [
+{ id: 'clicks_100', name: 'Начинающий боец', desc: 'Сделайте 100 кликов', type: 'clicks', target: 100, reward: { gold: 200, diamonds: 2 } },
+{ id: 'clicks_500', name: 'Опытный боец', desc: 'Сделайте 500 кликов', type: 'clicks', target: 500, reward: { gold: 500, diamonds: 5 } },
+{ id: 'kills_5', name: 'Охотник', desc: 'Победите 5 врагов', type: 'kills', target: 5, reward: { gold: 1000, diamonds: 3 } },
+{ id: 'kills_10', name: 'Воин', desc: 'Победите 10 врагов', type: 'kills', target: 10, reward: { gold: 2000, diamonds: 5 } },
+{ id: 'crits_20', name: 'Критический удар', desc: 'Нанесите 20 критических ударов', type: 'crits', target: 20, reward: { gold: 800, diamonds: 4 } },
+{ id: 'gold_5000', name: 'Богач', desc: 'Накопите 5000 золота', type: 'gold', target: 5000, reward: { gold: 1500, diamonds: 5 } },
+{ id: 'raid_1', name: 'Рейдер', desc: 'Участвуйте в 1 рейде', type: 'raid', target: 1, reward: { gold: 3000, diamonds: 10 } },
+{ id: 'combo_50', name: 'Комбо мастер', desc: 'Достигните комбо 50x', type: 'combo', target: 50, reward: { gold: 1000, diamonds: 5 } }
+];
+
 let game = {
 gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200,
 energy: 100, maxEnergy: 100, clicks: 0, totalCrits: 0, day: 1,
@@ -2552,8 +2687,12 @@ lastRaidParticipation: null,
 raidDamageDealt: 0,
 raidParticipations: 0,
 raidWins: 0,
-totalRaidDamage: 0
+totalRaidDamage: 0,
+dailyQuests: [],
+lastQuestUpdate: null,
+questProgress: {}
 };
+
 let autoSaveInterval, energyRegenInterval;
 let countdownInterval;
 let rouletteSpinning = false;
@@ -2567,6 +2706,9 @@ let raidBossActive = false;
 let raidBossData = null;
 let freeSpinInterval = null;
 let raidCountdownInterval = null;
+let questInterval = null;
+let raidUnsubscribe = null;
+
 // ================= ФУНКЦИИ НАВИГАЦИИ =================
 function toggleSideNav() {
 const sideNav = document.getElementById('sideNav');
@@ -2574,6 +2716,7 @@ const overlay = document.getElementById('sideNavOverlay');
 sideNav.classList.toggle('active');
 overlay.classList.toggle('active');
 }
+
 function switchScreen(screenId, btn) {
 toggleSideNav();
 if (screenId === 'battle') {
@@ -2586,7 +2729,7 @@ btn.classList.add('active');
 }
 return;
 }
-if (['shop', 'profile', 'promo', 'roulette', 'prestige', 'leaderboard', 'dev', 'online', 'messages', 'raid'].includes(screenId)) {
+if (['shop', 'profile', 'promo', 'roulette', 'prestige', 'leaderboard', 'dev', 'online', 'messages', 'raid', 'quests'].includes(screenId)) {
 document.querySelectorAll('.screen').forEach(s => {
 if(s.id !== 'screen-' + screenId) s.classList.remove('active');
 });
@@ -2599,19 +2742,23 @@ if (screenId === 'leaderboard') { loadLeaderboard(); }
 if (screenId === 'online') { loadOnlinePlayers(); }
 if (screenId === 'messages') { loadMessages(); }
 if (screenId === 'raid') { loadRaidBoss(); }
+if (screenId === 'quests') { renderQuests(); }
 }
 }
+
 function closeAllTabs() {
-document.querySelectorAll('#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-online, #screen-messages, #screen-raid').forEach(s => {
+document.querySelectorAll('#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-online, #screen-messages, #screen-raid, #screen-quests').forEach(s => {
 s.classList.remove('active');
 });
 document.getElementById('screen-battle').classList.add('active');
 document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
 document.querySelector('.side-nav-btn:first-child').classList.add('active');
 }
+
 window.onload = function() {
 showLoadingScreen();
 };
+
 function showLoadingScreen() {
 const loadingBar = document.getElementById('loadingBar');
 const loadingScreen = document.getElementById('loadingScreen');
@@ -2632,6 +2779,7 @@ initGame();
 loadingBar.style.width = progress + '%';
 }, 200);
 }
+
 function initGame() {
 loadGame();
 checkRegistration();
@@ -2645,10 +2793,12 @@ updateVersionBadge();
 startAbilityTimer();
 updateOnlineStatus();
 startFreeSpinTimer();
+initDailyQuests();
 setInterval(updateOnlineStatus, 30000);
 setInterval(updateFreeSpinTimer, 1000);
-setInterval(checkRaidBoss, 60000); // Проверка каждые 60 секунд
-setInterval(updateRaidCountdown, 1000); // Обновление таймера каждую секунду
+setInterval(checkRaidBoss, 5000);
+setInterval(updateRaidCountdown, 1000);
+setInterval(updateQuestTimer, 1000);
 autoSaveInterval = setInterval(() => { saveGame(true); syncWithFirebase(); }, 10000);
 energyRegenInterval = setInterval(() => {
 if(game.energy < game.maxEnergy) {
@@ -2658,6 +2808,7 @@ updateUI();
 }
 }, 60000);
 setInterval(checkAchievements, 2000);
+setInterval(checkQuestProgress, 2000);
 setInterval(updatePlayTime, 60000);
 setInterval(() => {
 if(Date.now() - game.lastComboTime > 3000 && game.comboCount > 0) {
@@ -2680,12 +2831,165 @@ if(e.key === '2') useAbility(2);
 if(e.key === '3') useAbility(3);
 });
 window.addEventListener('beforeunload', () => { saveGame(true); syncWithFirebase(); });
-// ✅ ИСПРАВЛЕНИЕ: Запускаем проверку рейда сразу при инициализации
 checkRaidBoss();
 }
+
+// ================= ЕЖЕДНЕВНЫЕ КВЕСТЫ =================
+function initDailyQuests() {
+const today = new Date().toDateString();
+if (game.lastQuestUpdate !== today) {
+game.dailyQuests = generateDailyQuests();
+game.lastQuestUpdate = today;
+game.questProgress = {};
+game.dailyQuests.forEach(q => {
+game.questProgress[q.id] = 0;
+});
+saveGame();
+}
+updateQuestBadge();
+}
+
+function generateDailyQuests() {
+const shuffled = [...QUEST_TEMPLATES].sort(() => 0.5 - Math.random());
+return shuffled.slice(0, 3).map(q => ({
+...q,
+progress: 0,
+completed: false,
+claimed: false
+}));
+}
+
+function renderQuests() {
+const list = document.getElementById('questsList');
+list.innerHTML = '';
+if (game.dailyQuests.length === 0) {
+list.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка квестов...</div>';
+return;
+}
+game.dailyQuests.forEach(quest => {
+const progress = game.questProgress[quest.id] || 0;
+const percent = Math.min(100, (progress / quest.target) * 100);
+const isCompleted = progress >= quest.target;
+const isClaimed = quest.claimed;
+list.innerHTML += `
+<div class="quest-item ${isCompleted ? 'completed' : ''} ${isClaimed ? 'claimed' : ''}">
+<div class="quest-header">
+<span class="quest-name">${quest.name}</span>
+<span class="quest-status ${isCompleted ? 'completed' : ''} ${isClaimed ? 'claimed' : ''}">
+${isClaimed ? 'Получено' : isCompleted ? 'Готово' : 'В процессе'}
+</span>
+</div>
+<div class="quest-desc">${quest.desc}</div>
+<div class="quest-progress">
+<div class="quest-progress-fill" style="width: ${percent}%"></div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<span class="quest-reward">🎁 ${quest.reward.gold} 💰 + ${quest.reward.diamonds} 💎</span>
+<button class="btn-claim-quest" ${!isCompleted || isClaimed ? 'disabled' : ''} onclick="claimQuest('${quest.id}')">
+${isClaimed ? '✓' : isCompleted ? 'ЗАБРАТЬ' : 'В процессе'}
+</button>
+</div>
+</div>
+`;
+});
+}
+
+function checkQuestProgress() {
+if (!game.dailyQuests || game.dailyQuests.length === 0) return;
+game.dailyQuests.forEach(quest => {
+if (quest.completed || quest.claimed) return;
+let current = game.questProgress[quest.id] || 0;
+let newValue = current;
+switch(quest.type) {
+case 'clicks': newValue = game.clicks % quest.target; break;
+case 'kills': newValue = game.achievements.filter(id => id <= 12).length; break;
+case 'crits': newValue = game.totalCrits % quest.target; break;
+case 'gold': newValue = game.totalGold; break;
+case 'raid': newValue = game.raidParticipations; break;
+case 'combo': newValue = game.maxCombo; break;
+}
+if (newValue >= quest.target) {
+quest.completed = true;
+showToast(`📋 Квест "${quest.name}" выполнен!`);
+playSound('winSound');
+updateQuestBadge();
+}
+game.questProgress[quest.id] = Math.min(newValue, quest.target);
+});
+if (document.getElementById('screen-quests').classList.contains('active')) {
+renderQuests();
+}
+saveGame();
+}
+
+function claimQuest(questId) {
+const quest = game.dailyQuests.find(q => q.id === questId);
+if (!quest || !quest.completed || quest.claimed) return;
+quest.claimed = true;
+game.gold += quest.reward.gold;
+game.totalGold += quest.reward.gold;
+game.promoCurrency += quest.reward.diamonds;
+showToast(`✅ Получено: ${quest.reward.gold} 💰 + ${quest.reward.diamonds} 💎`);
+playSound('winSound');
+updateQuestBadge();
+renderQuests();
+updateUI();
+saveGame();
+}
+
+function updateQuestBadge() {
+const badge = document.getElementById('questBadge');
+const hasUnclaimed = game.dailyQuests.some(q => q.completed && !q.claimed);
+if (hasUnclaimed) {
+badge.style.display = 'flex';
+} else {
+badge.style.display = 'none';
+}
+}
+
+function updateQuestTimer() {
+if (!game.lastQuestUpdate) return;
+const now = new Date();
+const tomorrow = new Date(now);
+tomorrow.setDate(tomorrow.getDate() + 1);
+tomorrow.setHours(0, 0, 0, 0);
+const diffMs = tomorrow - now;
+const hours = Math.floor(diffMs / (1000 * 60 * 60));
+const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+const timerEl = document.getElementById('questTimer');
+if (timerEl) {
+timerEl.textContent = `⏳ До обновления: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+}
+
+// ================= ВИбрация =================
+function vibrate(pattern) {
+if (navigator.vibrate) {
+navigator.vibrate(pattern);
+}
+}
+
+// ================= УЛУЧШЕННЫЕ ЭФФЕКТЫ УРОНА =================
+function showDamage(x, y, text, isCrit, isRaid = false, isAuto = false) {
+const el = document.createElement('div');
+let className = 'damage-popup';
+if (isCrit) className += ' crit';
+else if (isRaid) className += ' raid';
+else if (isAuto) className += ' auto';
+el.className = className;
+el.innerText = text;
+const randomX = (Math.random() - 0.5) * 40;
+el.style.left = (x - 40 + randomX) + 'px';
+el.style.top = (y - 80) + 'px';
+document.body.appendChild(el);
+setTimeout(() => el.remove(), isRaid ? 1200 : 1000);
+}
+
+// ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
 function startFreeSpinTimer() {
 const now = Date.now();
-const FREE_SPIN_COOLDOWN = 24 * 60 * 60 * 1000; // 24 часа
+const FREE_SPIN_COOLDOWN = 24 * 60 * 60 * 1000;
 if (game.lastFreeSpin && (now - game.lastFreeSpin) < FREE_SPIN_COOLDOWN) {
 game.freeSpinAvailable = false;
 } else {
@@ -2693,6 +2997,7 @@ game.freeSpinAvailable = true;
 }
 updateFreeSpinUI();
 }
+
 function updateFreeSpinTimer() {
 if (!game.lastFreeSpin) return;
 const now = Date.now();
@@ -2712,6 +3017,7 @@ String(minutes).padStart(2, '0') + ':' +
 String(seconds).padStart(2, '0');
 }
 }
+
 function updateFreeSpinUI() {
 const freeSpinInfo = document.getElementById('freeSpinInfo');
 const freeSpinTimer = document.getElementById('freeSpinTimer');
@@ -2727,6 +3033,7 @@ freeSpinTimer.style.display = 'block';
 rouletteBtn.disabled = false;
 }
 }
+
 function updateOnlineStatus() {
 if (!game.userId || !db) return;
 db.collection('players').doc(game.userId).set({
@@ -2738,8 +3045,11 @@ lastOnline: firebase.firestore.FieldValue.serverTimestamp(),
 level: game.level,
 clicks: game.clicks,
 achievements: game.achievements.length
-}, { merge: true });
+}, { merge: true }).catch(err => {
+console.log('⚠️ Firebase offline режим');
+});
 }
+
 function loadOnlinePlayers() {
 if (!db) {
 document.getElementById('onlinePlayersList').innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Ошибка подключения</div>';
@@ -2757,7 +3067,7 @@ if (player.userId !== game.userId) {
 onlinePlayers.push(player);
 }
 });
-countEl.textContent = onlinePlayers.length + 1; // +1 для себя
+countEl.textContent = onlinePlayers.length + 1;
 list.innerHTML = '';
 if (onlinePlayers.length === 0) {
 list.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Нет других игроков онлайн</div>';
@@ -2769,9 +3079,10 @@ list.innerHTML += '<div class="online-player-item"><div class="online-player-inf
 });
 }, err => {
 console.error('Ошибка загрузки онлайн игроков:', err);
-document.getElementById('onlinePlayersList').innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Ошибка загрузки</div>';
+document.getElementById('onlinePlayersList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Онлайн недоступен</div>';
 });
 }
+
 function openConversation(partnerId, partnerName, partnerAvatar) {
 currentConversationPartner = { userId: partnerId, username: partnerName, avatar: partnerAvatar };
 document.getElementById('conversationHeader').style.display = 'flex';
@@ -2784,6 +3095,7 @@ document.getElementById('conversationAvatar').textContent = partnerName.charAt(0
 loadMessagesWithPartner(partnerId);
 switchScreen('messages', null);
 }
+
 function loadMessagesWithPartner(partnerId) {
 if (!db || !game.userId) return;
 document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
@@ -2803,19 +3115,19 @@ const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString
 list.innerHTML += '<div class="message-item ' + (isOwn ? 'sent' : '') + '"><div class="sender">' + (isOwn ? 'Вы' : currentConversationPartner.username) + '</div><div class="text">' + escapeHtml(msg.text) + '</div><div class="time">' + time + '</div></div>';
 });
 list.scrollTop = list.scrollHeight;
-// Пометить сообщения как прочитанные
 snapshot.forEach(doc => {
 const msg = doc.data();
 if (msg.senderId !== game.userId && !msg.read) {
-doc.ref.update({ read: true });
+doc.ref.update({ read: true }).catch(() => {});
 }
 });
 updateMessageBadge();
 }, err => {
 console.error('Ошибка загрузки сообщений:', err);
-document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Ошибка загрузки</div>';
+document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Сообщения недоступны</div>';
 });
 }
+
 function sendMessage() {
 if (!game.userId || !currentConversationPartner) {
 showToast('❌ Выберите собеседника!');
@@ -2823,7 +3135,10 @@ return;
 }
 const input = document.getElementById('messageInput');
 const text = input.value.trim();
-if (!text) return;
+if (!text) {
+showToast('❌ Введите текст сообщения!');
+return;
+}
 if (text.length > 500) {
 showToast('❌ Сообщение слишком длинное!');
 return;
@@ -2845,6 +3160,7 @@ console.error('Ошибка отправки:', err);
 showToast('❌ Ошибка отправки');
 });
 }
+
 function loadMessages() {
 if (!game.userId) {
 document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Войдите в аккаунт</div>';
@@ -2856,6 +3172,7 @@ document.getElementById('messagesList').innerHTML = '<div style="text-align: cen
 }
 updateMessageBadge();
 }
+
 function updateMessageBadge() {
 if (!game.userId || !db) return;
 db.collectionGroup('messages').where('receiverId', '==', game.userId).where('read', '==', false).get().then(snapshot => {
@@ -2867,8 +3184,9 @@ badge.textContent = unreadMessagesCount > 99 ? '99+' : unreadMessagesCount;
 } else {
 badge.style.display = 'none';
 }
-});
+}).catch(() => {});
 }
+
 function showMessageNotification() {
 const notification = document.getElementById('messageNotification');
 notification.classList.add('show');
@@ -2876,20 +3194,34 @@ setTimeout(() => {
 notification.classList.remove('show');
 }, 5000);
 }
-// ================= ЛОГИКА РЕЙД БОССА (1 БОСС, КАЖДЫЕ 3 ЧАСА) =================
+
+// ================= ЛОГИКА РЕЙД БОССА =================
+// ✅ ИСПРАВЛЕНО: Проверка рейда с подпиской на изменения в реальном времени
 function checkRaidBoss() {
-if (!db) return;
-db.collection('raidBoss').doc('current').get().then(doc => {
+if (!db) {
+raidBossActive = false;
+updateRaidUI();
+loadRaidBoss();
+return;
+}
+
+// ✅ ПОДПИСКА НА ИЗМЕНЕНИЯ РЕЙД БОССА В РЕАЛЬНОМ ВРЕМЕНИ
+if (raidUnsubscribe) raidUnsubscribe();
+
+raidUnsubscribe = db.collection('raidBoss').doc('current').onSnapshot(doc => {
 if (doc.exists) {
 const raidData = doc.data();
 const now = Date.now();
-// Если прошло больше 3 часов с момента последнего спавна, создаем нового
 if (raidData.lastSpawnTime && (now - raidData.lastSpawnTime > RAID_COOLDOWN)) {
 createNewRaid();
 } else if (raidData.active) {
 raidBossActive = true;
 raidBossData = raidData;
 document.getElementById('raidBadge').style.display = 'flex';
+// ✅ ОБНОВЛЕНИЕ HP В РЕАЛЬНОМ ВРЕМЕНИ
+if (raidBossData.hp !== undefined) {
+updateRaidHP();
+}
 } else {
 raidBossActive = false;
 document.getElementById('raidBadge').style.display = 'none';
@@ -2898,9 +3230,16 @@ document.getElementById('raidBadge').style.display = 'none';
 createNewRaid();
 }
 updateRaidUI();
-loadRaidBoss(); // ✅ ИСПРАВЛЕНИЕ: Обновляем UI рейда после проверки
-}).catch(err => console.error('Ошибка проверки рейда:', err));
+loadRaidBoss();
+}, err => {
+console.log('⚠️ Рейд в оффлайн режиме');
+raidBossActive = false;
+updateRaidUI();
+loadRaidBoss();
+});
 }
+
+// ✅ ИСПРАВЛЕНО: Создание рейда
 function createNewRaid() {
 const randomBoss = RAID_BOSSES[Math.floor(Math.random() * RAID_BOSSES.length)];
 const now = Date.now();
@@ -2919,15 +3258,22 @@ raidBossActive = true;
 raidBossData = { ...randomBoss, active: true, lastSpawnTime: now, participants: 0 };
 document.getElementById('raidBadge').style.display = 'flex';
 showToast('👹 Появился новый Рейд Босс!');
-loadRaidBoss(); // ✅ ИСПРАВЛЕНИЕ: Обновляем UI сразу после создания рейда
-}).catch(err => console.error('Ошибка создания рейда:', err));
+loadRaidBoss();
+}).catch(err => {
+console.log('⚠️ Рейд создан локально');
+raidBossActive = true;
+raidBossData = { ...randomBoss, active: true, lastSpawnTime: now, participants: 0 };
+document.getElementById('raidBadge').style.display = 'flex';
+loadRaidBoss();
+});
 }
+
+// ✅ ИСПРАВЛЕНО: Загрузка рейд босса
 function loadRaidBoss() {
 if (!raidBossActive || !raidBossData) {
 document.getElementById('raidBossInfo').style.display = 'none';
 document.getElementById('raidNotActive').style.display = 'block';
 document.getElementById('raidCountdown').style.display = 'block';
-// Расчет времени до следующего рейда (3 часа от последнего спавна)
 let nextRaidTime = 0;
 if (raidBossData && raidBossData.lastSpawnTime) {
 const timePassed = Date.now() - raidBossData.lastSpawnTime;
@@ -2936,9 +3282,7 @@ nextRaidTime = Math.max(0, RAID_COOLDOWN - timePassed);
 nextRaidTime = RAID_COOLDOWN;
 }
 updateRaidCountdownDisplay(nextRaidTime);
-// Сброс фона рейда
 document.getElementById('screen-raid').style.backgroundImage = '';
-// Обновление кнопки вызова
 updateSummonButton();
 return;
 }
@@ -2948,7 +3292,6 @@ document.getElementById('raidCountdown').style.display = 'none';
 document.getElementById('raidBossName').textContent = raidBossData.name;
 document.getElementById('raidBossInfo').dataset.hp = raidBossData.hp;
 document.getElementById('raidBossInfo').dataset.maxHp = raidBossData.maxHp;
-// Установка картинки босса
 const bossImg = document.getElementById('raidBossImg');
 if (raidBossData.img) {
 bossImg.src = raidBossData.img;
@@ -2956,7 +3299,6 @@ bossImg.style.display = 'block';
 } else {
 bossImg.style.display = 'none';
 }
-// Установка фона экрана рейда
 if (raidBossData.bgImg) {
 document.getElementById('screen-raid').style.backgroundImage = `url('${raidBossData.bgImg}')`;
 } else {
@@ -2967,11 +3309,12 @@ document.getElementById('raidPlayersCount').textContent = `👥 ${raidBossData.p
 const canAttack = !game.lastRaidParticipation || game.lastRaidParticipation !== new Date().toISOString().split('T')[0];
 document.getElementById('btnRaidAttack').disabled = !canAttack;
 }
-// ✅ ИСПРАВЛЕННЫЙ ОБРАТНЫЙ ОТСЧЕТ
+
+// ✅ ИСПРАВЛЕНО: Таймер рейда
 function updateRaidCountdown() {
 if (raidBossActive && raidBossData) {
 document.getElementById('raidCountdown').style.display = 'none';
-document.getElementById('raidTimer').textContent = 'Рейд активен!';
+document.getElementById('raidTimer').textContent = '👹 Рейд активен!';
 return;
 }
 let nextRaidTime = 0;
@@ -2983,6 +3326,7 @@ nextRaidTime = RAID_COOLDOWN;
 }
 updateRaidCountdownDisplay(nextRaidTime);
 }
+
 function updateRaidCountdownDisplay(timeMs) {
 const hours = Math.floor(timeMs / (1000 * 60 * 60));
 const minutes = Math.floor((timeMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -2993,14 +3337,21 @@ String(minutes).padStart(2, '0') + ':' +
 String(seconds).padStart(2, '0');
 document.getElementById('raidTimer').textContent = `Следующий рейд через: ${hours}ч ${minutes}м ${seconds}с`;
 }
+
+// ✅ ИСПРАВЛЕНО: Обновление HP рейд босса
 function updateRaidHP() {
 if (!raidBossData) return;
 const hpPercent = (raidBossData.hp / raidBossData.maxHp) * 100;
 document.getElementById('raidHpFill').style.width = hpPercent + '%';
 document.getElementById('raidHpText').textContent = `${raidBossData.hp.toLocaleString()}/${raidBossData.maxHp.toLocaleString()}`;
 }
+
+// ✅ ИСПРАВЛЕНО: Атака рейд босса с отображением урона и синхронизацией
 function raidAttack() {
-if (!raidBossActive || !raidBossData) return;
+if (!raidBossActive || !raidBossData) {
+showToast('❌ Рейд босс не активен!');
+return;
+}
 const today = new Date().toISOString().split('T')[0];
 if (game.lastRaidParticipation === today) {
 showToast('❌ Вы уже атаковали сегодня!');
@@ -3012,6 +3363,11 @@ game.raidDamageDealt += damage;
 game.totalRaidDamage += damage;
 game.raidParticipations++;
 game.lastRaidParticipation = today;
+
+// ✅ ПОКАЗЫВАЕМ УРОН НА ЭКРАНЕ
+showDamage(window.innerWidth / 2, window.innerHeight / 2, damage.toLocaleString(), false, true);
+
+// ✅ ОБНОВЛЯЕМ FIREBASE
 db.collection('raidBoss').doc('current').update({
 hp: newHp,
 participants: firebase.firestore.FieldValue.increment(1)
@@ -3024,8 +3380,20 @@ if (newHp <= 0) {
 raidBossDefeated();
 }
 saveGame();
-}).catch(err => console.error('Ошибка атаки:', err));
+syncWithFirebase();
+}).catch(err => {
+console.log('⚠️ Атака сохранена локально');
+raidBossData.hp = newHp;
+updateRaidHP();
+showToast(`⚔️ Вы нанесли ${damage.toLocaleString()} урона!`);
+document.getElementById('btnRaidAttack').disabled = true;
+if (newHp <= 0) {
+raidBossDefeated();
 }
+saveGame();
+});
+}
+
 function raidBossDefeated() {
 showToast('🏆 РЕЙД БОСС ПОВЕЖДЁН!');
 const rewardGold = 50000;
@@ -3036,22 +3404,22 @@ game.promoCurrency += rewardDiamonds;
 game.prestigeChips += rewardChips;
 game.raidWins++;
 showToast(`🎁 Награда: +${rewardGold} 💰 +${rewardDiamonds} 💎 +${rewardChips} 💜`);
-// При победе обновляем lastSpawnTime, чтобы следующий появился через 3 часа
 db.collection('raidBoss').doc('current').update({
 active: false,
 defeated: true,
 defeatedAt: firebase.firestore.FieldValue.serverTimestamp(),
 lastSpawnTime: Date.now()
-}).then(() => {
-// ✅ ИСПРАВЛЕНИЕ: Обновляем состояние после победы
+}).catch(() => {});
+saveGame();
+syncWithFirebase();
+setTimeout(() => {
 raidBossActive = false;
 raidBossData = null;
 document.getElementById('raidBadge').style.display = 'none';
 loadRaidBoss();
-});
-saveGame();
-syncWithFirebase();
+}, 2000);
 }
+
 function updateRaidUI() {
 const badge = document.getElementById('raidBadge');
 if (raidBossActive) {
@@ -3060,43 +3428,46 @@ badge.style.display = 'flex';
 badge.style.display = 'none';
 }
 }
-// ✅ НОВАЯ ФУНКЦИЯ: ВЫЗОВ РЕЙД БОССА ЗА 50 АЛМАЗОВ
+
+// ✅ ИСПРАВЛЕНО: Вызов рейд босса БЕСПЛАТНО
 function summonRaidBoss() {
 if (!db) {
 showToast('❌ Нет подключения к Firebase!');
-return;
-}
-if (game.promoCurrency < RAID_SUMMON_COST) {
-showToast(`❌ Недостаточно алмазов! Нужно ${RAID_SUMMON_COST} 💎`);
 return;
 }
 if (raidBossActive) {
 showToast('❌ Рейд босс уже активен!');
 return;
 }
-if (!confirm(`Вызвать рейд босса за ${RAID_SUMMON_COST} алмазов?`)) {
+// ✅ ПРОВЕРКА КУЛДАУНА
+if (raidBossData && raidBossData.lastSpawnTime) {
+const timePassed = Date.now() - raidBossData.lastSpawnTime;
+if (timePassed < RAID_COOLDOWN) {
+const remaining = Math.ceil((RAID_COOLDOWN - timePassed) / (1000 * 60));
+showToast(`❌ Подождите ${remaining} мин до следующего рейда!`);
 return;
 }
-// Списание алмазов
-game.promoCurrency -= RAID_SUMMON_COST;
-updateUI();
-// Создание рейда
+}
+// ✅ БЕСПЛАТНЫЙ ВЫЗОВ (RAID_SUMMON_COST = 0)
 createNewRaid();
-showToast(`✅ Рейд босс вызван за ${RAID_SUMMON_COST} 💎!`);
+showToast(`✅ Рейд босс вызван бесплатно!`);
 saveGame();
 syncWithFirebase();
 }
+
 function updateSummonButton() {
 const btn = document.getElementById('btnRaidSummon');
 if (btn) {
-btn.disabled = raidBossActive || game.promoCurrency < RAID_SUMMON_COST;
+btn.disabled = raidBossActive;
 }
 }
+
 function escapeHtml(text) {
 const div = document.createElement('div');
 div.textContent = text;
 return div.innerHTML;
 }
+
 function checkOfflineEarnings() {
 const now = Date.now();
 const timeDiff = now - game.lastOfflineTime;
@@ -3109,6 +3480,7 @@ document.getElementById('offlineEarningsModal').classList.add('active');
 }
 }
 }
+
 function claimOfflineEarnings() {
 if(game.offlineEarnings > 0) {
 game.gold += game.offlineEarnings;
@@ -3121,29 +3493,39 @@ saveGame();
 syncWithFirebase();
 }
 }
+
 function checkRegistration() {
 const savedUser = localStorage.getItem('sf2_user_auth');
 if (savedUser) {
+try {
 const user = JSON.parse(savedUser);
 game.userId = user.userId;
 game.username = user.username;
 game.avatar = user.avatar || null;
 showUserInfo();
+} catch(e) {
+console.log('⚠️ Ошибка загрузки аккаунта');
+document.getElementById('registrationModal').classList.add('active');
+}
 } else {
 document.getElementById('registrationModal').classList.add('active');
 }
 }
+
 function showRegisterModal() {
 document.getElementById('loginModal').style.display = 'none';
 document.getElementById('registrationModal').classList.add('active');
 }
+
 function showLoginModal() {
 document.getElementById('registrationModal').classList.remove('active');
 document.getElementById('loginModal').style.display = 'flex';
 }
+
 function closeLoginModal() {
 document.getElementById('loginModal').style.display = 'none';
 }
+
 function registerUser() {
 const username = document.getElementById('regUsername').value.trim();
 const password = document.getElementById('regPassword').value;
@@ -3160,12 +3542,14 @@ showUserInfo();
 document.getElementById('registrationModal').classList.remove('active');
 showToast('✅ Регистрация успешна!');
 }
+
 function loginUser() {
 const username = document.getElementById('loginUsername').value.trim();
 const password = document.getElementById('loginPassword').value;
 if (!username || !password) { showToast('❌ Заполните все поля!'); return; }
 const savedUser = localStorage.getItem('sf2_user_auth');
 if (savedUser) {
+try {
 const user = JSON.parse(savedUser);
 if (user.username === username && user.password === password) {
 game.userId = user.userId;
@@ -3178,10 +3562,14 @@ showToast('✅ Вход успешен!');
 } else {
 showToast('❌ Неверный логин или пароль!');
 }
+} catch(e) {
+showToast('❌ Ошибка данных аккаунта!');
+}
 } else {
-showToast('❌ Аккаунт не найден!');
+showToast('❌ Аккаунт не найден! Сначала зарегистрируйтесь.');
 }
 }
+
 function showUserInfo() {
 const userInfo = document.getElementById('userInfo');
 const userName = document.getElementById('userName');
@@ -3195,12 +3583,16 @@ else userAvatar.textContent = game.username.charAt(0).toUpperCase();
 userIdDisplay.textContent = 'ID: ' + game.userId.substr(0, 15) + '...';
 }
 }
+
 function updateUserInfo() { showUserInfo(); }
+
 function editNickname() {
 document.getElementById('editNicknameInput').value = game.username;
 document.getElementById('editNicknameModal').style.display = 'flex';
 }
+
 function closeEditNicknameModal() { document.getElementById('editNicknameModal').style.display = 'none'; }
+
 function saveNickname() {
 const newNickname = document.getElementById('editNicknameInput').value.trim();
 if (!newNickname) { showToast('❌ Введите никнейм!'); return; }
@@ -3216,6 +3608,7 @@ syncWithFirebase();
 closeEditNicknameModal();
 showToast('✅ Никнейм изменён!');
 }
+
 function uploadAvatar() {
 const input = document.createElement('input');
 input.type = 'file';
@@ -3240,6 +3633,7 @@ reader.readAsDataURL(file);
 };
 input.click();
 }
+
 function syncWithFirebase() {
 if (!game.userId || !db) return;
 db.collection('players').doc(game.userId).set({
@@ -3254,8 +3648,11 @@ totalRaidDamage: game.totalRaidDamage,
 lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
 }, { merge: true }).then(() => {
 console.log('✅ Данные сохранены в Firebase');
-}).catch(err => console.log('❌ Firebase save error:', err));
+}).catch(err => {
+console.log('⚠️ Firebase offline режим');
+});
 }
+
 function loadLeaderboard() {
 const leaderboardList = document.getElementById('leaderboardList');
 leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
@@ -3277,8 +3674,9 @@ leaderboardList.innerHTML += '<div class="leaderboard-item ' + (isMe ? 'leaderbo
 rank++;
 });
 if (snapshot.empty) leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Пока нет игроков</div>';
-}).catch(err => { leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Ошибка</div>'; });
+}).catch(err => { leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Таблица лидеров недоступна</div>'; });
 }
+
 function getValueByTab(player) {
 switch(currentLeaderboardTab) {
 case 'level': return '⭐ ' + player.level;
@@ -3287,13 +3685,16 @@ case 'achievements': return '🏆 ' + player.achievements;
 default: return '-';
 }
 }
+
 function switchLeaderboardTab(tab) {
 currentLeaderboardTab = tab;
 document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
 event.target.classList.add('active');
 loadLeaderboard();
 }
+
 function updatePlayTime() { game.totalPlayTime++; updateUI(); }
+
 function checkDailyReward() {
 const today = new Date().toISOString().split('T')[0];
 const lastClaim = game.lastDailyClaim;
@@ -3321,6 +3722,7 @@ btnClaim.textContent = 'ПОЛУЧИТЬ НАГРАДУ';
 modal.classList.add('active');
 }
 }
+
 function claimDailyReward() {
 const today = new Date().toISOString().split('T')[0];
 if (game.lastDailyClaim === today) {
@@ -3341,6 +3743,7 @@ updateUI();
 saveGame();
 syncWithFirebase();
 }
+
 function updateComboUI() {
 const comboCounter = document.getElementById('comboCounter');
 const comboCount = document.getElementById('comboCount');
@@ -3351,6 +3754,7 @@ comboCount.innerText = game.comboCount;
 comboCounter.classList.remove('active');
 }
 }
+
 function startAbilityTimer() {
 if(abilityInterval) clearInterval(abilityInterval);
 abilityInterval = setInterval(() => {
@@ -3364,6 +3768,7 @@ if(game.abilities[i].cooldown <= 0) document.getElementById('ability' + i).class
 }
 }, 100);
 }
+
 function useAbility(id) {
 if(game.abilities[id].cooldown > 0 || game.isTransitioning) return;
 playSound('abilitySound');
@@ -3390,6 +3795,7 @@ game.abilities[id].cooldown = game.abilities[id].maxCooldown;
 document.getElementById('ability' + id).classList.add('disabled');
 saveGame();
 }
+
 function handleAttack(x, y) {
 if (game.isTransitioning) return;
 const now = Date.now();
@@ -3442,6 +3848,7 @@ updateAchievementProgress(16, game.totalCrits);
 if (game.enemyHp <= 0) enemyDefeated();
 updateUI();
 }
+
 function enemyDefeated() {
 const char = CHARACTERS[game.currentEnemy];
 let bonus = Math.floor(char.hp / 20);
@@ -3470,12 +3877,14 @@ game.totalWins++;
 updateAchievementProgress(17, game.totalWins);
 setTimeout(() => { showVictoryScreen(char.name); }, 500);
 }
+
 function showVictoryScreen(enemyName) {
 const victoryScreen = document.getElementById('victoryScreen');
 document.getElementById('victoryEnemyName').textContent = enemyName + ' повержен';
 victoryScreen.classList.add('active');
 setTimeout(() => { victoryScreen.classList.remove('active'); nextEnemyWithCountdown(); }, 2000);
 }
+
 function nextEnemyWithCountdown() {
 game.isTransitioning = true;
 const charContainer = document.getElementById('charContainer');
@@ -3530,10 +3939,12 @@ if(charContainer) charContainer.classList.remove('disabled');
 updateUI();
 saveGame();
 }
+
 function updateRoundInfo() {
 const char = CHARACTERS[game.currentEnemy];
 document.getElementById('roundInfo').textContent = 'Раунд ' + game.currentRound + ' из ' + char.rounds;
 }
+
 function showCountdown(callback) {
 const countdownScreen = document.getElementById('countdownScreen');
 const countdownNumber = document.getElementById('countdownNumber');
@@ -3554,6 +3965,7 @@ if (callback) callback();
 }
 }, 1000);
 }
+
 function startFight() {
 playSound('fightSound');
 document.getElementById('countdownScreen').classList.remove('active');
@@ -3571,6 +3983,7 @@ saveGame();
 window.nextEnemyData = null;
 }
 }
+
 function spinRoulette() {
 if (rouletteSpinning) return;
 let cost = 3;
@@ -3615,6 +4028,7 @@ updateUI();
 saveGame();
 }, 3000);
 }
+
 function getResultByType(type) {
 switch(type) {
 case 'gold': return ['🍒', '🍒', '🍋'];
@@ -3624,6 +4038,7 @@ case 'jackpot': return ['7️⃣', '7️⃣', '7️⃣'];
 default: return ['🍒', '🍋', '🍇'];
 }
 }
+
 function checkWin(results, resultType) {
 const resultEl = document.getElementById('rouletteResult');
 if (resultType === 'gold') {
@@ -3650,6 +4065,7 @@ resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!';
 addXP(10);
 updateUI();
 }
+
 function buyEnergy() {
 if (game.gold >= 100) {
 game.gold -= 100;
@@ -3661,6 +4077,7 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно золота'); }
 }
+
 function updateCharacterDisplay() {
 const char = CHARACTERS[game.currentEnemy];
 const img = document.getElementById('charImg');
@@ -3675,6 +4092,7 @@ container.style.border = '3px solid #fff';
 container.innerHTML = '<div style="color:#fff; text-align:center; padding: 20px;"><div style="font-size: 24px; font-weight: bold;">' + char.name + '</div></div>';
 };
 }
+
 function buyUpgrade(type, free = false) {
 let cost = game.costs[type];
 if (free || game.gold >= cost) {
@@ -3692,6 +4110,7 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно золота'); }
 }
+
 function buyAbilityUpgrade(abilityId) {
 const currentLevel = game.abilityLevels[abilityId];
 const cost = game.abilityUpgradeCosts[abilityId];
@@ -3716,6 +4135,7 @@ saveGame();
 showToast('❌ Недостаточно алмазов!');
 }
 }
+
 function activatePromoCode() {
 const input = document.getElementById('promoCodeInput');
 const code = input.value.trim().toUpperCase();
@@ -3735,6 +4155,7 @@ updateUI();
 saveGame();
 } else { showToast('❌ Неверный код!'); }
 }
+
 function buyPromoItem(item) {
 const items = {
 'gold1000': { cost: 5, gold: 1000 },
@@ -3761,6 +4182,7 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно алмазов!'); }
 }
+
 function openDevMenu() { document.getElementById('devPasswordModal').style.display = 'flex'; }
 function closeDevPasswordModal() { document.getElementById('devPasswordModal').style.display = 'none'; document.getElementById('devPasswordInput').value = ''; }
 function checkDevPassword() {
@@ -3872,7 +4294,6 @@ else if (ach.type === 'crit_total' && game.totalCrits >= 500) unlocked = true;
 else if (ach.type === 'gold_total_new' && game.totalGold >= 500000) unlocked = true;
 else if (ach.type === 'time_marathon' && game.totalPlayTime >= 6000) unlocked = true;
 else if (ach.type === 'win_legend' && game.totalWins >= 200) unlocked = true;
-// ✅ НОВЫЕ ДОСТИЖЕНИЯ ДЛЯ РЕЙДА
 else if (ach.type === 'raid_participation' && ach.id === 27 && game.raidParticipations >= 10) unlocked = true;
 else if (ach.type === 'raid_wins' && ach.id === 28 && game.raidWins >= 5) unlocked = true;
 else if (ach.type === 'raid_damage' && ach.id === 29 && game.totalRaidDamage >= 1000000) unlocked = true;
@@ -4069,7 +4490,6 @@ document.getElementById('statStreak').innerText = Math.min(game.loginStreak, 7);
 document.getElementById('statDiamonds').innerText = Math.floor(game.promoCurrency);
 document.getElementById('statRoulette').innerText = game.rouletteSpins;
 document.getElementById('statMaxCombo').innerText = game.maxCombo;
-// ✅ СТАТИСТИКА РЕЙДОВ
 document.getElementById('statRaids').innerText = game.raidParticipations;
 document.getElementById('statRaidWins').innerText = game.raidWins;
 const now = new Date();
@@ -4086,7 +4506,6 @@ const nextLevelXP = getNextLevelXP();
 const xpPct = (game.xp / nextLevelXP) * 100;
 document.getElementById('xpFill').style.width = xpPct + '%';
 document.getElementById('xpText').innerText = game.xp + '/' + nextLevelXP + ' XP';
-// Обновление кнопки вызова рейда
 updateSummonButton();
 }
 function renderAchievements() {
@@ -4098,15 +4517,6 @@ const progress = ach.required > 0 ? Math.min(ach.current, ach.required) + '/' + 
 const percent = ach.required > 0 ? Math.round((ach.current / ach.required) * 100) : 0;
 list.innerHTML += '<div class="achievement-item ' + (unlocked ? 'unlocked' : 'locked') + '"><div style="font-weight: bold; color: ' + (unlocked ? '#4caf50' : '#888') + '">' + (unlocked ? '✅' : '🔒') + ' ' + ach.name + '</div><div style="font-size: 12px; color: #aaa; margin-top: 5px;">' + ach.desc + ' | ' + ach.reward + ' 💰 + ' + ach.diamondReward + ' 💎</div>' + (!unlocked && progress ? '<div class="achievement-progress">Прогресс: ' + progress + ' (' + percent + '%)</div>' : '') + '</div>';
 });
-}
-function showDamage(x, y, text, isCrit) {
-const el = document.createElement('div');
-el.className = 'damage-popup ' + (isCrit ? 'crit' : '');
-el.innerText = text;
-el.style.left = (x - 40) + 'px';
-el.style.top = (y - 80) + 'px';
-document.body.appendChild(el);
-setTimeout(() => el.remove(), 1000);
 }
 function showToast(msg) {
 const t = document.getElementById('toast');
