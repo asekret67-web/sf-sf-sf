@@ -193,6 +193,7 @@ gap: 5px;
 flex: 1;
 max-width: 300px;
 margin: 0 20px;
+min-width: 150px;
 }
 .energy-bar-bg {
 width: 100%;
@@ -210,6 +211,7 @@ background: linear-gradient(90deg, #00e5ff, #00b8d4);
 width: 100%;
 transition: width 0.3s ease;
 box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+display: block !important;
 }
 .energy-text {
 position: absolute;
@@ -221,6 +223,7 @@ font-size: 14px;
 font-weight: bold;
 text-shadow: 2px 2px 4px #000;
 z-index: 2;
+color: #fff !important;
 }
 .dev-btn {
 background: rgba(156, 39, 176, 0.3);
@@ -1614,20 +1617,44 @@ text-align: center;
 color: var(--accent);
 font-weight: bold;
 }
-/* Online Status Indicator */
-.online-status {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--green);
-    background: rgba(0,0,0,0.5);
-    padding: 5px 10px;
-    border-radius: 15px;
-    border: 1px solid var(--green);
+/* Community Stats in Profile */
+.community-stats {
+background: linear-gradient(135deg, rgba(0, 188, 212, 0.1), rgba(156, 39, 176, 0.1));
+border: 1px solid rgba(0, 188, 212, 0.3);
+padding: 20px;
+border-radius: 12px;
+margin-bottom: 15px;
 }
-
+.community-stats-title {
+font-size: 16px;
+font-weight: bold;
+color: var(--diamond);
+margin-bottom: 15px;
+text-align: center;
+text-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
+}
+.community-stat-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 12px 0;
+border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.community-stat-row:last-child {
+border: none;
+}
+.community-stat-label {
+font-size: 14px;
+color: #ccc;
+}
+.community-stat-value {
+font-size: 16px;
+font-weight: bold;
+color: var(--accent);
+}
+.community-stat-value.online {
+color: var(--green);
+}
 @media (max-width: 480px) {
 .loading-text { font-size: 20px; }
 .loading-bar-bg { width: 250px; }
@@ -1659,7 +1686,7 @@ font-weight: bold;
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
-<div class="version-badge" id="versionBadge">V3.0.1</div>
+<div class="version-badge" id="versionBadge">V3.0.3</div>
 <div class="loading-logo">⚔️</div>
 <div class="loading-text">SHADOW STRIKE</div>
 <div class="loading-bar-bg">
@@ -1850,6 +1877,18 @@ font-weight: bold;
 <div class="xp-text"><span id="xpText">0/100 XP</span></div>
 </div>
 </div>
+<!-- ✅ НОВАЯ СЕКЦИЯ: Статистика сообщества -->
+<div class="community-stats">
+<div class="community-stats-title">🌍 СТАТИСТИКА СООБЩЕСТВА</div>
+<div class="community-stat-row">
+<span class="community-stat-label">👥 Зарегистрировано игроков:</span>
+<span class="community-stat-value" id="totalPlayersCount">Загрузка...</span>
+</div>
+<div class="community-stat-row">
+<span class="community-stat-label">🟢 Онлайн сейчас:</span>
+<span class="community-stat-value online" id="onlinePlayersCount">Загрузка...</span>
+</div>
+</div>
 <div class="stat-box">
 <div class="stat-row"><span>💀 Убито врагов:</span> <span id="statKills">0</span></div>
 <div class="stat-row"><span>👆 Всего кликов:</span> <span id="statClicks">0</span></div>
@@ -1897,14 +1936,6 @@ font-weight: bold;
 <div class="promo-shop-item">
 <div><div style="font-weight: bold;">💥 Крит.Урон +50%</div><small style="color:#888">Постоянное улучшение</small></div>
 <button class="btn-promo-buy" onclick="buyPromoItem('critDmg50')">30 💎</button>
-</div>
-<div class="promo-shop-item">
-<div><div style="font-weight: bold;">🎯 Критический Мастер</div><small style="color:#888">+10% шанс крита</small></div>
-<button class="btn-promo-buy" onclick="buyPromoItem('crit_master')">20 💎</button>
-</div>
-<div class="promo-shop-item">
-<div><div style="font-weight: bold;">💥 Разрушитель</div><small style="color:#888">+25% крит. урон</small></div>
-<button class="btn-promo-buy" onclick="buyPromoItem('destroyer')">30 💎</button>
 </div>
 <h3 style="margin: 20px 0 10px; text-align: center; color: var(--purple);">⚡ СУПЕР-СПОСОБНОСТИ (1-30 ур.)</h3>
 <div class="promo-shop-item">
@@ -2074,11 +2105,8 @@ font-weight: bold;
 </div>
 </div>
 <div style="display: flex; align-items: center; gap: 10px;">
-    <div class="online-status">
-        🟢 <span id="onlineCountValue">0</span>
-    </div>
-    <div class="xp-display">⭐ <span id="uiLevel">1</span></div>
-    <button class="dev-btn" onclick="openDevMenu()">⚙️</button>
+<div class="xp-display">⭐ <span id="uiLevel">1</span></div>
+<button class="dev-btn" onclick="openDevMenu()">⚙️</button>
 </div>
 </div>
 <div class="registration-modal" id="registrationModal">
@@ -2142,7 +2170,6 @@ measurementId: "G-74F5V4RP0Z"
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
-
 // ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
 const CHARACTERS = {
 shin: { name: 'Клинок Рассвета', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Ловкий и стремительный боец, мастер быстрых атак и уклонений. Его стиль напоминает первые лучи солнца — внезапный и ослепляющий.', achievementId: 1, order: 1, rounds: 1, chapter: 1, prestigeValue: 10 },
@@ -2159,7 +2186,6 @@ crane: { name: 'Белый Журавль', hp: 1000000, img: 'images/crane.png'
 master: { name: 'Мастер Безмолвия', hp: 3000000, img: 'images/master.png', bgImg: 'backgrounds/master.jpg', desc: 'Загадочный и могущественный наставник. Его сила безгранична.', achievementId: 12, isBoss: true, order: 12, rounds: 2, chapter: 2, prestigeValue: 500 }
 };
 const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx', 'guardian', 'bull', 'keeper', 'tiger', 'crane', 'master'];
-
 // 🔢 15 ПРОМО КОДОВ
 let promoCodes = {
 'START2026': { gold: 1000, promo: 3, used: false },
@@ -2179,7 +2205,7 @@ let promoCodes = {
 'POWERUP': { gold: 1000, promo: 5, used: false }
 };
 let stats = { totalPromoActivations: 0, energyPurchases: 0, jackpotWins: 0 };
-let gameVersion = 'V3.0.1';
+let gameVersion = 'V3.0.3';
 // 📊 20 УРОВНЕЙ РАНГОВ
 const RANKS = [
 { level: 1, name: 'Новичок', xpRequired: 100, reward: { gold: 0, diamonds: 0 } },
@@ -2203,7 +2229,7 @@ const RANKS = [
 { level: 19, name: 'Божество', xpRequired: 500000, reward: { gold: 50000, diamonds: 120 } },
 { level: 20, name: 'Повелитель Теней', xpRequired: 1200000, reward: { gold: 120000, diamonds: 150 } }
 ];
-// 🏆 26 ДОСТИЖЕНИЙ (Убраны рейдовые)
+// 🏆 26 ДОСТИЖЕНИЙ
 const ACHIEVEMENTS = [
 { id: 1, name: 'Победа над Клинком', desc: 'Победите Клинка Рассвета', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'boss' },
 { id: 2, name: 'Стена разрушена', desc: 'Победите Стальную Стену', reward: 250, diamondReward: 1, current: 0, required: 1, type: 'boss' },
@@ -2241,7 +2267,7 @@ const DAILY_REWARDS = [
 { day: 6, gold: 1000, promo: 10 },
 { day: 7, gold: 2000, promo: 20 }
 ];
-// 📋 ЕЖЕДНЕВНЫЕ КВЕСТЫ (Убран рейд)
+// 📋 ЕЖЕДНЕВНЫЕ КВЕСТЫ (ИСПРАВЛЕНО)
 const QUEST_TEMPLATES = [
 { id: 'clicks_100', name: 'Начинающий боец', desc: 'Сделайте 100 кликов', type: 'clicks', target: 100, reward: { gold: 200, diamonds: 2 } },
 { id: 'clicks_500', name: 'Опытный боец', desc: 'Сделайте 500 кликов', type: 'clicks', target: 500, reward: { gold: 500, diamonds: 5 } },
@@ -2297,9 +2323,9 @@ let countdownInterval;
 let rouletteSpinning = false;
 let currentLeaderboardTab = 'level';
 let abilityInterval = null;
-let onlineCountUnsubscribe = null;
 let freeSpinInterval = null;
 let questInterval = null;
+let communityStatsUnsubscribe = null;
 
 // ================= ФУНКЦИИ НАВИГАЦИИ =================
 function toggleSideNav() {
@@ -2327,7 +2353,11 @@ if(s.id !== 'screen-' + screenId) s.classList.remove('active');
 document.getElementById('screen-' + screenId).classList.add('active');
 document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
 if(btn) btn.classList.add('active');
-if (screenId === 'profile') { renderAchievements(); updateUserInfo(); }
+if (screenId === 'profile') { 
+    renderAchievements(); 
+    updateUserInfo(); 
+    loadCommunityStats(); // ✅ Загрузка статистики сообщества
+}
 if (screenId === 'prestige') { updatePrestigeUI(); }
 if (screenId === 'leaderboard') { loadLeaderboard(); }
 if (screenId === 'quests') { renderQuests(); }
@@ -2381,6 +2411,7 @@ initDailyQuests();
 setInterval(updateOnlineStatus, 30000);
 setInterval(updateFreeSpinTimer, 1000);
 setInterval(updateQuestTimer, 1000);
+setInterval(loadCommunityStats, 30000); // ✅ Обновление статистики каждые 30 сек
 autoSaveInterval = setInterval(() => { saveGame(true); syncWithFirebase(); }, 10000);
 energyRegenInterval = setInterval(() => {
 if(game.energy < game.maxEnergy) {
@@ -2398,8 +2429,6 @@ game.comboCount = 0;
 updateComboUI();
 }
 }, 1000);
-// Online Count Listener
-updateOnlineCountDisplay();
 const charContainer = document.getElementById('charContainer');
 charContainer.addEventListener('touchstart', function(e) {
 if (e.cancelable) { e.preventDefault(); }
@@ -2416,7 +2445,36 @@ if(e.key === '3') useAbility(3);
 });
 window.addEventListener('beforeunload', () => { saveGame(true); syncWithFirebase(); });
 }
-// ================= ЕЖЕДНЕВНЫЕ КВЕСТЫ =================
+
+// ✅ НОВАЯ ФУНКЦИЯ: Загрузка статистики сообщества
+function loadCommunityStats() {
+if (!db) {
+    document.getElementById('totalPlayersCount').textContent = '—';
+    document.getElementById('onlinePlayersCount').textContent = '—';
+    return;
+}
+
+// Загрузка общего количества игроков
+db.collection('players').get().then(snapshot => {
+    const totalPlayers = snapshot.size;
+    document.getElementById('totalPlayersCount').textContent = totalPlayers.toLocaleString();
+}).catch(err => {
+    console.log('⚠️ Ошибка загрузки общего количества игроков');
+    document.getElementById('totalPlayersCount').textContent = '—';
+});
+
+// Загрузка онлайн игроков (в реальном времени)
+if (communityStatsUnsubscribe) communityStatsUnsubscribe();
+communityStatsUnsubscribe = db.collection('players').where('isOnline', '==', true).onSnapshot(snapshot => {
+    const onlinePlayers = snapshot.size;
+    document.getElementById('onlinePlayersCount').textContent = onlinePlayers.toLocaleString();
+}, err => {
+    console.log('⚠️ Ошибка загрузки онлайн игроков');
+    document.getElementById('onlinePlayersCount').textContent = '—';
+});
+}
+
+// ================= ЕЖЕДНЕВНЫЕ КВЕСТЫ (ИСПРАВЛЕНО) =================
 function initDailyQuests() {
 const today = new Date().toDateString();
 if (game.lastQuestUpdate !== today) {
@@ -2480,19 +2538,29 @@ if (quest.completed || quest.claimed) return;
 let current = game.questProgress[quest.id] || 0;
 let newValue = current;
 switch(quest.type) {
-case 'clicks': newValue = game.clicks % quest.target; break;
-case 'kills': newValue = game.achievements.filter(id => id <= 12).length; break;
-case 'crits': newValue = game.totalCrits % quest.target; break;
-case 'gold': newValue = game.totalGold; break;
-case 'combo': newValue = game.maxCombo; break;
+case 'clicks':
+newValue = Math.min(game.clicks, quest.target);
+break;
+case 'kills':
+newValue = Math.min(game.achievements.filter(id => id <= 12).length, quest.target);
+break;
+case 'crits':
+newValue = Math.min(game.totalCrits, quest.target);
+break;
+case 'gold':
+newValue = Math.min(game.totalGold, quest.target);
+break;
+case 'combo':
+newValue = Math.min(game.maxCombo, quest.target);
+break;
 }
-if (newValue >= quest.target) {
+if (newValue >= quest.target && !quest.completed) {
 quest.completed = true;
 showToast(`📋 Квест "${quest.name}" выполнен!`);
 playSound('winSound');
 updateQuestBadge();
 }
-game.questProgress[quest.id] = Math.min(newValue, quest.target);
+game.questProgress[quest.id] = newValue;
 });
 if (document.getElementById('screen-quests').classList.contains('active')) {
 renderQuests();
@@ -2537,12 +2605,14 @@ if (timerEl) {
 timerEl.textContent = `⏳ До обновления: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 }
+
 // ================= ВИбрация =================
 function vibrate(pattern) {
 if (navigator.vibrate) {
 navigator.vibrate(pattern);
 }
 }
+
 // ================= УЛУЧШЕННЫЕ ЭФФЕКТЫ УРОНА =================
 function showDamage(x, y, text, isCrit, isAuto = false) {
 const el = document.createElement('div');
@@ -2557,6 +2627,7 @@ el.style.top = (y - 80) + 'px';
 document.body.appendChild(el);
 setTimeout(() => el.remove(), 1000);
 }
+
 // ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
 function startFreeSpinTimer() {
 const now = Date.now();
@@ -2615,21 +2686,6 @@ clicks: game.clicks,
 achievements: game.achievements.length
 }, { merge: true }).catch(err => {
 console.log('⚠️ Firebase offline режим');
-});
-}
-// ================= ОТОБРАЖЕНИЕ ОНЛАЙН ИГРОКОВ =================
-function updateOnlineCountDisplay() {
-if (!db) {
-    document.getElementById('onlineCountValue').textContent = '0';
-    return;
-}
-if (onlineCountUnsubscribe) onlineCountUnsubscribe();
-onlineCountUnsubscribe = db.collection('players').where('isOnline', '==', true).onSnapshot(snapshot => {
-    const count = snapshot.size;
-    document.getElementById('onlineCountValue').textContent = count;
-}, err => {
-    console.error('Ошибка загрузки онлайн игроков:', err);
-    document.getElementById('onlineCountValue').textContent = '0';
 });
 }
 function escapeHtml(text) {
@@ -3568,7 +3624,17 @@ document.getElementById('uiPrestigeChips').innerText = game.prestigeChips;
 document.getElementById('uiLevel').innerText = game.level;
 document.getElementById('uiEnergy').innerText = game.energy + '/' + game.maxEnergy;
 let energyPct = (game.energy / game.maxEnergy) * 100;
-document.getElementById('energyFill').style.width = energyPct + '%';
+energyPct = Math.max(0, Math.min(100, energyPct));
+const energyFill = document.getElementById('energyFill');
+if (energyFill) {
+energyFill.style.width = energyPct + '%';
+energyFill.style.display = 'block';
+}
+const energyText = document.getElementById('uiEnergy');
+if (energyText) {
+energyText.style.color = '#fff';
+energyText.style.display = 'block';
+}
 document.getElementById('enemyName').innerText = char.name + (char.isBoss ? ' (БОСС)' : '');
 updateRoundInfo();
 let hpPct = (game.enemyHp / game.enemyMaxHp) * 100;
