@@ -513,17 +513,6 @@ color: #00e5ff;
 font-size: 24px;
 text-shadow: 0 0 15px #00e5ff, 2px 2px 0 #000;
 }
-.damage-popup.raid {
-color: #f44336;
-font-size: 36px;
-text-shadow: 0 0 25px #f44336, 3px 3px 0 #000;
-animation: raidDamage 1.2s forwards;
-}
-@keyframes raidDamage {
-0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-50% { transform: translateY(-80px) scale(1.2) rotate(5deg); }
-100% { opacity: 0; transform: translateY(-150px) scale(0.8) rotate(-5deg); }
-}
 .combo-counter {
 position: fixed;
 top: 150px;
@@ -694,7 +683,7 @@ pointer-events: none;
 transition: opacity 0.3s;
 }
 .transition-effect.active { opacity: 1; }
-#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-online, #screen-messages, #screen-raid, #screen-quests {
+#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-quests {
 position: fixed;
 top: 0;
 left: 0;
@@ -709,7 +698,7 @@ overflow-y: auto;
 overscroll-behavior-y: contain;
 -webkit-overflow-scrolling: touch;
 }
-#screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-online.active, #screen-messages.active, #screen-raid.active, #screen-quests.active {
+#screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-quests.active {
 display: block;
 animation: fadeIn 0.3s;
 }
@@ -1536,314 +1525,6 @@ border-bottom: 1px solid rgba(156, 39, 176, 0.2);
 .chip-calc-row:last-child {
 border: none;
 }
-/* Online Players Screen */
-.online-players-container {
-padding: 20px;
-}
-.online-players-list {
-background: rgba(0,0,0,0.3);
-border-radius: 10px;
-padding: 15px;
-max-height: 500px;
-overflow-y: auto;
-}
-.online-player-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 15px;
-margin-bottom: 10px;
-background: rgba(255,255,255,0.05);
-border-radius: 8px;
-border-left: 3px solid var(--green);
-transition: all 0.2s;
-}
-.online-player-item:hover {
-background: rgba(255,255,255,0.1);
-transform: translateX(5px);
-}
-.online-player-info {
-display: flex;
-align-items: center;
-flex: 1;
-}
-.online-player-avatar {
-width: 40px;
-height: 40px;
-border-radius: 50%;
-background: linear-gradient(135deg, var(--accent), var(--purple));
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 18px;
-font-weight: bold;
-color: #fff;
-margin-right: 10px;
-overflow: hidden;
-}
-.online-player-avatar img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-}
-.online-player-name {
-font-weight: bold;
-color: #fff;
-}
-.online-player-status {
-font-size: 12px;
-color: var(--green);
-}
-.btn-message-player {
-background: var(--blue);
-color: #fff;
-border: none;
-padding: 8px 15px;
-border-radius: 8px;
-font-weight: bold;
-cursor: pointer;
-font-size: 12px;
-}
-.btn-message-player:hover {
-background: #1976D2;
-}
-/* Private Messages Screen */
-.messages-container {
-padding: 20px;
-display: flex;
-flex-direction: column;
-height: calc(100vh - 100px);
-}
-.messages-list {
-flex: 1;
-overflow-y: auto;
-background: rgba(0,0,0,0.3);
-border-radius: 10px;
-padding: 15px;
-margin-bottom: 15px;
--webkit-overflow-scrolling: touch;
-}
-.message-item {
-background: rgba(255,255,255,0.05);
-padding: 12px;
-border-radius: 8px;
-margin-bottom: 10px;
-border-left: 3px solid var(--blue);
-}
-.message-item.sent {
-border-left-color: var(--green);
-background: rgba(76, 175, 80, 0.1);
-}
-.message-item .sender {
-font-weight: bold;
-color: var(--accent);
-font-size: 14px;
-margin-bottom: 5px;
-}
-.message-item .text {
-color: #fff;
-font-size: 14px;
-word-wrap: break-word;
-}
-.message-item .time {
-font-size: 10px;
-color: #888;
-margin-top: 5px;
-}
-.message-input-container {
-display: flex;
-gap: 10px;
-}
-.message-input {
-flex: 1;
-padding: 12px;
-background: rgba(255,255,255,0.1);
-border: 1px solid rgba(255,255,255,0.2);
-border-radius: 8px;
-color: #fff;
-font-size: 14px;
-}
-.message-input:focus {
-outline: none;
-border-color: var(--accent);
-}
-.btn-send-message {
-background: var(--accent);
-color: #fff;
-border: none;
-padding: 12px 25px;
-border-radius: 8px;
-font-weight: bold;
-cursor: pointer;
-}
-.btn-send-message:disabled {
-background: #444;
-cursor: not-allowed;
-}
-.conversation-header {
-background: rgba(0,0,0,0.3);
-padding: 15px;
-border-radius: 10px;
-margin-bottom: 15px;
-display: flex;
-align-items: center;
-gap: 10px;
-}
-.conversation-avatar {
-width: 40px;
-height: 40px;
-border-radius: 50%;
-background: linear-gradient(135deg, var(--accent), var(--purple));
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 18px;
-font-weight: bold;
-color: #fff;
-overflow: hidden;
-}
-.conversation-name {
-font-weight: bold;
-font-size: 16px;
-}
-.message-notification {
-position: fixed;
-top: 80px;
-right: 20px;
-background: var(--blue);
-color: #fff;
-padding: 10px 20px;
-border-radius: 25px;
-font-size: 14px;
-z-index: 1000;
-opacity: 0;
-transition: opacity 0.3s;
-pointer-events: none;
-}
-.message-notification.show {
-opacity: 1;
-animation: messagePulse 0.5s infinite;
-}
-@keyframes messagePulse {
-0%, 100% { transform: scale(1); }
-50% { transform: scale(1.05); }
-}
-/* Raid Boss Screen */
-.raid-container {
-padding: 20px;
-text-align: center;
-}
-.raid-boss-info {
-background: rgba(244, 67, 54, 0.2);
-padding: 20px;
-border-radius: 15px;
-margin-bottom: 20px;
-}
-.raid-boss-name {
-font-size: 28px;
-font-weight: bold;
-color: var(--red);
-margin-bottom: 10px;
-text-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
-}
-.raid-boss-img {
-max-width: 200px;
-max-height: 250px;
-margin: 10px auto;
-display: block;
-filter: drop-shadow(0 0 15px rgba(244, 67, 54, 0.6));
-}
-.raid-hp-bar-bg {
-width: 100%;
-height: 30px;
-background: #222;
-border-radius: 15px;
-overflow: hidden;
-margin: 15px 0;
-}
-.raid-hp-bar-fill {
-height: 100%;
-background: linear-gradient(90deg, #f44336, #ff1744);
-width: 100%;
-transition: width 0.3s ease;
-box-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
-}
-.raid-hp-text {
-position: relative;
-top: -35px;
-font-size: 16px;
-font-weight: bold;
-text-shadow: 2px 2px 4px #000;
-}
-.raid-players-count {
-font-size: 18px;
-color: var(--green);
-margin-bottom: 20px;
-}
-.raid-timer {
-background: rgba(0,0,0,0.3);
-padding: 15px;
-border-radius: 10px;
-margin-bottom: 20px;
-font-size: 18px;
-color: var(--accent);
-font-weight: bold;
-}
-.raid-countdown {
-background: linear-gradient(135deg, #f44336, #d32f2f);
-padding: 20px;
-border-radius: 10px;
-margin-bottom: 20px;
-font-size: 24px;
-color: #fff;
-font-weight: bold;
-text-shadow: 0 0 20px rgba(244, 67, 54, 0.8);
-animation: countdownPulse 1s infinite;
-}
-@keyframes countdownPulse {
-0%, 100% { transform: scale(1); }
-50% { transform: scale(1.02); }
-}
-.btn-raid-attack {
-background: linear-gradient(135deg, #f44336, #d32f2f);
-color: #fff;
-border: none;
-padding: 20px 50px;
-border-radius: 12px;
-font-weight: bold;
-font-size: 20px;
-cursor: pointer;
-box-shadow: 0 4px 20px rgba(244, 67, 54, 0.5);
-}
-.btn-raid-attack:disabled {
-background: #444;
-cursor: not-allowed;
-opacity: 0.5;
-}
-.btn-raid-summon {
-background: linear-gradient(135deg, #00bcd4, #0097a7);
-color: #fff;
-border: none;
-padding: 15px 40px;
-border-radius: 12px;
-font-weight: bold;
-font-size: 18px;
-cursor: pointer;
-box-shadow: 0 4px 20px rgba(0, 188, 212, 0.5);
-margin-top: 15px;
-}
-.btn-raid-summon:disabled {
-background: #444;
-cursor: not-allowed;
-opacity: 0.5;
-}
-.raid-reward-info {
-background: rgba(255, 152, 0, 0.2);
-border: 1px solid var(--accent);
-padding: 15px;
-border-radius: 10px;
-margin-top: 20px;
-}
 /* Quests Screen */
 .quests-container {
 padding: 20px;
@@ -1933,6 +1614,20 @@ text-align: center;
 color: var(--accent);
 font-weight: bold;
 }
+/* Online Status Indicator */
+.online-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--green);
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 15px;
+    border: 1px solid var(--green);
+}
+
 @media (max-width: 480px) {
 .loading-text { font-size: 20px; }
 .loading-bar-bg { width: 250px; }
@@ -1949,11 +1644,6 @@ font-weight: bold;
 .slot-reel { width: 60px; height: 80px; font-size: 36px; }
 .abilities-bar { bottom: 80px; }
 .ability-btn { width: 50px; height: 50px; font-size: 20px; }
-.messages-container { max-height: 400px; }
-.raid-boss-name { font-size: 22px; }
-.btn-raid-attack { padding: 15px 30px; font-size: 16px; }
-.btn-raid-summon { padding: 12px 25px; font-size: 16px; }
-.raid-boss-img { max-width: 150px; max-height: 200px; }
 }
 @media (max-width: 360px) {
 .loading-text { font-size: 18px; }
@@ -2049,7 +1739,6 @@ font-weight: bold;
 <button class="audio-btn" onclick="toggleSound()" id="soundBtn">🔊</button>
 </div>
 <div class="save-indicator" id="saveIndicator">💾 Сохранено</div>
-<div class="message-notification" id="messageNotification">💬 Новое сообщение!</div>
 <div class="side-nav-overlay" id="sideNavOverlay" onclick="toggleSideNav()"></div>
 <div class="side-nav" id="sideNav">
 <div class="side-nav-header">
@@ -2073,22 +1762,11 @@ font-weight: bold;
 <button class="side-nav-btn" onclick="switchScreen('roulette', this)">
 <span class="side-nav-icon">🎰</span><span>Казино</span>
 </button>
-<button class="side-nav-btn" onclick="switchScreen('raid', this)">
-<span class="side-nav-icon">👹</span><span>Рейд Босс</span>
-<span class="badge" id="raidBadge" style="display:none;">!</span>
-</button>
 <button class="side-nav-btn" onclick="switchScreen('prestige', this)">
 <span class="side-nav-icon">💜</span><span>Престиж</span>
 </button>
 <button class="side-nav-btn" onclick="switchScreen('leaderboard', this)">
 <span class="side-nav-icon">🏆</span><span>Топ игроков</span>
-</button>
-<button class="side-nav-btn" onclick="switchScreen('online', this)">
-<span class="side-nav-icon">🟢</span><span>Онлайн</span>
-</button>
-<button class="side-nav-btn" onclick="switchScreen('messages', this)">
-<span class="side-nav-icon">💬</span><span>Сообщения</span>
-<span class="badge" id="messageBadge" style="display:none;">0</span>
 </button>
 <button class="side-nav-btn" onclick="switchScreen('profile', this)">
 <span class="side-nav-icon">👤</span><span>Профиль</span>
@@ -2184,8 +1862,6 @@ font-weight: bold;
 <div class="stat-row"><span>🎰 Прокруток рулетки:</span> <span id="statRoulette">0</span></div>
 <div class="stat-row"><span>🔥 Макс комбо:</span> <span id="statMaxCombo">0</span></div>
 <div class="stat-row"><span>💜 Уровень престижа:</span> <span id="statPrestige">0</span></div>
-<div class="stat-row"><span>👹 Участий в рейдах:</span> <span id="statRaids">0</span></div>
-<div class="stat-row"><span>🏆 Побед в рейдах:</span> <span id="statRaidWins">0</span></div>
 </div>
 <h3 style="margin: 20px 0 10px; text-align: center;">🏆 Достижения</h3>
 <div id="achievementsList"></div>
@@ -2366,64 +2042,6 @@ font-weight: bold;
 </div>
 </div>
 </div>
-<div id="screen-online" class="screen">
-<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
-<h2 style="margin: 20px 0; text-align: center;">🟢 Онлайн Игроки</h2>
-<div class="online-players-container">
-<div style="text-align: center; margin-bottom: 20px; color: var(--green);">
-<span id="onlineCount">0</span> игроков онлайн
-</div>
-<div class="online-players-list" id="onlinePlayersList">
-<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>
-</div>
-</div>
-</div>
-<div id="screen-messages" class="screen">
-<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
-<h2 style="margin: 20px 0; text-align: center;">💬 Личные Сообщения</h2>
-<div class="messages-container">
-<div class="conversation-header" id="conversationHeader" style="display: none;">
-<div class="conversation-avatar" id="conversationAvatar">👤</div>
-<div class="conversation-name" id="conversationName">Игрок</div>
-</div>
-<div class="messages-list" id="messagesList">
-<div style="text-align: center; padding: 40px; color: #888;">Выберите игрока для начала диалога</div>
-</div>
-<div class="message-input-container">
-<input type="text" class="message-input" id="messageInput" placeholder="Введите сообщение..." maxlength="500">
-<button class="btn-send-message" id="btnSendMessage" onclick="sendMessage()">📤</button>
-</div>
-</div>
-</div>
-<div id="screen-raid" class="screen">
-<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
-<h2 style="margin: 20px 0; text-align: center;">👹 РЕЙД БОСС</h2>
-<div class="raid-container">
-<div class="raid-timer" id="raidTimer">Следующий рейд через: --:--:--</div>
-<div class="raid-countdown" id="raidCountdown" style="display:none;">⏳ До начала рейда: <span id="raidCountdownText">00:00:00</span></div>
-<div class="raid-boss-info" id="raidBossInfo" style="display:none;">
-<div class="raid-boss-name" id="raidBossName">Тёмный Властелин</div>
-<img id="raidBossImg" src="" class="raid-boss-img" alt="Raid Boss" style="display:none;">
-<div class="raid-hp-bar-bg">
-<div class="raid-hp-bar-fill" id="raidHpFill"></div>
-</div>
-<div class="raid-hp-text" id="raidHpText">1000000/1000000</div>
-<div class="raid-players-count" id="raidPlayersCount">👥 0 игроков участвуют</div>
-<button class="btn-raid-attack" id="btnRaidAttack" onclick="raidAttack()">⚔️ АТАКОВАТЬ!</button>
-<div class="raid-reward-info">
-<h4 style="color: var(--accent); margin-bottom: 10px;">🎁 Награды за победу:</h4>
-<p style="color: #ffd700;">💰 50000 Золота</p>
-<p style="color: #00bcd4;">💎 100 Алмазов</p>
-<p style="color: #9c27b0;">💜 50 Фишек Престижа</p>
-</div>
-</div>
-<div id="raidNotActive" style="padding: 40px; color: #888;">
-👹 Рейд босс появится через некоторое время.<br>Проверьте позже!
-<br><br>
-<button class="btn-raid-summon" id="btnRaidSummon" onclick="summonRaidBoss()">🆓 Вызвать бесплатно</button>
-</div>
-</div>
-</div>
 <div id="screen-dev" class="screen">
 <button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center; color: var(--dev-accent);">🔧 Меню разработчика</h2>
@@ -2455,8 +2073,13 @@ font-weight: bold;
 <div class="energy-text"><span id="uiEnergy">100/100</span></div>
 </div>
 </div>
-<div class="xp-display">⭐ <span id="uiLevel">1</span></div>
-<button class="dev-btn" onclick="openDevMenu()">⚙️</button>
+<div style="display: flex; align-items: center; gap: 10px;">
+    <div class="online-status">
+        🟢 <span id="onlineCountValue">0</span>
+    </div>
+    <div class="xp-display">⭐ <span id="uiLevel">1</span></div>
+    <button class="dev-btn" onclick="openDevMenu()">⚙️</button>
+</div>
 </div>
 <div class="registration-modal" id="registrationModal">
 <div class="registration-content">
@@ -2520,10 +2143,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const auth = firebase.auth();
 
-// ✅ ИЗМЕНЕНО: Рейд босс теперь бесплатный (0 алмазов)
-const RAID_SUMMON_COST = 0;
-const RAID_COOLDOWN = 3 * 60 * 60 * 1000;
-
 // ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
 const CHARACTERS = {
 shin: { name: 'Клинок Рассвета', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Ловкий и стремительный боец, мастер быстрых атак и уклонений. Его стиль напоминает первые лучи солнца — внезапный и ослепляющий.', achievementId: 1, order: 1, rounds: 1, chapter: 1, prestigeValue: 10 },
@@ -2540,11 +2159,6 @@ crane: { name: 'Белый Журавль', hp: 1000000, img: 'images/crane.png'
 master: { name: 'Мастер Безмолвия', hp: 3000000, img: 'images/master.png', bgImg: 'backgrounds/master.jpg', desc: 'Загадочный и могущественный наставник. Его сила безгранична.', achievementId: 12, isBoss: true, order: 12, rounds: 2, chapter: 2, prestigeValue: 500 }
 };
 const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx', 'guardian', 'bull', 'keeper', 'tiger', 'crane', 'master'];
-
-// ================= НАСТРОЙКИ РЕЙД БОССА =================
-const RAID_BOSSES = [
-{ name: 'Тёмный Властелин', hp: 3000000, img: 'images/raid_boss.png', bgImg: 'backgrounds/raid_bg.jpg' }
-];
 
 // 🔢 15 ПРОМО КОДОВ
 let promoCodes = {
@@ -2566,7 +2180,6 @@ let promoCodes = {
 };
 let stats = { totalPromoActivations: 0, energyPurchases: 0, jackpotWins: 0 };
 let gameVersion = 'V3.0.1';
-
 // 📊 20 УРОВНЕЙ РАНГОВ
 const RANKS = [
 { level: 1, name: 'Новичок', xpRequired: 100, reward: { gold: 0, diamonds: 0 } },
@@ -2590,8 +2203,7 @@ const RANKS = [
 { level: 19, name: 'Божество', xpRequired: 500000, reward: { gold: 50000, diamonds: 120 } },
 { level: 20, name: 'Повелитель Теней', xpRequired: 1200000, reward: { gold: 120000, diamonds: 150 } }
 ];
-
-// 🏆 29 ДОСТИЖЕНИЙ
+// 🏆 26 ДОСТИЖЕНИЙ (Убраны рейдовые)
 const ACHIEVEMENTS = [
 { id: 1, name: 'Победа над Клинком', desc: 'Победите Клинка Рассвета', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'boss' },
 { id: 2, name: 'Стена разрушена', desc: 'Победите Стальную Стену', reward: 250, diamondReward: 1, current: 0, required: 1, type: 'boss' },
@@ -2618,12 +2230,8 @@ const ACHIEVEMENTS = [
 { id: 23, name: 'Король Критов', desc: '500 критических ударов', reward: 20000, diamondReward: 20, current: 0, required: 500, type: 'crit_total' },
 { id: 24, name: 'Золотой Дождь', desc: 'Накопить 500,000 золота', reward: 50000, diamondReward: 30, current: 0, required: 500000, type: 'gold_total_new' },
 { id: 25, name: 'Марафонец', desc: '100 часов в игре', reward: 30000, diamondReward: 25, current: 0, required: 6000, type: 'time_marathon' },
-{ id: 26, name: 'Легенда Арены', desc: '200 побед', reward: 40000, diamondReward: 35, current: 0, required: 200, type: 'win_legend' },
-{ id: 27, name: 'Охотник на Рейды', desc: 'Участвовать в 10 рейдах', reward: 10000, diamondReward: 10, current: 0, required: 10, type: 'raid_participation' },
-{ id: 28, name: 'Победитель Рейдов', desc: 'Победить в 5 рейдах', reward: 20000, diamondReward: 20, current: 0, required: 5, type: 'raid_wins' },
-{ id: 29, name: 'Легенда Рейда', desc: 'Нанести 1,000,000 урона в рейдах', reward: 50000, diamondReward: 50, current: 0, required: 1000000, type: 'raid_damage' }
+{ id: 26, name: 'Легенда Арены', desc: '200 побед', reward: 40000, diamondReward: 35, current: 0, required: 200, type: 'win_legend' }
 ];
-
 const DAILY_REWARDS = [
 { day: 1, gold: 100, promo: 1 },
 { day: 2, gold: 200, promo: 2 },
@@ -2633,8 +2241,7 @@ const DAILY_REWARDS = [
 { day: 6, gold: 1000, promo: 10 },
 { day: 7, gold: 2000, promo: 20 }
 ];
-
-// 📋 ЕЖЕДНЕВНЫЕ КВЕСТЫ
+// 📋 ЕЖЕДНЕВНЫЕ КВЕСТЫ (Убран рейд)
 const QUEST_TEMPLATES = [
 { id: 'clicks_100', name: 'Начинающий боец', desc: 'Сделайте 100 кликов', type: 'clicks', target: 100, reward: { gold: 200, diamonds: 2 } },
 { id: 'clicks_500', name: 'Опытный боец', desc: 'Сделайте 500 кликов', type: 'clicks', target: 500, reward: { gold: 500, diamonds: 5 } },
@@ -2642,10 +2249,8 @@ const QUEST_TEMPLATES = [
 { id: 'kills_10', name: 'Воин', desc: 'Победите 10 врагов', type: 'kills', target: 10, reward: { gold: 2000, diamonds: 5 } },
 { id: 'crits_20', name: 'Критический удар', desc: 'Нанесите 20 критических ударов', type: 'crits', target: 20, reward: { gold: 800, diamonds: 4 } },
 { id: 'gold_5000', name: 'Богач', desc: 'Накопите 5000 золота', type: 'gold', target: 5000, reward: { gold: 1500, diamonds: 5 } },
-{ id: 'raid_1', name: 'Рейдер', desc: 'Участвуйте в 1 рейде', type: 'raid', target: 1, reward: { gold: 3000, diamonds: 10 } },
 { id: 'combo_50', name: 'Комбо мастер', desc: 'Достигните комбо 50x', type: 'combo', target: 50, reward: { gold: 1000, diamonds: 5 } }
 ];
-
 let game = {
 gold: 500, totalGold: 0, promoCurrency: 0, damage: 1, critChance: 5, critDamage: 200,
 energy: 100, maxEnergy: 100, clicks: 0, totalCrits: 0, day: 1,
@@ -2683,31 +2288,18 @@ defeatedCharacters: [],
 totalUpgrades: 0,
 lastDailyClaim: null,
 dailyStreak: 0,
-lastRaidParticipation: null,
-raidDamageDealt: 0,
-raidParticipations: 0,
-raidWins: 0,
-totalRaidDamage: 0,
 dailyQuests: [],
 lastQuestUpdate: null,
 questProgress: {}
 };
-
 let autoSaveInterval, energyRegenInterval;
 let countdownInterval;
 let rouletteSpinning = false;
 let currentLeaderboardTab = 'level';
 let abilityInterval = null;
-let onlinePlayersUnsubscribe = null;
-let messagesUnsubscribe = null;
-let currentConversationPartner = null;
-let unreadMessagesCount = 0;
-let raidBossActive = false;
-let raidBossData = null;
+let onlineCountUnsubscribe = null;
 let freeSpinInterval = null;
-let raidCountdownInterval = null;
 let questInterval = null;
-let raidUnsubscribe = null;
 
 // ================= ФУНКЦИИ НАВИГАЦИИ =================
 function toggleSideNav() {
@@ -2716,7 +2308,6 @@ const overlay = document.getElementById('sideNavOverlay');
 sideNav.classList.toggle('active');
 overlay.classList.toggle('active');
 }
-
 function switchScreen(screenId, btn) {
 toggleSideNav();
 if (screenId === 'battle') {
@@ -2729,7 +2320,7 @@ btn.classList.add('active');
 }
 return;
 }
-if (['shop', 'profile', 'promo', 'roulette', 'prestige', 'leaderboard', 'dev', 'online', 'messages', 'raid', 'quests'].includes(screenId)) {
+if (['shop', 'profile', 'promo', 'roulette', 'prestige', 'leaderboard', 'dev', 'quests'].includes(screenId)) {
 document.querySelectorAll('.screen').forEach(s => {
 if(s.id !== 'screen-' + screenId) s.classList.remove('active');
 });
@@ -2739,26 +2330,20 @@ if(btn) btn.classList.add('active');
 if (screenId === 'profile') { renderAchievements(); updateUserInfo(); }
 if (screenId === 'prestige') { updatePrestigeUI(); }
 if (screenId === 'leaderboard') { loadLeaderboard(); }
-if (screenId === 'online') { loadOnlinePlayers(); }
-if (screenId === 'messages') { loadMessages(); }
-if (screenId === 'raid') { loadRaidBoss(); }
 if (screenId === 'quests') { renderQuests(); }
 }
 }
-
 function closeAllTabs() {
-document.querySelectorAll('#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-online, #screen-messages, #screen-raid, #screen-quests').forEach(s => {
+document.querySelectorAll('#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-quests').forEach(s => {
 s.classList.remove('active');
 });
 document.getElementById('screen-battle').classList.add('active');
 document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
 document.querySelector('.side-nav-btn:first-child').classList.add('active');
 }
-
 window.onload = function() {
 showLoadingScreen();
 };
-
 function showLoadingScreen() {
 const loadingBar = document.getElementById('loadingBar');
 const loadingScreen = document.getElementById('loadingScreen');
@@ -2779,7 +2364,6 @@ initGame();
 loadingBar.style.width = progress + '%';
 }, 200);
 }
-
 function initGame() {
 loadGame();
 checkRegistration();
@@ -2796,8 +2380,6 @@ startFreeSpinTimer();
 initDailyQuests();
 setInterval(updateOnlineStatus, 30000);
 setInterval(updateFreeSpinTimer, 1000);
-setInterval(checkRaidBoss, 5000);
-setInterval(updateRaidCountdown, 1000);
 setInterval(updateQuestTimer, 1000);
 autoSaveInterval = setInterval(() => { saveGame(true); syncWithFirebase(); }, 10000);
 energyRegenInterval = setInterval(() => {
@@ -2816,6 +2398,8 @@ game.comboCount = 0;
 updateComboUI();
 }
 }, 1000);
+// Online Count Listener
+updateOnlineCountDisplay();
 const charContainer = document.getElementById('charContainer');
 charContainer.addEventListener('touchstart', function(e) {
 if (e.cancelable) { e.preventDefault(); }
@@ -2831,9 +2415,7 @@ if(e.key === '2') useAbility(2);
 if(e.key === '3') useAbility(3);
 });
 window.addEventListener('beforeunload', () => { saveGame(true); syncWithFirebase(); });
-checkRaidBoss();
 }
-
 // ================= ЕЖЕДНЕВНЫЕ КВЕСТЫ =================
 function initDailyQuests() {
 const today = new Date().toDateString();
@@ -2848,7 +2430,6 @@ saveGame();
 }
 updateQuestBadge();
 }
-
 function generateDailyQuests() {
 const shuffled = [...QUEST_TEMPLATES].sort(() => 0.5 - Math.random());
 return shuffled.slice(0, 3).map(q => ({
@@ -2858,7 +2439,6 @@ completed: false,
 claimed: false
 }));
 }
-
 function renderQuests() {
 const list = document.getElementById('questsList');
 list.innerHTML = '';
@@ -2893,7 +2473,6 @@ ${isClaimed ? '✓' : isCompleted ? 'ЗАБРАТЬ' : 'В процессе'}
 `;
 });
 }
-
 function checkQuestProgress() {
 if (!game.dailyQuests || game.dailyQuests.length === 0) return;
 game.dailyQuests.forEach(quest => {
@@ -2905,7 +2484,6 @@ case 'clicks': newValue = game.clicks % quest.target; break;
 case 'kills': newValue = game.achievements.filter(id => id <= 12).length; break;
 case 'crits': newValue = game.totalCrits % quest.target; break;
 case 'gold': newValue = game.totalGold; break;
-case 'raid': newValue = game.raidParticipations; break;
 case 'combo': newValue = game.maxCombo; break;
 }
 if (newValue >= quest.target) {
@@ -2921,7 +2499,6 @@ renderQuests();
 }
 saveGame();
 }
-
 function claimQuest(questId) {
 const quest = game.dailyQuests.find(q => q.id === questId);
 if (!quest || !quest.completed || quest.claimed) return;
@@ -2936,7 +2513,6 @@ renderQuests();
 updateUI();
 saveGame();
 }
-
 function updateQuestBadge() {
 const badge = document.getElementById('questBadge');
 const hasUnclaimed = game.dailyQuests.some(q => q.completed && !q.claimed);
@@ -2946,7 +2522,6 @@ badge.style.display = 'flex';
 badge.style.display = 'none';
 }
 }
-
 function updateQuestTimer() {
 if (!game.lastQuestUpdate) return;
 const now = new Date();
@@ -2962,20 +2537,17 @@ if (timerEl) {
 timerEl.textContent = `⏳ До обновления: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 }
-
 // ================= ВИбрация =================
 function vibrate(pattern) {
 if (navigator.vibrate) {
 navigator.vibrate(pattern);
 }
 }
-
 // ================= УЛУЧШЕННЫЕ ЭФФЕКТЫ УРОНА =================
-function showDamage(x, y, text, isCrit, isRaid = false, isAuto = false) {
+function showDamage(x, y, text, isCrit, isAuto = false) {
 const el = document.createElement('div');
 let className = 'damage-popup';
 if (isCrit) className += ' crit';
-else if (isRaid) className += ' raid';
 else if (isAuto) className += ' auto';
 el.className = className;
 el.innerText = text;
@@ -2983,9 +2555,8 @@ const randomX = (Math.random() - 0.5) * 40;
 el.style.left = (x - 40 + randomX) + 'px';
 el.style.top = (y - 80) + 'px';
 document.body.appendChild(el);
-setTimeout(() => el.remove(), isRaid ? 1200 : 1000);
+setTimeout(() => el.remove(), 1000);
 }
-
 // ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
 function startFreeSpinTimer() {
 const now = Date.now();
@@ -2997,7 +2568,6 @@ game.freeSpinAvailable = true;
 }
 updateFreeSpinUI();
 }
-
 function updateFreeSpinTimer() {
 if (!game.lastFreeSpin) return;
 const now = Date.now();
@@ -3017,7 +2587,6 @@ String(minutes).padStart(2, '0') + ':' +
 String(seconds).padStart(2, '0');
 }
 }
-
 function updateFreeSpinUI() {
 const freeSpinInfo = document.getElementById('freeSpinInfo');
 const freeSpinTimer = document.getElementById('freeSpinTimer');
@@ -3033,7 +2602,6 @@ freeSpinTimer.style.display = 'block';
 rouletteBtn.disabled = false;
 }
 }
-
 function updateOnlineStatus() {
 if (!game.userId || !db) return;
 db.collection('players').doc(game.userId).set({
@@ -3049,425 +2617,26 @@ achievements: game.achievements.length
 console.log('⚠️ Firebase offline режим');
 });
 }
-
-function loadOnlinePlayers() {
+// ================= ОТОБРАЖЕНИЕ ОНЛАЙН ИГРОКОВ =================
+function updateOnlineCountDisplay() {
 if (!db) {
-document.getElementById('onlinePlayersList').innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Ошибка подключения</div>';
-return;
+    document.getElementById('onlineCountValue').textContent = '0';
+    return;
 }
-document.getElementById('onlinePlayersList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
-if (onlinePlayersUnsubscribe) onlinePlayersUnsubscribe();
-onlinePlayersUnsubscribe = db.collection('players').where('isOnline', '==', true).onSnapshot(snapshot => {
-const list = document.getElementById('onlinePlayersList');
-const countEl = document.getElementById('onlineCount');
-const onlinePlayers = [];
-snapshot.forEach(doc => {
-const player = doc.data();
-if (player.userId !== game.userId) {
-onlinePlayers.push(player);
-}
-});
-countEl.textContent = onlinePlayers.length + 1;
-list.innerHTML = '';
-if (onlinePlayers.length === 0) {
-list.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Нет других игроков онлайн</div>';
-return;
-}
-onlinePlayers.forEach(player => {
-const avatarDisplay = player.avatar ? '<img src="' + player.avatar + '" alt="Avatar">' : (player.username || 'A').charAt(0).toUpperCase();
-list.innerHTML += '<div class="online-player-item"><div class="online-player-info"><div class="online-player-avatar">' + avatarDisplay + '</div><div><div class="online-player-name">' + (player.username || 'Аноним') + '</div><div class="online-player-status">🟢 Онлайн</div></div></div><button class="btn-message-player" onclick="openConversation(\'' + player.userId + '\', \'' + (player.username || 'Аноним') + '\', \'' + (player.avatar || '') + '\')">💬 Написать</button></div>';
-});
+if (onlineCountUnsubscribe) onlineCountUnsubscribe();
+onlineCountUnsubscribe = db.collection('players').where('isOnline', '==', true).onSnapshot(snapshot => {
+    const count = snapshot.size;
+    document.getElementById('onlineCountValue').textContent = count;
 }, err => {
-console.error('Ошибка загрузки онлайн игроков:', err);
-document.getElementById('onlinePlayersList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Онлайн недоступен</div>';
+    console.error('Ошибка загрузки онлайн игроков:', err);
+    document.getElementById('onlineCountValue').textContent = '0';
 });
 }
-
-function openConversation(partnerId, partnerName, partnerAvatar) {
-currentConversationPartner = { userId: partnerId, username: partnerName, avatar: partnerAvatar };
-document.getElementById('conversationHeader').style.display = 'flex';
-document.getElementById('conversationName').textContent = partnerName;
-if (partnerAvatar) {
-document.getElementById('conversationAvatar').innerHTML = '<img src="' + partnerAvatar + '" style="width:100%;height:100%;object-fit:cover;">';
-} else {
-document.getElementById('conversationAvatar').textContent = partnerName.charAt(0).toUpperCase();
-}
-loadMessagesWithPartner(partnerId);
-switchScreen('messages', null);
-}
-
-function loadMessagesWithPartner(partnerId) {
-if (!db || !game.userId) return;
-document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
-if (messagesUnsubscribe) messagesUnsubscribe();
-const conversationId = [game.userId, partnerId].sort().join('_');
-messagesUnsubscribe = db.collection('conversations').doc(conversationId).collection('messages').orderBy('timestamp', 'asc').onSnapshot(snapshot => {
-const list = document.getElementById('messagesList');
-list.innerHTML = '';
-if (snapshot.empty) {
-list.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Нет сообщений. Напишите первым!</div>';
-return;
-}
-snapshot.forEach(doc => {
-const msg = doc.data();
-const isOwn = msg.senderId === game.userId;
-const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'}) : '';
-list.innerHTML += '<div class="message-item ' + (isOwn ? 'sent' : '') + '"><div class="sender">' + (isOwn ? 'Вы' : currentConversationPartner.username) + '</div><div class="text">' + escapeHtml(msg.text) + '</div><div class="time">' + time + '</div></div>';
-});
-list.scrollTop = list.scrollHeight;
-snapshot.forEach(doc => {
-const msg = doc.data();
-if (msg.senderId !== game.userId && !msg.read) {
-doc.ref.update({ read: true }).catch(() => {});
-}
-});
-updateMessageBadge();
-}, err => {
-console.error('Ошибка загрузки сообщений:', err);
-document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Сообщения недоступны</div>';
-});
-}
-
-function sendMessage() {
-if (!game.userId || !currentConversationPartner) {
-showToast('❌ Выберите собеседника!');
-return;
-}
-const input = document.getElementById('messageInput');
-const text = input.value.trim();
-if (!text) {
-showToast('❌ Введите текст сообщения!');
-return;
-}
-if (text.length > 500) {
-showToast('❌ Сообщение слишком длинное!');
-return;
-}
-const conversationId = [game.userId, currentConversationPartner.userId].sort().join('_');
-db.collection('conversations').doc(conversationId).collection('messages').add({
-senderId: game.userId,
-senderName: game.username,
-senderAvatar: game.avatar,
-receiverId: currentConversationPartner.userId,
-text: text,
-timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-read: false
-}).then(() => {
-input.value = '';
-showToast('✅ Сообщение отправлено!');
-}).catch(err => {
-console.error('Ошибка отправки:', err);
-showToast('❌ Ошибка отправки');
-});
-}
-
-function loadMessages() {
-if (!game.userId) {
-document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #f44336;">Войдите в аккаунт</div>';
-return;
-}
-if (!currentConversationPartner) {
-document.getElementById('conversationHeader').style.display = 'none';
-document.getElementById('messagesList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Выберите игрока в списке "Онлайн"</div>';
-}
-updateMessageBadge();
-}
-
-function updateMessageBadge() {
-if (!game.userId || !db) return;
-db.collectionGroup('messages').where('receiverId', '==', game.userId).where('read', '==', false).get().then(snapshot => {
-unreadMessagesCount = snapshot.size;
-const badge = document.getElementById('messageBadge');
-if (unreadMessagesCount > 0) {
-badge.style.display = 'flex';
-badge.textContent = unreadMessagesCount > 99 ? '99+' : unreadMessagesCount;
-} else {
-badge.style.display = 'none';
-}
-}).catch(() => {});
-}
-
-function showMessageNotification() {
-const notification = document.getElementById('messageNotification');
-notification.classList.add('show');
-setTimeout(() => {
-notification.classList.remove('show');
-}, 5000);
-}
-
-// ================= ЛОГИКА РЕЙД БОССА =================
-// ✅ ИСПРАВЛЕНО: Проверка рейда с подпиской на изменения в реальном времени
-function checkRaidBoss() {
-if (!db) {
-raidBossActive = false;
-updateRaidUI();
-loadRaidBoss();
-return;
-}
-
-// ✅ ПОДПИСКА НА ИЗМЕНЕНИЯ РЕЙД БОССА В РЕАЛЬНОМ ВРЕМЕНИ
-if (raidUnsubscribe) raidUnsubscribe();
-
-raidUnsubscribe = db.collection('raidBoss').doc('current').onSnapshot(doc => {
-if (doc.exists) {
-const raidData = doc.data();
-const now = Date.now();
-if (raidData.lastSpawnTime && (now - raidData.lastSpawnTime > RAID_COOLDOWN)) {
-createNewRaid();
-} else if (raidData.active) {
-raidBossActive = true;
-raidBossData = raidData;
-document.getElementById('raidBadge').style.display = 'flex';
-// ✅ ОБНОВЛЕНИЕ HP В РЕАЛЬНОМ ВРЕМЕНИ
-if (raidBossData.hp !== undefined) {
-updateRaidHP();
-}
-} else {
-raidBossActive = false;
-document.getElementById('raidBadge').style.display = 'none';
-}
-} else {
-createNewRaid();
-}
-updateRaidUI();
-loadRaidBoss();
-}, err => {
-console.log('⚠️ Рейд в оффлайн режиме');
-raidBossActive = false;
-updateRaidUI();
-loadRaidBoss();
-});
-}
-
-// ✅ ИСПРАВЛЕНО: Создание рейда
-function createNewRaid() {
-const randomBoss = RAID_BOSSES[Math.floor(Math.random() * RAID_BOSSES.length)];
-const now = Date.now();
-db.collection('raidBoss').doc('current').set({
-name: randomBoss.name,
-hp: randomBoss.hp,
-maxHp: randomBoss.hp,
-active: true,
-defeated: false,
-participants: 0,
-lastSpawnTime: now,
-img: randomBoss.img,
-bgImg: randomBoss.bgImg
-}).then(() => {
-raidBossActive = true;
-raidBossData = { ...randomBoss, active: true, lastSpawnTime: now, participants: 0 };
-document.getElementById('raidBadge').style.display = 'flex';
-showToast('👹 Появился новый Рейд Босс!');
-loadRaidBoss();
-}).catch(err => {
-console.log('⚠️ Рейд создан локально');
-raidBossActive = true;
-raidBossData = { ...randomBoss, active: true, lastSpawnTime: now, participants: 0 };
-document.getElementById('raidBadge').style.display = 'flex';
-loadRaidBoss();
-});
-}
-
-// ✅ ИСПРАВЛЕНО: Загрузка рейд босса
-function loadRaidBoss() {
-if (!raidBossActive || !raidBossData) {
-document.getElementById('raidBossInfo').style.display = 'none';
-document.getElementById('raidNotActive').style.display = 'block';
-document.getElementById('raidCountdown').style.display = 'block';
-let nextRaidTime = 0;
-if (raidBossData && raidBossData.lastSpawnTime) {
-const timePassed = Date.now() - raidBossData.lastSpawnTime;
-nextRaidTime = Math.max(0, RAID_COOLDOWN - timePassed);
-} else {
-nextRaidTime = RAID_COOLDOWN;
-}
-updateRaidCountdownDisplay(nextRaidTime);
-document.getElementById('screen-raid').style.backgroundImage = '';
-updateSummonButton();
-return;
-}
-document.getElementById('raidBossInfo').style.display = 'block';
-document.getElementById('raidNotActive').style.display = 'none';
-document.getElementById('raidCountdown').style.display = 'none';
-document.getElementById('raidBossName').textContent = raidBossData.name;
-document.getElementById('raidBossInfo').dataset.hp = raidBossData.hp;
-document.getElementById('raidBossInfo').dataset.maxHp = raidBossData.maxHp;
-const bossImg = document.getElementById('raidBossImg');
-if (raidBossData.img) {
-bossImg.src = raidBossData.img;
-bossImg.style.display = 'block';
-} else {
-bossImg.style.display = 'none';
-}
-if (raidBossData.bgImg) {
-document.getElementById('screen-raid').style.backgroundImage = `url('${raidBossData.bgImg}')`;
-} else {
-document.getElementById('screen-raid').style.backgroundImage = '';
-}
-updateRaidHP();
-document.getElementById('raidPlayersCount').textContent = `👥 ${raidBossData.participants || 0} игроков участвуют`;
-const canAttack = !game.lastRaidParticipation || game.lastRaidParticipation !== new Date().toISOString().split('T')[0];
-document.getElementById('btnRaidAttack').disabled = !canAttack;
-}
-
-// ✅ ИСПРАВЛЕНО: Таймер рейда
-function updateRaidCountdown() {
-if (raidBossActive && raidBossData) {
-document.getElementById('raidCountdown').style.display = 'none';
-document.getElementById('raidTimer').textContent = '👹 Рейд активен!';
-return;
-}
-let nextRaidTime = 0;
-if (raidBossData && raidBossData.lastSpawnTime) {
-const timePassed = Date.now() - raidBossData.lastSpawnTime;
-nextRaidTime = Math.max(0, RAID_COOLDOWN - timePassed);
-} else {
-nextRaidTime = RAID_COOLDOWN;
-}
-updateRaidCountdownDisplay(nextRaidTime);
-}
-
-function updateRaidCountdownDisplay(timeMs) {
-const hours = Math.floor(timeMs / (1000 * 60 * 60));
-const minutes = Math.floor((timeMs % (1000 * 60 * 60)) / (1000 * 60));
-const seconds = Math.floor((timeMs % (1000 * 60)) / 1000);
-document.getElementById('raidCountdownText').textContent =
-String(hours).padStart(2, '0') + ':' +
-String(minutes).padStart(2, '0') + ':' +
-String(seconds).padStart(2, '0');
-document.getElementById('raidTimer').textContent = `Следующий рейд через: ${hours}ч ${minutes}м ${seconds}с`;
-}
-
-// ✅ ИСПРАВЛЕНО: Обновление HP рейд босса
-function updateRaidHP() {
-if (!raidBossData) return;
-const hpPercent = (raidBossData.hp / raidBossData.maxHp) * 100;
-document.getElementById('raidHpFill').style.width = hpPercent + '%';
-document.getElementById('raidHpText').textContent = `${raidBossData.hp.toLocaleString()}/${raidBossData.maxHp.toLocaleString()}`;
-}
-
-// ✅ ИСПРАВЛЕНО: Атака рейд босса с отображением урона и синхронизацией
-function raidAttack() {
-if (!raidBossActive || !raidBossData) {
-showToast('❌ Рейд босс не активен!');
-return;
-}
-const today = new Date().toISOString().split('T')[0];
-if (game.lastRaidParticipation === today) {
-showToast('❌ Вы уже атаковали сегодня!');
-return;
-}
-const damage = game.damage * 100;
-const newHp = Math.max(0, raidBossData.hp - damage);
-game.raidDamageDealt += damage;
-game.totalRaidDamage += damage;
-game.raidParticipations++;
-game.lastRaidParticipation = today;
-
-// ✅ ПОКАЗЫВАЕМ УРОН НА ЭКРАНЕ
-showDamage(window.innerWidth / 2, window.innerHeight / 2, damage.toLocaleString(), false, true);
-
-// ✅ ОБНОВЛЯЕМ FIREBASE
-db.collection('raidBoss').doc('current').update({
-hp: newHp,
-participants: firebase.firestore.FieldValue.increment(1)
-}).then(() => {
-raidBossData.hp = newHp;
-updateRaidHP();
-showToast(`⚔️ Вы нанесли ${damage.toLocaleString()} урона!`);
-document.getElementById('btnRaidAttack').disabled = true;
-if (newHp <= 0) {
-raidBossDefeated();
-}
-saveGame();
-syncWithFirebase();
-}).catch(err => {
-console.log('⚠️ Атака сохранена локально');
-raidBossData.hp = newHp;
-updateRaidHP();
-showToast(`⚔️ Вы нанесли ${damage.toLocaleString()} урона!`);
-document.getElementById('btnRaidAttack').disabled = true;
-if (newHp <= 0) {
-raidBossDefeated();
-}
-saveGame();
-});
-}
-
-function raidBossDefeated() {
-showToast('🏆 РЕЙД БОСС ПОВЕЖДЁН!');
-const rewardGold = 50000;
-const rewardDiamonds = 100;
-const rewardChips = 50;
-game.gold += rewardGold;
-game.promoCurrency += rewardDiamonds;
-game.prestigeChips += rewardChips;
-game.raidWins++;
-showToast(`🎁 Награда: +${rewardGold} 💰 +${rewardDiamonds} 💎 +${rewardChips} 💜`);
-db.collection('raidBoss').doc('current').update({
-active: false,
-defeated: true,
-defeatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-lastSpawnTime: Date.now()
-}).catch(() => {});
-saveGame();
-syncWithFirebase();
-setTimeout(() => {
-raidBossActive = false;
-raidBossData = null;
-document.getElementById('raidBadge').style.display = 'none';
-loadRaidBoss();
-}, 2000);
-}
-
-function updateRaidUI() {
-const badge = document.getElementById('raidBadge');
-if (raidBossActive) {
-badge.style.display = 'flex';
-} else {
-badge.style.display = 'none';
-}
-}
-
-// ✅ ИСПРАВЛЕНО: Вызов рейд босса БЕСПЛАТНО
-function summonRaidBoss() {
-if (!db) {
-showToast('❌ Нет подключения к Firebase!');
-return;
-}
-if (raidBossActive) {
-showToast('❌ Рейд босс уже активен!');
-return;
-}
-// ✅ ПРОВЕРКА КУЛДАУНА
-if (raidBossData && raidBossData.lastSpawnTime) {
-const timePassed = Date.now() - raidBossData.lastSpawnTime;
-if (timePassed < RAID_COOLDOWN) {
-const remaining = Math.ceil((RAID_COOLDOWN - timePassed) / (1000 * 60));
-showToast(`❌ Подождите ${remaining} мин до следующего рейда!`);
-return;
-}
-}
-// ✅ БЕСПЛАТНЫЙ ВЫЗОВ (RAID_SUMMON_COST = 0)
-createNewRaid();
-showToast(`✅ Рейд босс вызван бесплатно!`);
-saveGame();
-syncWithFirebase();
-}
-
-function updateSummonButton() {
-const btn = document.getElementById('btnRaidSummon');
-if (btn) {
-btn.disabled = raidBossActive;
-}
-}
-
 function escapeHtml(text) {
 const div = document.createElement('div');
 div.textContent = text;
 return div.innerHTML;
 }
-
 function checkOfflineEarnings() {
 const now = Date.now();
 const timeDiff = now - game.lastOfflineTime;
@@ -3480,7 +2649,6 @@ document.getElementById('offlineEarningsModal').classList.add('active');
 }
 }
 }
-
 function claimOfflineEarnings() {
 if(game.offlineEarnings > 0) {
 game.gold += game.offlineEarnings;
@@ -3493,7 +2661,6 @@ saveGame();
 syncWithFirebase();
 }
 }
-
 function checkRegistration() {
 const savedUser = localStorage.getItem('sf2_user_auth');
 if (savedUser) {
@@ -3511,21 +2678,17 @@ document.getElementById('registrationModal').classList.add('active');
 document.getElementById('registrationModal').classList.add('active');
 }
 }
-
 function showRegisterModal() {
 document.getElementById('loginModal').style.display = 'none';
 document.getElementById('registrationModal').classList.add('active');
 }
-
 function showLoginModal() {
 document.getElementById('registrationModal').classList.remove('active');
 document.getElementById('loginModal').style.display = 'flex';
 }
-
 function closeLoginModal() {
 document.getElementById('loginModal').style.display = 'none';
 }
-
 function registerUser() {
 const username = document.getElementById('regUsername').value.trim();
 const password = document.getElementById('regPassword').value;
@@ -3542,7 +2705,6 @@ showUserInfo();
 document.getElementById('registrationModal').classList.remove('active');
 showToast('✅ Регистрация успешна!');
 }
-
 function loginUser() {
 const username = document.getElementById('loginUsername').value.trim();
 const password = document.getElementById('loginPassword').value;
@@ -3569,7 +2731,6 @@ showToast('❌ Ошибка данных аккаунта!');
 showToast('❌ Аккаунт не найден! Сначала зарегистрируйтесь.');
 }
 }
-
 function showUserInfo() {
 const userInfo = document.getElementById('userInfo');
 const userName = document.getElementById('userName');
@@ -3583,16 +2744,12 @@ else userAvatar.textContent = game.username.charAt(0).toUpperCase();
 userIdDisplay.textContent = 'ID: ' + game.userId.substr(0, 15) + '...';
 }
 }
-
 function updateUserInfo() { showUserInfo(); }
-
 function editNickname() {
 document.getElementById('editNicknameInput').value = game.username;
 document.getElementById('editNicknameModal').style.display = 'flex';
 }
-
 function closeEditNicknameModal() { document.getElementById('editNicknameModal').style.display = 'none'; }
-
 function saveNickname() {
 const newNickname = document.getElementById('editNicknameInput').value.trim();
 if (!newNickname) { showToast('❌ Введите никнейм!'); return; }
@@ -3608,7 +2765,6 @@ syncWithFirebase();
 closeEditNicknameModal();
 showToast('✅ Никнейм изменён!');
 }
-
 function uploadAvatar() {
 const input = document.createElement('input');
 input.type = 'file';
@@ -3633,7 +2789,6 @@ reader.readAsDataURL(file);
 };
 input.click();
 }
-
 function syncWithFirebase() {
 if (!game.userId || !db) return;
 db.collection('players').doc(game.userId).set({
@@ -3642,9 +2797,6 @@ clicks: game.clicks, achievements: game.achievements.length, gold: game.gold,
 diamonds: game.promoCurrency, totalPlayTime: game.totalPlayTime,
 prestigeLevel: game.prestigeLevel, prestigeChips: game.prestigeChips,
 xp: game.xp, totalWins: game.totalWins, totalGold: game.totalGold,
-raidParticipations: game.raidParticipations,
-raidWins: game.raidWins,
-totalRaidDamage: game.totalRaidDamage,
 lastUpdate: firebase.firestore.FieldValue.serverTimestamp()
 }, { merge: true }).then(() => {
 console.log('✅ Данные сохранены в Firebase');
@@ -3652,7 +2804,6 @@ console.log('✅ Данные сохранены в Firebase');
 console.log('⚠️ Firebase offline режим');
 });
 }
-
 function loadLeaderboard() {
 const leaderboardList = document.getElementById('leaderboardList');
 leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
@@ -3676,7 +2827,6 @@ rank++;
 if (snapshot.empty) leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Пока нет игроков</div>';
 }).catch(err => { leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Таблица лидеров недоступна</div>'; });
 }
-
 function getValueByTab(player) {
 switch(currentLeaderboardTab) {
 case 'level': return '⭐ ' + player.level;
@@ -3685,16 +2835,13 @@ case 'achievements': return '🏆 ' + player.achievements;
 default: return '-';
 }
 }
-
 function switchLeaderboardTab(tab) {
 currentLeaderboardTab = tab;
 document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
 event.target.classList.add('active');
 loadLeaderboard();
 }
-
 function updatePlayTime() { game.totalPlayTime++; updateUI(); }
-
 function checkDailyReward() {
 const today = new Date().toISOString().split('T')[0];
 const lastClaim = game.lastDailyClaim;
@@ -3722,7 +2869,6 @@ btnClaim.textContent = 'ПОЛУЧИТЬ НАГРАДУ';
 modal.classList.add('active');
 }
 }
-
 function claimDailyReward() {
 const today = new Date().toISOString().split('T')[0];
 if (game.lastDailyClaim === today) {
@@ -3743,7 +2889,6 @@ updateUI();
 saveGame();
 syncWithFirebase();
 }
-
 function updateComboUI() {
 const comboCounter = document.getElementById('comboCounter');
 const comboCount = document.getElementById('comboCount');
@@ -3754,7 +2899,6 @@ comboCount.innerText = game.comboCount;
 comboCounter.classList.remove('active');
 }
 }
-
 function startAbilityTimer() {
 if(abilityInterval) clearInterval(abilityInterval);
 abilityInterval = setInterval(() => {
@@ -3768,7 +2912,6 @@ if(game.abilities[i].cooldown <= 0) document.getElementById('ability' + i).class
 }
 }, 100);
 }
-
 function useAbility(id) {
 if(game.abilities[id].cooldown > 0 || game.isTransitioning) return;
 playSound('abilitySound');
@@ -3795,7 +2938,6 @@ game.abilities[id].cooldown = game.abilities[id].maxCooldown;
 document.getElementById('ability' + id).classList.add('disabled');
 saveGame();
 }
-
 function handleAttack(x, y) {
 if (game.isTransitioning) return;
 const now = Date.now();
@@ -3848,7 +2990,6 @@ updateAchievementProgress(16, game.totalCrits);
 if (game.enemyHp <= 0) enemyDefeated();
 updateUI();
 }
-
 function enemyDefeated() {
 const char = CHARACTERS[game.currentEnemy];
 let bonus = Math.floor(char.hp / 20);
@@ -3877,14 +3018,12 @@ game.totalWins++;
 updateAchievementProgress(17, game.totalWins);
 setTimeout(() => { showVictoryScreen(char.name); }, 500);
 }
-
 function showVictoryScreen(enemyName) {
 const victoryScreen = document.getElementById('victoryScreen');
 document.getElementById('victoryEnemyName').textContent = enemyName + ' повержен';
 victoryScreen.classList.add('active');
 setTimeout(() => { victoryScreen.classList.remove('active'); nextEnemyWithCountdown(); }, 2000);
 }
-
 function nextEnemyWithCountdown() {
 game.isTransitioning = true;
 const charContainer = document.getElementById('charContainer');
@@ -3939,12 +3078,10 @@ if(charContainer) charContainer.classList.remove('disabled');
 updateUI();
 saveGame();
 }
-
 function updateRoundInfo() {
 const char = CHARACTERS[game.currentEnemy];
 document.getElementById('roundInfo').textContent = 'Раунд ' + game.currentRound + ' из ' + char.rounds;
 }
-
 function showCountdown(callback) {
 const countdownScreen = document.getElementById('countdownScreen');
 const countdownNumber = document.getElementById('countdownNumber');
@@ -3965,7 +3102,6 @@ if (callback) callback();
 }
 }, 1000);
 }
-
 function startFight() {
 playSound('fightSound');
 document.getElementById('countdownScreen').classList.remove('active');
@@ -3983,7 +3119,6 @@ saveGame();
 window.nextEnemyData = null;
 }
 }
-
 function spinRoulette() {
 if (rouletteSpinning) return;
 let cost = 3;
@@ -4028,7 +3163,6 @@ updateUI();
 saveGame();
 }, 3000);
 }
-
 function getResultByType(type) {
 switch(type) {
 case 'gold': return ['🍒', '🍒', '🍋'];
@@ -4038,7 +3172,6 @@ case 'jackpot': return ['7️⃣', '7️⃣', '7️⃣'];
 default: return ['🍒', '🍋', '🍇'];
 }
 }
-
 function checkWin(results, resultType) {
 const resultEl = document.getElementById('rouletteResult');
 if (resultType === 'gold') {
@@ -4065,7 +3198,6 @@ resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!';
 addXP(10);
 updateUI();
 }
-
 function buyEnergy() {
 if (game.gold >= 100) {
 game.gold -= 100;
@@ -4077,7 +3209,6 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно золота'); }
 }
-
 function updateCharacterDisplay() {
 const char = CHARACTERS[game.currentEnemy];
 const img = document.getElementById('charImg');
@@ -4092,7 +3223,6 @@ container.style.border = '3px solid #fff';
 container.innerHTML = '<div style="color:#fff; text-align:center; padding: 20px;"><div style="font-size: 24px; font-weight: bold;">' + char.name + '</div></div>';
 };
 }
-
 function buyUpgrade(type, free = false) {
 let cost = game.costs[type];
 if (free || game.gold >= cost) {
@@ -4110,7 +3240,6 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно золота'); }
 }
-
 function buyAbilityUpgrade(abilityId) {
 const currentLevel = game.abilityLevels[abilityId];
 const cost = game.abilityUpgradeCosts[abilityId];
@@ -4135,7 +3264,6 @@ saveGame();
 showToast('❌ Недостаточно алмазов!');
 }
 }
-
 function activatePromoCode() {
 const input = document.getElementById('promoCodeInput');
 const code = input.value.trim().toUpperCase();
@@ -4155,7 +3283,6 @@ updateUI();
 saveGame();
 } else { showToast('❌ Неверный код!'); }
 }
-
 function buyPromoItem(item) {
 const items = {
 'gold1000': { cost: 5, gold: 1000 },
@@ -4182,7 +3309,6 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно алмазов!'); }
 }
-
 function openDevMenu() { document.getElementById('devPasswordModal').style.display = 'flex'; }
 function closeDevPasswordModal() { document.getElementById('devPasswordModal').style.display = 'none'; document.getElementById('devPasswordInput').value = ''; }
 function checkDevPassword() {
@@ -4294,9 +3420,6 @@ else if (ach.type === 'crit_total' && game.totalCrits >= 500) unlocked = true;
 else if (ach.type === 'gold_total_new' && game.totalGold >= 500000) unlocked = true;
 else if (ach.type === 'time_marathon' && game.totalPlayTime >= 6000) unlocked = true;
 else if (ach.type === 'win_legend' && game.totalWins >= 200) unlocked = true;
-else if (ach.type === 'raid_participation' && ach.id === 27 && game.raidParticipations >= 10) unlocked = true;
-else if (ach.type === 'raid_wins' && ach.id === 28 && game.raidWins >= 5) unlocked = true;
-else if (ach.type === 'raid_damage' && ach.id === 29 && game.totalRaidDamage >= 1000000) unlocked = true;
 if (unlocked) {
 game.achievements.push(ach.id);
 game.gold += ach.reward;
@@ -4490,8 +3613,6 @@ document.getElementById('statStreak').innerText = Math.min(game.loginStreak, 7);
 document.getElementById('statDiamonds').innerText = Math.floor(game.promoCurrency);
 document.getElementById('statRoulette').innerText = game.rouletteSpins;
 document.getElementById('statMaxCombo').innerText = game.maxCombo;
-document.getElementById('statRaids').innerText = game.raidParticipations;
-document.getElementById('statRaidWins').innerText = game.raidWins;
 const now = new Date();
 const tomorrow = new Date(now);
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -4506,7 +3627,6 @@ const nextLevelXP = getNextLevelXP();
 const xpPct = (game.xp / nextLevelXP) * 100;
 document.getElementById('xpFill').style.width = xpPct + '%';
 document.getElementById('xpText').innerText = game.xp + '/' + nextLevelXP + ' XP';
-updateSummonButton();
 }
 function renderAchievements() {
 const list = document.getElementById('achievementsList');
