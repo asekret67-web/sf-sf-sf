@@ -45,8 +45,8 @@ user-select: none;
 html, body {
 height: 100vh;
 width: 100vw;
-touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: разрешаем вертикальный скролл */
-overscroll-behavior: none; /* ✅ ИСПРАВЛЕНО: убираем блокировку скролла */
+touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: только вертикальный скролл */
+overscroll-behavior-y: contain; /* ✅ ИСПРАВЛЕНО: предотвращаем навигацию браузера */
 }
 body {
 font-family: 'Roboto', sans-serif;
@@ -136,8 +136,8 @@ padding: 20px;
 padding-bottom: 80px;
 animation: fadeIn 0.3s;
 -webkit-overflow-scrolling: touch;
-overscroll-behavior-y: auto; /* ✅ ИСПРАВЛЕНО: разрешаем скролл */
-touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: разрешаем вертикальный скролл */
+overscroll-behavior-y: contain; /* ✅ ИСПРАВЛЕНО: скролл работает */
+touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: вертикальный скролл */
 }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -466,6 +466,10 @@ max-width: 100%;
 filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
 transition: all 0.1s;
 pointer-events: none;
+opacity: 0; /* ✅ ИСПРАВЛЕНО: скрыто пока грузится */
+}
+.character-img.loaded {
+opacity: 1;
 }
 .character-img.hit {
 animation: hitShake 0.4s;
@@ -709,7 +713,7 @@ z-index: 300;
 padding-top: 80px;
 display: none;
 overflow-y: auto;
-overscroll-behavior-y: auto; /* ✅ ИСПРАВЛЕНО: скролл работает */
+overscroll-behavior-y: contain; /* ✅ ИСПРАВЛЕНО: скролл работает */
 -webkit-overflow-scrolling: touch;
 touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: скролл на телефоне */
 }
@@ -759,6 +763,8 @@ transition: all 0.2s;
 .btn-buy:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
 .btn-buy.purchased { background: #4caf50; cursor: default; }
 .btn-buy.purchased::after { content: ' ✓'; }
+.btn-buy.affordable { background: var(--green); opacity: 1; }
+.btn-buy.unaffordable { background: #444; opacity: 0.5; }
 .btn-dev {
 background: linear-gradient(135deg, #e040fb 0%, #aa00ff 100%);
 color: #fff; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px;
@@ -1945,6 +1951,11 @@ cursor: default;
 <div><div style="font-weight: bold;">💰 Золотой Удар</div><small style="color:#888">+5% золота за клик</small></div>
 <button class="btn-buy" id="btnBuyGold" onclick="buyUpgrade('goldBonus')"><span id="costGold">500</span> 💰</button>
 </div>
+<!-- ✅ НОВОЕ: Покупка энергии -->
+<div class="shop-item">
+<div><div style="font-weight: bold;">⚡ +50 Энергии</div><small style="color:#888">Мгновенное восстановление</small></div>
+<button class="btn-buy" id="btnBuyEnergyInstant" onclick="buyEnergy()">100 💰</button>
+</div>
 </div>
 <!-- НОВЫЙ ЭКРАН УЛУЧШЕНИЙ V3.0.1 -->
 <div id="screen-upgrades" class="screen">
@@ -2233,7 +2244,6 @@ cursor: default;
 <button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">🏆 Топ Игроков</h2>
 <div class="leaderboard-container">
-<!-- ✅ ИСПРАВЛЕНО: передача this в функцию -->
 <div class="leaderboard-tabs">
 <div class="leaderboard-tab active" onclick="switchLeaderboardTab('level', this)">📊 По уровню</div>
 <div class="leaderboard-tab" onclick="switchLeaderboardTab('clicks', this)">👆 По кликам</div>
@@ -3124,61 +3134,56 @@ console.log('⚠️ Firebase offline режим');
 }
 // ✅ ИСПРАВЛЕНА ФУНКЦИЯ ЗАГРУЗКИ ЛИДЕРБОРДА
 function loadLeaderboard() {
-    const leaderboardList = document.getElementById('leaderboardList');
-    if(!leaderboardList) return;
-    if (!db) {
-        leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">🌐 Требуется подключение к интернету</div>';
-        return;
-    }
-    
-    leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">⏳ Загрузка...</div>';
-    
-    let query;
-    switch(currentLeaderboardTab) {
-        case 'level': query = db.collection('players').orderBy('level', 'desc').limit(10); break;
-        case 'clicks': query = db.collection('players').orderBy('clicks', 'desc').limit(10); break;
-        case 'achievements': query = db.collection('players').orderBy('achievements', 'desc').limit(10); break;
-    }
-    if (!query) return;
-
-    query.get().then(snapshot => {
-        leaderboardList.innerHTML = '';
-        if (snapshot.empty) {
-            leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">📭 Пока нет игроков. Станьте первым!</div>';
-            return;
-        }
-        let rank = 1;
-        snapshot.forEach(doc => {
-            const player = doc.data();
-            const isMe = player.userId === game.userId;
-            const avatarDisplay = player.avatar ? `<img src="${player.avatar}" alt="Avatar">` : (player.username || '?').charAt(0).toUpperCase();
-            
-            leaderboardList.innerHTML += `
-                <div class="leaderboard-item ${isMe ? 'leaderboard-me' : ''}">
-                    <div class="leaderboard-rank">#${rank}</div>
-                    <div class="leaderboard-info">
-                        <div class="leaderboard-avatar">${avatarDisplay}</div>
-                        <div class="leaderboard-name">${player.username || 'Аноним'}</div>
-                    </div>
-                    <div class="leaderboard-value">${getValueByTab(player)}</div>
-                </div>`;
-            rank++;
-        });
-    }).catch(err => {
-        console.error('🔴 Ошибка загрузки лидерборда:', err.code, err.message);
-        // Если ошибка MISSING_INDEX, Firebase выдаст ссылку для создания
-        if(err.code === 'failed-precondition' && err.message.includes('index')) {
-            leaderboardList.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #888;">
-                    ⚠️ Требуется создание индекса<br>
-                    <a href="${err.message.match(/https:\/\/[^\s]+/)[0]}" target="_blank" style="color: var(--accent);">🔗 Создать индекс автоматически</a>
-                </div>`;
-        } else {
-            leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">❌ Ошибка загрузки. Проверьте интернет или правила Firestore.</div>';
-        }
-    });
+const leaderboardList = document.getElementById('leaderboardList');
+if(!leaderboardList) return;
+if (!db) {
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">🌐 Требуется подключение к интернету</div>';
+return;
 }
-
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">⏳ Загрузка...</div>';
+let query;
+switch(currentLeaderboardTab) {
+case 'level': query = db.collection('players').orderBy('level', 'desc').limit(10); break;
+case 'clicks': query = db.collection('players').orderBy('clicks', 'desc').limit(10); break;
+case 'achievements': query = db.collection('players').orderBy('achievements', 'desc').limit(10); break;
+}
+if (!query) return;
+query.get().then(snapshot => {
+leaderboardList.innerHTML = '';
+if (snapshot.empty) {
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">📭 Пока нет игроков. Станьте первым!</div>';
+return;
+}
+let rank = 1;
+snapshot.forEach(doc => {
+const player = doc.data();
+const isMe = player.userId === game.userId;
+const avatarDisplay = player.avatar ? `<img src="${player.avatar}" alt="Avatar">` : (player.username || '?').charAt(0).toUpperCase();
+leaderboardList.innerHTML += `
+<div class="leaderboard-item ${isMe ? 'leaderboard-me' : ''}">
+<div class="leaderboard-rank">#${rank}</div>
+<div class="leaderboard-info">
+<div class="leaderboard-avatar">${avatarDisplay}</div>
+<div class="leaderboard-name">${player.username || 'Аноним'}</div>
+</div>
+<div class="leaderboard-value">${getValueByTab(player)}</div>
+</div>`;
+rank++;
+});
+}).catch(err => {
+console.error('🔴 Ошибка загрузки лидерборда:', err.code, err.message);
+// Если ошибка MISSING_INDEX, Firebase выдаст ссылку для создания
+if(err.code === 'failed-precondition' && err.message.includes('index')) {
+leaderboardList.innerHTML = `
+<div style="text-align: center; padding: 40px; color: #888;">
+⚠️ Требуется создание индекса<br>
+<a href="${err.message.match(/https:\/\/[^\s]+/)[0]}" target="_blank" style="color: var(--accent);">🔗 Создать индекс автоматически</a>
+</div>`;
+} else {
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">❌ Ошибка загрузки. Проверьте интернет или правила Firestore.</div>';
+}
+});
+}
 function getValueByTab(player) {
 switch(currentLeaderboardTab) {
 case 'level': return '⭐ ' + (player.level || 1);
@@ -3187,15 +3192,13 @@ case 'achievements': return '🏆 ' + (player.achievements || 0);
 default: return '-';
 }
 }
-
 // ✅ ИСПРАВЛЕНА ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ТАБОВ
 function switchLeaderboardTab(tab, btn) {
-    currentLeaderboardTab = tab;
-    document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
-    if(btn) btn.classList.add('active'); // Безопасно меняем класс
-    loadLeaderboard(); // Перезагружаем данные
+currentLeaderboardTab = tab;
+document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
+if(btn) btn.classList.add('active'); // Безопасно меняем класс
+loadLeaderboard(); // Перезагружаем данные
 }
-
 function updatePlayTime() { game.totalPlayTime++; updateUI(); }
 function checkDailyReward() {
 const today = new Date().toISOString().split('T')[0];
@@ -3614,6 +3617,7 @@ if(resultEl) resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!'
 addXP(10);
 updateUI();
 }
+// ✅ НОВАЯ ФУНКЦИЯ: Покупка энергии
 function buyEnergy() {
 if (game.gold >= 100) {
 game.gold -= 100;
@@ -3625,15 +3629,26 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно золота'); }
 }
+// ✅ ИСПРАВЛЕНА: Загрузка изображения персонажа с заглушкой
 function updateCharacterDisplay() {
 const char = CHARACTERS[game.currentEnemy];
 const img = document.getElementById('charImg');
 const charDesc = document.getElementById('charDesc');
 if(!img || !char) return;
+
+// ✅ Скрываем пока грузится
+img.style.opacity = '0';
+img.classList.remove('loaded');
 img.src = char.img;
-if(charDesc) charDesc.textContent = char.desc;
+
+img.onload = function() {
+img.style.opacity = '1';
+img.classList.add('loaded');
 img.style.display = 'block';
+};
+
 img.onerror = function() {
+// ✅ Заглушка при ошибке
 this.style.display = 'none';
 const container = document.getElementById('charContainer');
 if(container) {
@@ -3643,6 +3658,8 @@ container.innerHTML = '<div style="color:#fff; text-align:center; padding: 20px;
 '<div style="font-size: 24px; font-weight: bold;">' + char.name + '</div></div>';
 }
 };
+
+if(charDesc) charDesc.textContent = char.desc;
 }
 function buyUpgrade(type, free = false) {
 let cost = game.costs[type];
@@ -4175,6 +4192,70 @@ const shopCritDmg = document.getElementById('shopCritDmg'); if(shopCritDmg) shop
 const costEnergy = document.getElementById('costEnergy'); if(costEnergy) costEnergy.innerText = game.costs.maxEnergy;
 const shopEnergy = document.getElementById('shopEnergy'); if(shopEnergy) shopEnergy.innerText = game.maxEnergy;
 const costGold = document.getElementById('costGold'); if(costGold) costGold.innerText = game.costs.goldBonus;
+
+// ✅ ПОДСВЕТКА ДОСТУПНЫХ ПОКУПОК В МАГАЗИНЕ
+const btnBuyDmg = document.getElementById('btnBuyDmg');
+if(btnBuyDmg) {
+if(game.gold >= game.costs.damage) {
+btnBuyDmg.classList.add('affordable');
+btnBuyDmg.classList.remove('unaffordable');
+} else {
+btnBuyDmg.classList.add('unaffordable');
+btnBuyDmg.classList.remove('affordable');
+}
+}
+const btnBuyCrit = document.getElementById('btnBuyCrit');
+if(btnBuyCrit) {
+if(game.gold >= game.costs.critChance) {
+btnBuyCrit.classList.add('affordable');
+btnBuyCrit.classList.remove('unaffordable');
+} else {
+btnBuyCrit.classList.add('unaffordable');
+btnBuyCrit.classList.remove('affordable');
+}
+}
+const btnBuyCritDmg = document.getElementById('btnBuyCritDmg');
+if(btnBuyCritDmg) {
+if(game.gold >= game.costs.critDamage) {
+btnBuyCritDmg.classList.add('affordable');
+btnBuyCritDmg.classList.remove('unaffordable');
+} else {
+btnBuyCritDmg.classList.add('unaffordable');
+btnBuyCritDmg.classList.remove('affordable');
+}
+}
+const btnBuyEnergy = document.getElementById('btnBuyEnergy');
+if(btnBuyEnergy) {
+if(game.gold >= game.costs.maxEnergy) {
+btnBuyEnergy.classList.add('affordable');
+btnBuyEnergy.classList.remove('unaffordable');
+} else {
+btnBuyEnergy.classList.add('unaffordable');
+btnBuyEnergy.classList.remove('affordable');
+}
+}
+const btnBuyGold = document.getElementById('btnBuyGold');
+if(btnBuyGold) {
+if(game.gold >= game.costs.goldBonus) {
+btnBuyGold.classList.add('affordable');
+btnBuyGold.classList.remove('unaffordable');
+} else {
+btnBuyGold.classList.add('unaffordable');
+btnBuyGold.classList.remove('affordable');
+}
+}
+// ✅ Кнопка покупки энергии
+const btnBuyEnergyInstant = document.getElementById('btnBuyEnergyInstant');
+if(btnBuyEnergyInstant) {
+if(game.gold >= 100) {
+btnBuyEnergyInstant.classList.add('affordable');
+btnBuyEnergyInstant.classList.remove('unaffordable');
+} else {
+btnBuyEnergyInstant.classList.add('unaffordable');
+btnBuyEnergyInstant.classList.remove('affordable');
+}
+}
+
 // [ИСПРАВЛЕНО] Обновление уровней и цен супер-способностей
 for(let i = 1; i <= 3; i++) {
 const lvlEl = document.getElementById(`ability${i}LevelDisplay`);
