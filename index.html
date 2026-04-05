@@ -45,8 +45,8 @@ user-select: none;
 html, body {
 height: 100vh;
 width: 100vw;
-touch-action: pan-x pan-y;
-overscroll-behavior: contain;
+touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: разрешаем вертикальный скролл */
+overscroll-behavior: none; /* ✅ ИСПРАВЛЕНО: убираем блокировку скролла */
 }
 body {
 font-family: 'Roboto', sans-serif;
@@ -136,7 +136,8 @@ padding: 20px;
 padding-bottom: 80px;
 animation: fadeIn 0.3s;
 -webkit-overflow-scrolling: touch;
-overscroll-behavior-y: contain;
+overscroll-behavior-y: auto; /* ✅ ИСПРАВЛЕНО: разрешаем скролл */
+touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: разрешаем вертикальный скролл */
 }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -313,6 +314,7 @@ overflow-y: auto;
 display: flex;
 flex-direction: column;
 align-items: stretch;
+touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: скролл в меню */
 }
 .side-nav-btn {
 background: rgba(255,255,255,0.05);
@@ -707,8 +709,9 @@ z-index: 300;
 padding-top: 80px;
 display: none;
 overflow-y: auto;
-overscroll-behavior-y: contain;
+overscroll-behavior-y: auto; /* ✅ ИСПРАВЛЕНО: скролл работает */
 -webkit-overflow-scrolling: touch;
+touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: скролл на телефоне */
 }
 #screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-quests.active, #screen-upgrades.active {
 display: block;
@@ -1121,6 +1124,7 @@ border-radius: 10px;
 padding: 15px;
 max-height: 400px;
 overflow-y: auto;
+touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: скролл списка */
 }
 .leaderboard-item {
 display: flex;
@@ -2229,10 +2233,11 @@ cursor: default;
 <button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">🏆 Топ Игроков</h2>
 <div class="leaderboard-container">
+<!-- ✅ ИСПРАВЛЕНО: передача this в функцию -->
 <div class="leaderboard-tabs">
-<div class="leaderboard-tab active" onclick="switchLeaderboardTab('level')">📊 По уровню</div>
-<div class="leaderboard-tab" onclick="switchLeaderboardTab('clicks')">👆 По кликам</div>
-<div class="leaderboard-tab" onclick="switchLeaderboardTab('achievements')">🏆 По достижениям</div>
+<div class="leaderboard-tab active" onclick="switchLeaderboardTab('level', this)">📊 По уровню</div>
+<div class="leaderboard-tab" onclick="switchLeaderboardTab('clicks', this)">👆 По кликам</div>
+<div class="leaderboard-tab" onclick="switchLeaderboardTab('achievements', this)">🏆 По достижениям</div>
 </div>
 <div class="leaderboard-list" id="leaderboardList">
 <div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>
@@ -2666,11 +2671,13 @@ saveGame(true);
 window.addEventListener('unhandledrejection', function(e) {
 console.error('🔴 Необработанное Promise:', e.reason);
 });
+// ✅ ИСПРАВЛЕНО: Скролл на телефоне - не блокируем вертикальное перемещение
 document.addEventListener('touchmove', function(e) {
+// Разрешаем скролл, блокируем только зум
 if (e.scale !== 1) {
 e.preventDefault();
 }
-}, { passive: false });
+}, { passive: true }); // ✅ passive: true улучшает производительность скролла
 document.addEventListener('contextmenu', function(e) {
 e.preventDefault();
 });
@@ -3115,45 +3122,63 @@ console.log('✅ Данные сохранены в Firebase');
 console.log('⚠️ Firebase offline режим');
 });
 }
+// ✅ ИСПРАВЛЕНА ФУНКЦИЯ ЗАГРУЗКИ ЛИДЕРБОРДА
 function loadLeaderboard() {
-const leaderboardList = document.getElementById('leaderboardList');
-if(!leaderboardList) return;
-if (!db) {
-leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">' +
-'🌐 Требуется подключение к интернету</div>';
-return;
+    const leaderboardList = document.getElementById('leaderboardList');
+    if(!leaderboardList) return;
+    if (!db) {
+        leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">🌐 Требуется подключение к интернету</div>';
+        return;
+    }
+    
+    leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">⏳ Загрузка...</div>';
+    
+    let query;
+    switch(currentLeaderboardTab) {
+        case 'level': query = db.collection('players').orderBy('level', 'desc').limit(10); break;
+        case 'clicks': query = db.collection('players').orderBy('clicks', 'desc').limit(10); break;
+        case 'achievements': query = db.collection('players').orderBy('achievements', 'desc').limit(10); break;
+    }
+    if (!query) return;
+
+    query.get().then(snapshot => {
+        leaderboardList.innerHTML = '';
+        if (snapshot.empty) {
+            leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">📭 Пока нет игроков. Станьте первым!</div>';
+            return;
+        }
+        let rank = 1;
+        snapshot.forEach(doc => {
+            const player = doc.data();
+            const isMe = player.userId === game.userId;
+            const avatarDisplay = player.avatar ? `<img src="${player.avatar}" alt="Avatar">` : (player.username || '?').charAt(0).toUpperCase();
+            
+            leaderboardList.innerHTML += `
+                <div class="leaderboard-item ${isMe ? 'leaderboard-me' : ''}">
+                    <div class="leaderboard-rank">#${rank}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-avatar">${avatarDisplay}</div>
+                        <div class="leaderboard-name">${player.username || 'Аноним'}</div>
+                    </div>
+                    <div class="leaderboard-value">${getValueByTab(player)}</div>
+                </div>`;
+            rank++;
+        });
+    }).catch(err => {
+        console.error('🔴 Ошибка загрузки лидерборда:', err.code, err.message);
+        // Если ошибка MISSING_INDEX, Firebase выдаст ссылку для создания
+        if(err.code === 'failed-precondition' && err.message.includes('index')) {
+            leaderboardList.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #888;">
+                    ⚠️ Требуется создание индекса<br>
+                    <a href="${err.message.match(/https:\/\/[^\s]+/)[0]}" target="_blank" style="color: var(--accent);">🔗 Создать индекс автоматически</a>
+                </div>`;
+        } else {
+            leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">❌ Ошибка загрузки. Проверьте интернет или правила Firestore.</div>';
+        }
+    });
 }
-leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
-let query;
-switch(currentLeaderboardTab) {
-case 'level':
-query = db.collection('players').orderBy('level', 'desc').limit(10);
-break;
-case 'clicks':
-query = db.collection('players').orderBy('clicks', 'desc').limit(10);
-break;
-case 'achievements':
-query = db.collection('players').orderBy('achievements', 'desc').limit(10);
-break;
-}
-if (!query) return;
-query.get().then(snapshot => {
-leaderboardList.innerHTML = '';
-let rank = 1;
-snapshot.forEach(doc => {
-const player = doc.data();
-const isMe = player.userId === game.userId;
-const avatarDisplay = player.avatar ? '<img src="' + player.avatar + '" alt="Avatar">' : (player.username || 'A').charAt(0).toUpperCase();
-leaderboardList.innerHTML += '<div class="leaderboard-item ' + (isMe ? 'leaderboard-me' : '') + '"><div class="leaderboard-rank">#' + rank + '</div><div class="leaderboard-info"><div class="leaderboard-avatar">' + avatarDisplay + '</div><div class="leaderboard-name">' + (player.username || 'Аноним') + '</div></div><div class="leaderboard-value">' + getValueByTab(player) + '</div></div>';
-rank++;
-});
-if (snapshot.empty) leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Пока нет игроков</div>';
-}).catch(err => {
-console.log('⚠️ Ошибка лидерборда (возможно нужны индексы):', err);
-leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">' +
-'Таблица лидеров недоступна<br><small>Требуется подключение или индексы Firebase</small></div>';
-});
-}
+
 function getValueByTab(player) {
 switch(currentLeaderboardTab) {
 case 'level': return '⭐ ' + (player.level || 1);
@@ -3162,12 +3187,15 @@ case 'achievements': return '🏆 ' + (player.achievements || 0);
 default: return '-';
 }
 }
-function switchLeaderboardTab(tab) {
-currentLeaderboardTab = tab;
-document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
-if(event && event.target) event.target.classList.add('active');
-loadLeaderboard();
+
+// ✅ ИСПРАВЛЕНА ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ТАБОВ
+function switchLeaderboardTab(tab, btn) {
+    currentLeaderboardTab = tab;
+    document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
+    if(btn) btn.classList.add('active'); // Безопасно меняем класс
+    loadLeaderboard(); // Перезагружаем данные
 }
+
 function updatePlayTime() { game.totalPlayTime++; updateUI(); }
 function checkDailyReward() {
 const today = new Date().toISOString().split('T')[0];
@@ -4137,7 +4165,6 @@ function updateUI() {
 if(uiUpdateTimeout) clearTimeout(uiUpdateTimeout);
 uiUpdateTimeout = setTimeout(() => {
 const char = CHARACTERS[game.currentEnemy];
-
 // [ИСПРАВЛЕНО] Обновление цен и текущих значений в магазине
 const costDmg = document.getElementById('costDmg'); if(costDmg) costDmg.innerText = game.costs.damage;
 const shopDmg = document.getElementById('shopDmg'); if(shopDmg) shopDmg.innerText = game.damage;
@@ -4148,23 +4175,21 @@ const shopCritDmg = document.getElementById('shopCritDmg'); if(shopCritDmg) shop
 const costEnergy = document.getElementById('costEnergy'); if(costEnergy) costEnergy.innerText = game.costs.maxEnergy;
 const shopEnergy = document.getElementById('shopEnergy'); if(shopEnergy) shopEnergy.innerText = game.maxEnergy;
 const costGold = document.getElementById('costGold'); if(costGold) costGold.innerText = game.costs.goldBonus;
-
 // [ИСПРАВЛЕНО] Обновление уровней и цен супер-способностей
 for(let i = 1; i <= 3; i++) {
-    const lvlEl = document.getElementById(`ability${i}LevelDisplay`);
-    const costEl = document.getElementById(`ability${i}Cost`);
-    const btnEl = document.getElementById(`btnAbility${i}Upgrade`);
-    if(lvlEl) lvlEl.innerText = `Ур.${game.abilityLevels[i]}`;
-    if(costEl) costEl.innerText = game.abilityUpgradeCosts[i];
-    if(btnEl) {
-        const isMaxed = game.abilityLevels[i] >= 30;
-        const canAfford = game.promoCurrency >= game.abilityUpgradeCosts[i];
-        btnEl.disabled = isMaxed || !canAfford;
-        btnEl.innerText = isMaxed ? 'МАКС' : 'Улучшить';
-        if(isMaxed) btnEl.classList.add('purchased'); else btnEl.classList.remove('purchased');
-    }
+const lvlEl = document.getElementById(`ability${i}LevelDisplay`);
+const costEl = document.getElementById(`ability${i}Cost`);
+const btnEl = document.getElementById(`btnAbility${i}Upgrade`);
+if(lvlEl) lvlEl.innerText = `Ур.${game.abilityLevels[i]}`;
+if(costEl) costEl.innerText = game.abilityUpgradeCosts[i];
+if(btnEl) {
+const isMaxed = game.abilityLevels[i] >= 30;
+const canAfford = game.promoCurrency >= game.abilityUpgradeCosts[i];
+btnEl.disabled = isMaxed || !canAfford;
+btnEl.innerText = isMaxed ? 'МАКС' : 'Улучшить';
+if(isMaxed) btnEl.classList.add('purchased'); else btnEl.classList.remove('purchased');
 }
-
+}
 const uiGold = document.getElementById('uiGold');
 const uiDiamonds = document.getElementById('uiDiamonds');
 const uiPrestigeChips = document.getElementById('uiPrestigeChips');
