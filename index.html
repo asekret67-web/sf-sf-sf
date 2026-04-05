@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="appe-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0a0a">
-<title>SHADOW STRIKE - Глава 1 & 2</title>
+<title>SHADOW STRIKE V3.0.1 - Глава 1 & 2</title>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -27,6 +27,12 @@
 --xp-gold: #ffd700;
 --prestige: #9c27b0;
 --quest: #00e5ff;
+--crit: #ff5722;
+--luck: #9c27b0;
+--auto: #00bcd4;
+--dmg: #f44336;
+--gold: #ffd700;
+--combo: #ff9800;
 }
 * {
 margin: 0;
@@ -444,6 +450,7 @@ justify-content: center;
 cursor: pointer;
 transition: transform 0.1s;
 margin-top: 10px;
+z-index: 10;
 }
 .char-container.disabled {
 pointer-events: none;
@@ -456,6 +463,7 @@ max-height: 100%;
 max-width: 100%;
 filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
 transition: all 0.1s;
+pointer-events: none;
 }
 .character-img.hit {
 animation: hitShake 0.4s;
@@ -488,6 +496,7 @@ text-align: center;
 max-width: 300px;
 border: 1px solid rgba(255,255,255,0.2);
 backdrop-filter: blur(5px);
+pointer-events: none;
 }
 .char-desc-text {
 font-size: 13px;
@@ -686,7 +695,7 @@ pointer-events: none;
 transition: opacity 0.3s;
 }
 .transition-effect.active { opacity: 1; }
-#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-quests {
+#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-quests, #screen-upgrades {
 position: fixed;
 top: 0;
 left: 0;
@@ -701,7 +710,7 @@ overflow-y: auto;
 overscroll-behavior-y: contain;
 -webkit-overflow-scrolling: touch;
 }
-#screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-quests.active {
+#screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-quests.active, #screen-upgrades.active {
 display: block;
 animation: fadeIn 0.3s;
 }
@@ -1655,6 +1664,90 @@ color: var(--accent);
 .community-stat-value.online {
 color: var(--green);
 }
+/* Upgrades Screen V3.0.1 */
+.upgrades-container {
+padding: 20px;
+}
+.upgrade-category {
+margin-bottom: 30px;
+}
+.upgrade-category-title {
+font-size: 20px;
+font-weight: bold;
+color: var(--accent);
+margin-bottom: 15px;
+text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+}
+.upgrade-item {
+background: rgba(255,255,255,0.05);
+padding: 15px;
+margin-bottom: 10px;
+border-radius: 10px;
+display: flex;
+justify-content: space-between;
+align-items: center;
+border: 1px solid rgba(255,255,255,0.1);
+transition: all 0.2s;
+}
+.upgrade-item:hover {
+background: rgba(255,255,255,0.08);
+border-color: var(--accent);
+}
+.upgrade-info {
+flex: 1;
+}
+.upgrade-name {
+font-weight: bold;
+font-size: 16px;
+color: #fff;
+margin-bottom: 5px;
+}
+.upgrade-desc {
+font-size: 12px;
+color: #888;
+margin-bottom: 5px;
+}
+.upgrade-level {
+font-size: 12px;
+color: var(--xp-gold);
+}
+.upgrade-cost {
+font-size: 14px;
+color: var(--accent);
+font-weight: bold;
+margin-left: 15px;
+}
+.btn-upgrade {
+background: var(--accent);
+color: #fff;
+border: none;
+padding: 10px 20px;
+border-radius: 8px;
+font-weight: bold;
+cursor: pointer;
+min-width: 100px;
+transition: all 0.2s;
+}
+.btn-upgrade:hover:not(:disabled) {
+transform: translateY(-2px);
+box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+}
+.btn-upgrade:disabled {
+background: #444;
+cursor: not-allowed;
+opacity: 0.5;
+}
+.btn-upgrade.maxed {
+background: #4caf50;
+cursor: default;
+}
+/* Color variants for upgrade types */
+.upgrade-item.crit { border-left: 3px solid var(--crit); }
+.upgrade-item.luck { border-left: 3px solid var(--luck); }
+.upgrade-item.auto { border-left: 3px solid var(--auto); }
+.upgrade-item.dmg { border-left: 3px solid var(--dmg); }
+.upgrade-item.gold { border-left: 3px solid var(--gold); }
+.upgrade-item.combo { border-left: 3px solid var(--combo); }
 @media (max-width: 480px) {
 .loading-text { font-size: 20px; }
 .loading-bar-bg { width: 250px; }
@@ -1671,6 +1764,9 @@ color: var(--green);
 .slot-reel { width: 60px; height: 80px; font-size: 36px; }
 .abilities-bar { bottom: 80px; }
 .ability-btn { width: 50px; height: 50px; font-size: 20px; }
+.upgrade-item { flex-direction: column; align-items: flex-start; }
+.upgrade-cost { margin-left: 0; margin-top: 10px; }
+.btn-upgrade { width: 100%; margin-top: 10px; }
 }
 @media (max-width: 360px) {
 .loading-text { font-size: 18px; }
@@ -1686,7 +1782,7 @@ color: var(--green);
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
-<div class="version-badge" id="versionBadge">V3.0.3</div>
+<div class="version-badge" id="versionBadge">V3.0.1</div>
 <div class="loading-logo">⚔️</div>
 <div class="loading-text">SHADOW STRIKE</div>
 <div class="loading-bar-bg">
@@ -1779,6 +1875,9 @@ color: var(--green);
 <button class="side-nav-btn" onclick="switchScreen('shop', this)">
 <span class="side-nav-icon">🛒</span><span>Магазин</span>
 </button>
+<button class="side-nav-btn" onclick="switchScreen('upgrades', this)">
+<span class="side-nav-icon">⬆️</span><span>Улучшения</span>
+</button>
 <button class="side-nav-btn" onclick="switchScreen('quests', this)">
 <span class="side-nav-icon">📋</span><span>Квесты</span>
 <span class="badge" id="questBadge" style="display:none;">!</span>
@@ -1823,10 +1922,6 @@ color: var(--green);
 <button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">⚔️ Магазин</h2>
 <div class="shop-item">
-<div><div style="font-weight: bold;">⚡ +50 Энергии</div><small style="color:#888">Мгновенное восстановление</small></div>
-<button class="btn-buy" onclick="buyEnergy()" style="background: #2196F3;">100 💰</button>
-</div>
-<div class="shop-item">
 <div><div style="font-weight: bold;">⚔️ Урон +1</div><small style="color:#888">Текущий: <span id="shopDmg">1</span></small></div>
 <button class="btn-buy" id="btnBuyDmg" onclick="buyUpgrade('damage')"><span id="costDmg">25</span> 💰</button>
 </div>
@@ -1845,6 +1940,82 @@ color: var(--green);
 <div class="shop-item">
 <div><div style="font-weight: bold;">💰 Золотой Удар</div><small style="color:#888">+5% золота за клик</small></div>
 <button class="btn-buy" id="btnBuyGold" onclick="buyUpgrade('goldBonus')"><span id="costGold">500</span> 💰</button>
+</div>
+</div>
+<!-- НОВЫЙ ЭКРАН УЛУЧШЕНИЙ V3.0.1 -->
+<div id="screen-upgrades" class="screen">
+<button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
+<h2 style="margin: 20px 0; text-align: center;">⬆️ Улучшения</h2>
+<div class="upgrades-container">
+<div class="upgrade-category">
+<div class="upgrade-category-title">⚔️ Боевые Улучшения</div>
+<div class="upgrade-item dmg">
+<div class="upgrade-info">
+<div class="upgrade-name">Сила Удара</div>
+<div class="upgrade-desc">+1 к базовому урону</div>
+<div class="upgrade-level">Уровень: <span id="dmgLevel">0</span>/100</div>
+</div>
+<div class="upgrade-cost"><span id="dmgCost">25</span> 💰</div>
+<button class="btn-upgrade" id="btnDmgUpgrade" onclick="buyDmgUpgrade()">Улучшить</button>
+</div>
+<div class="upgrade-item crit">
+<div class="upgrade-info">
+<div class="upgrade-name">Шанс Крита</div>
+<div class="upgrade-desc">+1% шанс критического удара</div>
+<div class="upgrade-level">Уровень: <span id="critChanceLevel">0</span>/50</div>
+</div>
+<div class="upgrade-cost"><span id="critChanceCost">100</span> 💰</div>
+<button class="btn-upgrade" id="btnCritChanceUpgrade" onclick="buyCritChanceUpgrade()">Улучшить</button>
+</div>
+<div class="upgrade-item crit">
+<div class="upgrade-info">
+<div class="upgrade-name">Крит. Урон</div>
+<div class="upgrade-desc">+10% к критическому урону</div>
+<div class="upgrade-level">Уровень: <span id="critDmgLevel">0</span>/50</div>
+</div>
+<div class="upgrade-cost"><span id="critDmgCost">200</span> 💰</div>
+<button class="btn-upgrade" id="btnCritDmgUpgrade" onclick="buyCritDmgUpgrade()">Улучшить</button>
+</div>
+</div>
+<div class="upgrade-category">
+<div class="upgrade-category-title">🎯 Специальные Улучшения</div>
+<div class="upgrade-item auto">
+<div class="upgrade-info">
+<div class="upgrade-name">Авто-Кликер</div>
+<div class="upgrade-desc">Автоматически атакует врага</div>
+<div class="upgrade-level">Уровень: <span id="autoClickerLevel">0</span>/10</div>
+</div>
+<div class="upgrade-cost"><span id="autoClickerCost">5000</span> 💰</div>
+<button class="btn-upgrade" id="btnAutoClickerUpgrade" onclick="buyAutoClickerUpgrade()">Улучшить</button>
+</div>
+<div class="upgrade-item luck">
+<div class="upgrade-info">
+<div class="upgrade-name">Удача</div>
+<div class="upgrade-desc">Шанс на дополнительный дроп</div>
+<div class="upgrade-level">Уровень: <span id="luckLevel">0</span>/20</div>
+</div>
+<div class="upgrade-cost"><span id="luckCost">2000</span> 💰</div>
+<button class="btn-upgrade" id="btnLuckUpgrade" onclick="buyLuckUpgrade()">Улучшить</button>
+</div>
+<div class="upgrade-item combo">
+<div class="upgrade-info">
+<div class="upgrade-name">Комбо Бонус</div>
+<div class="upgrade-desc">+1% бонус за комбо</div>
+<div class="upgrade-level">Уровень: <span id="comboBonusLevel">0</span>/20</div>
+</div>
+<div class="upgrade-cost"><span id="comboBonusCost">3000</span> 💰</div>
+<button class="btn-upgrade" id="btnComboBonusUpgrade" onclick="buyComboBonusUpgrade()">Улучшить</button>
+</div>
+<div class="upgrade-item gold">
+<div class="upgrade-info">
+<div class="upgrade-name">Золотой Бонус</div>
+<div class="upgrade-desc">+5% золота за клик</div>
+<div class="upgrade-level">Уровень: <span id="goldBonusLevel">0</span>/20</div>
+</div>
+<div class="upgrade-cost"><span id="goldBonusCost">500</span> 💰</div>
+<button class="btn-upgrade" id="btnGoldBonusUpgrade" onclick="buyGoldBonusUpgrade()">Улучшить</button>
+</div>
+</div>
 </div>
 </div>
 <div id="screen-quests" class="screen">
@@ -1877,7 +2048,6 @@ color: var(--green);
 <div class="xp-text"><span id="xpText">0/100 XP</span></div>
 </div>
 </div>
-<!-- ✅ НОВАЯ СЕКЦИЯ: Статистика сообщества -->
 <div class="community-stats">
 <div class="community-stats-title">🌍 СТАТИСТИКА СООБЩЕСТВА</div>
 <div class="community-stat-row">
@@ -1920,10 +2090,6 @@ color: var(--green);
 <div class="promo-shop-item">
 <div><div style="font-weight: bold;">💰 5000 Золота</div><small style="color:#888">Мгновенное получение</small></div>
 <button class="btn-promo-buy" onclick="buyPromoItem('gold5000')">20 💎</button>
-</div>
-<div class="promo-shop-item">
-<div><div style="font-weight: bold;">⚡ Полная энергия</div><small style="color:#888">Восстановление энергии</small></div>
-<button class="btn-promo-buy" onclick="buyPromoItem('energy')">3 💎</button>
 </div>
 <div class="promo-shop-item">
 <div><div style="font-weight: bold;">⚔️ Урон +5</div><small style="color:#888">Постоянное улучшение</small></div>
@@ -2167,9 +2333,20 @@ messagingSenderId: "370402326490",
 appId: "1:370402326490:web:5f6212bbd7e24fc10ab2e3",
 measurementId: "G-74F5V4RP0Z"
 };
+let db = null;
+let auth = null;
+if (typeof firebase !== 'undefined') {
+try {
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+db = firebase.firestore();
+auth = firebase.auth();
+console.log('✅ Firebase инициализирован');
+} catch(e) {
+console.log('⚠️ Firebase не доступен, работа в офлайн режиме');
+}
+} else {
+console.log('⚠️ Firebase SDK не загружен');
+}
 // ================= КОНФИГУРАЦИЯ ПЕРСОНАЖЕЙ =================
 const CHARACTERS = {
 shin: { name: 'Клинок Рассвета', hp: 3000, img: 'images/shin.png', bgImg: 'backgrounds/shin.jpg', desc: 'Ловкий и стремительный боец, мастер быстрых атак и уклонений. Его стиль напоминает первые лучи солнца — внезапный и ослепляющий.', achievementId: 1, order: 1, rounds: 1, chapter: 1, prestigeValue: 10 },
@@ -2186,7 +2363,6 @@ crane: { name: 'Белый Журавль', hp: 1000000, img: 'images/crane.png'
 master: { name: 'Мастер Безмолвия', hp: 3000000, img: 'images/master.png', bgImg: 'backgrounds/master.jpg', desc: 'Загадочный и могущественный наставник. Его сила безгранична.', achievementId: 12, isBoss: true, order: 12, rounds: 2, chapter: 2, prestigeValue: 500 }
 };
 const CHARACTER_ORDER = ['shin', 'brick', 'needle', 'ghost', 'dandy', 'lynx', 'guardian', 'bull', 'keeper', 'tiger', 'crane', 'master'];
-// 🔢 15 ПРОМО КОДОВ
 let promoCodes = {
 'START2026': { gold: 1000, promo: 3, used: false },
 'WELCOME': { gold: 1000, promo: 3, used: false },
@@ -2205,8 +2381,7 @@ let promoCodes = {
 'POWERUP': { gold: 1000, promo: 5, used: false }
 };
 let stats = { totalPromoActivations: 0, energyPurchases: 0, jackpotWins: 0 };
-let gameVersion = 'V3.0.3';
-// 📊 20 УРОВНЕЙ РАНГОВ
+let gameVersion = 'V3.0.1';
 const RANKS = [
 { level: 1, name: 'Новичок', xpRequired: 100, reward: { gold: 0, diamonds: 0 } },
 { level: 2, name: 'Ученик', xpRequired: 250, reward: { gold: 100, diamonds: 1 } },
@@ -2229,7 +2404,6 @@ const RANKS = [
 { level: 19, name: 'Божество', xpRequired: 500000, reward: { gold: 50000, diamonds: 120 } },
 { level: 20, name: 'Повелитель Теней', xpRequired: 1200000, reward: { gold: 120000, diamonds: 150 } }
 ];
-// 🏆 26 ДОСТИЖЕНИЙ
 const ACHIEVEMENTS = [
 { id: 1, name: 'Победа над Клинком', desc: 'Победите Клинка Рассвета', reward: 100, diamondReward: 1, current: 0, required: 1, type: 'boss' },
 { id: 2, name: 'Стена разрушена', desc: 'Победите Стальную Стену', reward: 250, diamondReward: 1, current: 0, required: 1, type: 'boss' },
@@ -2267,7 +2441,6 @@ const DAILY_REWARDS = [
 { day: 6, gold: 1000, promo: 10 },
 { day: 7, gold: 2000, promo: 20 }
 ];
-// 📋 ЕЖЕДНЕВНЫЕ КВЕСТЫ (ИСПРАВЛЕНО)
 const QUEST_TEMPLATES = [
 { id: 'clicks_100', name: 'Начинающий боец', desc: 'Сделайте 100 кликов', type: 'clicks', target: 100, reward: { gold: 200, diamonds: 2 } },
 { id: 'clicks_500', name: 'Опытный боец', desc: 'Сделайте 500 кликов', type: 'clicks', target: 500, reward: { gold: 500, diamonds: 5 } },
@@ -2316,60 +2489,82 @@ lastDailyClaim: null,
 dailyStreak: 0,
 dailyQuests: [],
 lastQuestUpdate: null,
-questProgress: {}
+questProgress: {},
+totalKills: 0,
+// НОВЫЕ УЛУЧШЕНИЯ V3.0.1
+dmgLevel: 0,
+dmgCost: 25,
+critChanceLevel: 0,
+critChanceCost: 100,
+critDmgLevel: 0,
+critDmgCost: 200,
+autoClickerLevel: 0,
+autoClickerCost: 5000,
+luckLevel: 0,
+luckCost: 2000,
+comboBonusLevel: 0,
+comboBonusCost: 3000,
+goldBonusLevel: 0,
+goldBonusCost: 500
 };
-let autoSaveInterval, energyRegenInterval;
+let autoSaveInterval, energyRegenInterval, abilityInterval,
+freeSpinInterval, questInterval, communityStatsInterval,
+onlineStatusInterval, questTimerInterval, achievementInterval,
+questProgressInterval, playTimeInterval, comboInterval, autoClickerInterval;
+let communityStatsUnsubscribe;
 let countdownInterval;
 let rouletteSpinning = false;
 let currentLeaderboardTab = 'level';
-let abilityInterval = null;
-let freeSpinInterval = null;
-let questInterval = null;
-let communityStatsUnsubscribe = null;
-
+let uiUpdateTimeout;
+let saveTimeout;
 // ================= ФУНКЦИИ НАВИГАЦИИ =================
 function toggleSideNav() {
 const sideNav = document.getElementById('sideNav');
 const overlay = document.getElementById('sideNavOverlay');
-sideNav.classList.toggle('active');
-overlay.classList.toggle('active');
+if(sideNav) sideNav.classList.toggle('active');
+if(overlay) overlay.classList.toggle('active');
 }
 function switchScreen(screenId, btn) {
 toggleSideNav();
 if (screenId === 'battle') {
 closeAllTabs();
 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-document.getElementById('screen-battle').classList.add('active');
+const battleScreen = document.getElementById('screen-battle');
+if(battleScreen) battleScreen.classList.add('active');
 if(btn) {
 document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
 btn.classList.add('active');
 }
 return;
 }
-if (['shop', 'profile', 'promo', 'roulette', 'prestige', 'leaderboard', 'dev', 'quests'].includes(screenId)) {
+if (['shop', 'profile', 'promo', 'roulette', 'prestige', 'leaderboard', 'dev', 'quests', 'upgrades'].includes(screenId)) {
 document.querySelectorAll('.screen').forEach(s => {
 if(s.id !== 'screen-' + screenId) s.classList.remove('active');
 });
-document.getElementById('screen-' + screenId).classList.add('active');
+const targetScreen = document.getElementById('screen-' + screenId);
+if(targetScreen) targetScreen.classList.add('active');
 document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
 if(btn) btn.classList.add('active');
-if (screenId === 'profile') { 
-    renderAchievements(); 
-    updateUserInfo(); 
-    loadCommunityStats(); // ✅ Загрузка статистики сообщества
+if (screenId === 'profile') {
+renderAchievements();
+updateUserInfo();
+loadCommunityStats();
 }
 if (screenId === 'prestige') { updatePrestigeUI(); }
 if (screenId === 'leaderboard') { loadLeaderboard(); }
 if (screenId === 'quests') { renderQuests(); }
+if (screenId === 'upgrades') { updateUpgradesUI(); }
 }
 }
 function closeAllTabs() {
-document.querySelectorAll('#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-quests').forEach(s => {
+document.querySelectorAll('#screen-shop, #screen-profile, #screen-promo, #screen-dev, #screen-roulette, #screen-leaderboard, #screen-prestige, #screen-quests, #screen-upgrades').forEach(s => {
 s.classList.remove('active');
 });
-document.getElementById('screen-battle').classList.add('active');
+const battleScreen = document.getElementById('screen-battle');
+if(battleScreen) battleScreen.classList.add('active');
 document.querySelectorAll('.side-nav-btn').forEach(b => b.classList.remove('active'));
-document.querySelector('.side-nav-btn:first-child').classList.add('active');
+const firstBtn = document.querySelector('.side-nav-btn:first-child');
+if(firstBtn) firstBtn.classList.add('active');
 }
 window.onload = function() {
 showLoadingScreen();
@@ -2384,14 +2579,14 @@ if (progress >= 100) {
 progress = 100;
 clearInterval(loadInterval);
 setTimeout(() => {
-loadingScreen.classList.add('hidden');
+if(loadingScreen) loadingScreen.classList.add('hidden');
 setTimeout(() => {
-loadingScreen.style.display = 'none';
+if(loadingScreen) loadingScreen.style.display = 'none';
 initGame();
 }, 500);
 }, 500);
 }
-loadingBar.style.width = progress + '%';
+if(loadingBar) loadingBar.style.width = progress + '%';
 }, 200);
 }
 function initGame() {
@@ -2408,10 +2603,11 @@ startAbilityTimer();
 updateOnlineStatus();
 startFreeSpinTimer();
 initDailyQuests();
-setInterval(updateOnlineStatus, 30000);
-setInterval(updateFreeSpinTimer, 1000);
-setInterval(updateQuestTimer, 1000);
-setInterval(loadCommunityStats, 30000); // ✅ Обновление статистики каждые 30 сек
+startAutoClicker();
+onlineStatusInterval = setInterval(updateOnlineStatus, 30000);
+freeSpinInterval = setInterval(updateFreeSpinTimer, 1000);
+questTimerInterval = setInterval(updateQuestTimer, 1000);
+communityStatsInterval = setInterval(loadCommunityStats, 30000);
 autoSaveInterval = setInterval(() => { saveGame(true); syncWithFirebase(); }, 10000);
 energyRegenInterval = setInterval(() => {
 if(game.energy < game.maxEnergy) {
@@ -2420,16 +2616,17 @@ if(game.energy > game.maxEnergy) game.energy = game.maxEnergy;
 updateUI();
 }
 }, 60000);
-setInterval(checkAchievements, 2000);
-setInterval(checkQuestProgress, 2000);
-setInterval(updatePlayTime, 60000);
-setInterval(() => {
+achievementInterval = setInterval(checkAchievements, 2000);
+questProgressInterval = setInterval(checkQuestProgress, 2000);
+playTimeInterval = setInterval(updatePlayTime, 60000);
+comboInterval = setInterval(() => {
 if(Date.now() - game.lastComboTime > 3000 && game.comboCount > 0) {
 game.comboCount = 0;
 updateComboUI();
 }
 }, 1000);
 const charContainer = document.getElementById('charContainer');
+if(charContainer) {
 charContainer.addEventListener('touchstart', function(e) {
 if (e.cancelable) { e.preventDefault(); }
 handleAttack(e.touches[0].clientX, e.touches[0].clientY);
@@ -2437,44 +2634,74 @@ handleAttack(e.touches[0].clientX, e.touches[0].clientY);
 charContainer.addEventListener('mousedown', function(e) {
 handleAttack(e.clientX, e.clientY);
 });
+}
 document.addEventListener('click', initAudio, { once: true });
 document.addEventListener('keydown', function(e) {
 if(e.key === '1') useAbility(1);
 if(e.key === '2') useAbility(2);
 if(e.key === '3') useAbility(3);
 });
-window.addEventListener('beforeunload', () => { saveGame(true); syncWithFirebase(); });
+window.addEventListener('beforeunload', () => {
+if(autoSaveInterval) clearInterval(autoSaveInterval);
+if(energyRegenInterval) clearInterval(energyRegenInterval);
+if(abilityInterval) clearInterval(abilityInterval);
+if(onlineStatusInterval) clearInterval(onlineStatusInterval);
+if(freeSpinInterval) clearInterval(freeSpinInterval);
+if(questTimerInterval) clearInterval(questTimerInterval);
+if(communityStatsInterval) clearInterval(communityStatsInterval);
+if(achievementInterval) clearInterval(achievementInterval);
+if(questProgressInterval) clearInterval(questProgressInterval);
+if(playTimeInterval) clearInterval(playTimeInterval);
+if(comboInterval) clearInterval(comboInterval);
+if(autoClickerInterval) clearInterval(autoClickerInterval);
+if(communityStatsUnsubscribe) communityStatsUnsubscribe();
+saveGame(true);
+syncWithFirebase();
+});
+window.addEventListener('error', function(e) {
+console.error('🔴 Глобальная ошибка:', e.error);
+showToast('⚠️ Произошла ошибка! Сохранение...');
+saveGame(true);
+});
+window.addEventListener('unhandledrejection', function(e) {
+console.error('🔴 Необработанное Promise:', e.reason);
+});
+document.addEventListener('touchmove', function(e) {
+if (e.scale !== 1) {
+e.preventDefault();
 }
-
-// ✅ НОВАЯ ФУНКЦИЯ: Загрузка статистики сообщества
+}, { passive: false });
+document.addEventListener('contextmenu', function(e) {
+e.preventDefault();
+});
+}
 function loadCommunityStats() {
+const totalEl = document.getElementById('totalPlayersCount');
+const onlineEl = document.getElementById('onlinePlayersCount');
 if (!db) {
-    document.getElementById('totalPlayersCount').textContent = '—';
-    document.getElementById('onlinePlayersCount').textContent = '—';
-    return;
+if(totalEl) totalEl.textContent = '—';
+if(onlineEl) onlineEl.textContent = '—';
+return;
 }
-
-// Загрузка общего количества игроков
 db.collection('players').get().then(snapshot => {
-    const totalPlayers = snapshot.size;
-    document.getElementById('totalPlayersCount').textContent = totalPlayers.toLocaleString();
+const totalPlayers = snapshot.size;
+if(totalEl) totalEl.textContent = totalPlayers.toLocaleString();
 }).catch(err => {
-    console.log('⚠️ Ошибка загрузки общего количества игроков');
-    document.getElementById('totalPlayersCount').textContent = '—';
+console.log('⚠️ Ошибка загрузки общего количества игроков');
+if(totalEl) totalEl.textContent = '—';
 });
-
-// Загрузка онлайн игроков (в реальном времени)
-if (communityStatsUnsubscribe) communityStatsUnsubscribe();
+if (communityStatsUnsubscribe) {
+communityStatsUnsubscribe();
+communityStatsUnsubscribe = null;
+}
 communityStatsUnsubscribe = db.collection('players').where('isOnline', '==', true).onSnapshot(snapshot => {
-    const onlinePlayers = snapshot.size;
-    document.getElementById('onlinePlayersCount').textContent = onlinePlayers.toLocaleString();
+const onlinePlayers = snapshot.size;
+if(onlineEl) onlineEl.textContent = onlinePlayers.toLocaleString();
 }, err => {
-    console.log('⚠️ Ошибка загрузки онлайн игроков');
-    document.getElementById('onlinePlayersCount').textContent = '—';
+console.log('⚠️ Ошибка загрузки онлайн игроков');
+if(onlineEl) onlineEl.textContent = '—';
 });
 }
-
-// ================= ЕЖЕДНЕВНЫЕ КВЕСТЫ (ИСПРАВЛЕНО) =================
 function initDailyQuests() {
 const today = new Date().toDateString();
 if (game.lastQuestUpdate !== today) {
@@ -2499,6 +2726,7 @@ claimed: false
 }
 function renderQuests() {
 const list = document.getElementById('questsList');
+if(!list) return;
 list.innerHTML = '';
 if (game.dailyQuests.length === 0) {
 list.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка квестов...</div>';
@@ -2539,19 +2767,19 @@ let current = game.questProgress[quest.id] || 0;
 let newValue = current;
 switch(quest.type) {
 case 'clicks':
-newValue = Math.min(game.clicks, quest.target);
+newValue = Math.min(game.clicks || 0, quest.target);
 break;
 case 'kills':
-newValue = Math.min(game.achievements.filter(id => id <= 12).length, quest.target);
+newValue = Math.min(game.totalKills || 0, quest.target);
 break;
 case 'crits':
-newValue = Math.min(game.totalCrits, quest.target);
+newValue = Math.min(game.totalCrits || 0, quest.target);
 break;
 case 'gold':
-newValue = Math.min(game.totalGold, quest.target);
+newValue = Math.min(game.totalGold || 0, quest.target);
 break;
 case 'combo':
-newValue = Math.min(game.maxCombo, quest.target);
+newValue = Math.min(game.maxCombo || 0, quest.target);
 break;
 }
 if (newValue >= quest.target && !quest.completed) {
@@ -2562,7 +2790,8 @@ updateQuestBadge();
 }
 game.questProgress[quest.id] = newValue;
 });
-if (document.getElementById('screen-quests').classList.contains('active')) {
+const questsScreen = document.getElementById('screen-quests');
+if (questsScreen && questsScreen.classList.contains('active')) {
 renderQuests();
 }
 saveGame();
@@ -2583,15 +2812,14 @@ saveGame();
 }
 function updateQuestBadge() {
 const badge = document.getElementById('questBadge');
+if(!badge) return;
 const hasUnclaimed = game.dailyQuests.some(q => q.completed && !q.claimed);
-if (hasUnclaimed) {
-badge.style.display = 'flex';
-} else {
-badge.style.display = 'none';
-}
+badge.style.display = hasUnclaimed ? 'flex' : 'none';
 }
 function updateQuestTimer() {
 if (!game.lastQuestUpdate) return;
+const timerEl = document.getElementById('questTimer');
+if(!timerEl) return;
 const now = new Date();
 const tomorrow = new Date(now);
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -2600,20 +2828,13 @@ const diffMs = tomorrow - now;
 const hours = Math.floor(diffMs / (1000 * 60 * 60));
 const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-const timerEl = document.getElementById('questTimer');
-if (timerEl) {
 timerEl.textContent = `⏳ До обновления: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
-}
-
-// ================= ВИбрация =================
 function vibrate(pattern) {
 if (navigator.vibrate) {
 navigator.vibrate(pattern);
 }
 }
-
-// ================= УЛУЧШЕННЫЕ ЭФФЕКТЫ УРОНА =================
 function showDamage(x, y, text, isCrit, isAuto = false) {
 const el = document.createElement('div');
 let className = 'damage-popup';
@@ -2627,8 +2848,6 @@ el.style.top = (y - 80) + 'px';
 document.body.appendChild(el);
 setTimeout(() => el.remove(), 1000);
 }
-
-// ================= ОСТАЛЬНЫЕ ФУНКЦИИ =================
 function startFreeSpinTimer() {
 const now = Date.now();
 const FREE_SPIN_COOLDOWN = 24 * 60 * 60 * 1000;
@@ -2652,10 +2871,10 @@ const timeRemaining = FREE_SPIN_COOLDOWN - timePassed;
 const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
 const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
 const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-document.getElementById('freeSpinCountdown').textContent =
-String(hours).padStart(2, '0') + ':' +
-String(minutes).padStart(2, '0') + ':' +
-String(seconds).padStart(2, '0');
+const countdownEl = document.getElementById('freeSpinCountdown');
+if(countdownEl) {
+countdownEl.textContent = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+}
 }
 }
 function updateFreeSpinUI() {
@@ -2663,14 +2882,16 @@ const freeSpinInfo = document.getElementById('freeSpinInfo');
 const freeSpinTimer = document.getElementById('freeSpinTimer');
 const rouletteBtn = document.getElementById('rouletteBtn');
 if (game.freeSpinAvailable) {
+if(freeSpinInfo) {
 freeSpinInfo.style.display = 'block';
 freeSpinInfo.textContent = '🎁 Бесплатный спин доступен!';
-freeSpinTimer.style.display = 'none';
-rouletteBtn.disabled = false;
+}
+if(freeSpinTimer) freeSpinTimer.style.display = 'none';
+if(rouletteBtn) rouletteBtn.disabled = false;
 } else {
-freeSpinInfo.style.display = 'none';
-freeSpinTimer.style.display = 'block';
-rouletteBtn.disabled = false;
+if(freeSpinInfo) freeSpinInfo.style.display = 'none';
+if(freeSpinTimer) freeSpinTimer.style.display = 'block';
+if(rouletteBtn) rouletteBtn.disabled = false;
 }
 }
 function updateOnlineStatus() {
@@ -2688,20 +2909,20 @@ achievements: game.achievements.length
 console.log('⚠️ Firebase offline режим');
 });
 }
-function escapeHtml(text) {
-const div = document.createElement('div');
-div.textContent = text;
-return div.innerHTML;
-}
 function checkOfflineEarnings() {
 const now = Date.now();
 const timeDiff = now - game.lastOfflineTime;
 const hoursOffline = Math.floor(timeDiff / (1000 * 60 * 60));
 if(hoursOffline > 0 && game.totalGold > 0) {
-game.offlineEarnings = Math.min(Math.floor(game.totalGold * 0.1 * hoursOffline), 10000);
+game.offlineEarnings = Math.min(
+Math.floor(game.totalGold * 0.1 * hoursOffline),
+10000
+);
 if(game.offlineEarnings > 0) {
-document.getElementById('offlineAmount').innerText = '+' + game.offlineEarnings + ' 💰';
-document.getElementById('offlineEarningsModal').classList.add('active');
+const offlineAmount = document.getElementById('offlineAmount');
+const offlineModal = document.getElementById('offlineEarningsModal');
+if(offlineAmount) offlineAmount.innerText = '+' + game.offlineEarnings + ' 💰';
+if(offlineModal) offlineModal.classList.add('active');
 }
 }
 }
@@ -2711,7 +2932,8 @@ game.gold += game.offlineEarnings;
 game.totalGold += game.offlineEarnings;
 showToast('💰 Получено ' + game.offlineEarnings + ' золота!');
 game.offlineEarnings = 0;
-document.getElementById('offlineEarningsModal').classList.remove('active');
+const offlineModal = document.getElementById('offlineEarningsModal');
+if(offlineModal) offlineModal.classList.remove('active');
 updateUI();
 saveGame();
 syncWithFirebase();
@@ -2728,37 +2950,63 @@ game.avatar = user.avatar || null;
 showUserInfo();
 } catch(e) {
 console.log('⚠️ Ошибка загрузки аккаунта');
-document.getElementById('registrationModal').classList.add('active');
+const regModal = document.getElementById('registrationModal');
+if(regModal) regModal.classList.add('active');
 }
 } else {
-document.getElementById('registrationModal').classList.add('active');
+const regModal = document.getElementById('registrationModal');
+if(regModal) regModal.classList.add('active');
 }
 }
 function showRegisterModal() {
-document.getElementById('loginModal').style.display = 'none';
-document.getElementById('registrationModal').classList.add('active');
+const loginModal = document.getElementById('loginModal');
+const regModal = document.getElementById('registrationModal');
+if(loginModal) loginModal.style.display = 'none';
+if(regModal) regModal.classList.add('active');
 }
 function showLoginModal() {
-document.getElementById('registrationModal').classList.remove('active');
-document.getElementById('loginModal').style.display = 'flex';
+const regModal = document.getElementById('registrationModal');
+const loginModal = document.getElementById('loginModal');
+if(regModal) regModal.classList.remove('active');
+if(loginModal) loginModal.style.display = 'flex';
 }
 function closeLoginModal() {
-document.getElementById('loginModal').style.display = 'none';
+const loginModal = document.getElementById('loginModal');
+if(loginModal) loginModal.style.display = 'none';
 }
 function registerUser() {
 const username = document.getElementById('regUsername').value.trim();
 const password = document.getElementById('regPassword').value;
 const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-if (!username || !password) { showToast('❌ Заполните все поля!'); return; }
-if (password !== passwordConfirm) { showToast('❌ Пароли не совпадают!'); return; }
-if (password.length < 6) { showToast('❌ Пароль должен быть не менее 6 символов!'); return; }
+if (!username || !password) {
+showToast('❌ Заполните все поля!');
+return;
+}
+if (password !== passwordConfirm) {
+showToast('❌ Пароли не совпадают!');
+return;
+}
+if (password.length < 6) {
+showToast('❌ Пароль должен быть не менее 6 символов!');
+return;
+}
+if (username.length < 3) {
+showToast('❌ Логин должен быть не менее 3 символов!');
+return;
+}
 const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 game.userId = userId;
 game.username = username;
-localStorage.setItem('sf2_user_auth', JSON.stringify({ userId, username, password, avatar: game.avatar }));
+localStorage.setItem('sf2_user_auth', JSON.stringify({
+userId,
+username,
+password,
+avatar: game.avatar
+}));
 syncWithFirebase();
 showUserInfo();
-document.getElementById('registrationModal').classList.remove('active');
+const regModal = document.getElementById('registrationModal');
+if(regModal) regModal.classList.remove('active');
 showToast('✅ Регистрация успешна!');
 }
 function loginUser() {
@@ -2793,19 +3041,26 @@ const userName = document.getElementById('userName');
 const userAvatar = document.getElementById('userAvatar');
 const userIdDisplay = document.getElementById('userIdDisplay');
 if (game.username) {
-userInfo.style.display = 'flex';
-userName.textContent = game.username;
+if(userInfo) userInfo.style.display = 'flex';
+if(userName) userName.textContent = game.username;
+if(userAvatar) {
 if (game.avatar) userAvatar.innerHTML = '<img src="' + game.avatar + '" alt="Avatar">';
 else userAvatar.textContent = game.username.charAt(0).toUpperCase();
-userIdDisplay.textContent = 'ID: ' + game.userId.substr(0, 15) + '...';
+}
+if(userIdDisplay) userIdDisplay.textContent = 'ID: ' + game.userId.substr(0, 15) + '...';
 }
 }
 function updateUserInfo() { showUserInfo(); }
 function editNickname() {
-document.getElementById('editNicknameInput').value = game.username;
-document.getElementById('editNicknameModal').style.display = 'flex';
+const input = document.getElementById('editNicknameInput');
+const modal = document.getElementById('editNicknameModal');
+if(input) input.value = game.username;
+if(modal) modal.style.display = 'flex';
 }
-function closeEditNicknameModal() { document.getElementById('editNicknameModal').style.display = 'none'; }
+function closeEditNicknameModal() {
+const modal = document.getElementById('editNicknameModal');
+if(modal) modal.style.display = 'none';
+}
 function saveNickname() {
 const newNickname = document.getElementById('editNicknameInput').value.trim();
 if (!newNickname) { showToast('❌ Введите никнейм!'); return; }
@@ -2862,12 +3117,24 @@ console.log('⚠️ Firebase offline режим');
 }
 function loadLeaderboard() {
 const leaderboardList = document.getElementById('leaderboardList');
+if(!leaderboardList) return;
+if (!db) {
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">' +
+'🌐 Требуется подключение к интернету</div>';
+return;
+}
 leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Загрузка...</div>';
 let query;
 switch(currentLeaderboardTab) {
-case 'level': query = db.collection('players').orderBy('level', 'desc').limit(10); break;
-case 'clicks': query = db.collection('players').orderBy('clicks', 'desc').limit(10); break;
-case 'achievements': query = db.collection('players').orderBy('achievements', 'desc').limit(10); break;
+case 'level':
+query = db.collection('players').orderBy('level', 'desc').limit(10);
+break;
+case 'clicks':
+query = db.collection('players').orderBy('clicks', 'desc').limit(10);
+break;
+case 'achievements':
+query = db.collection('players').orderBy('achievements', 'desc').limit(10);
+break;
 }
 if (!query) return;
 query.get().then(snapshot => {
@@ -2881,20 +3148,24 @@ leaderboardList.innerHTML += '<div class="leaderboard-item ' + (isMe ? 'leaderbo
 rank++;
 });
 if (snapshot.empty) leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Пока нет игроков</div>';
-}).catch(err => { leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">Таблица лидеров недоступна</div>'; });
+}).catch(err => {
+console.log('⚠️ Ошибка лидерборда (возможно нужны индексы):', err);
+leaderboardList.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">' +
+'Таблица лидеров недоступна<br><small>Требуется подключение или индексы Firebase</small></div>';
+});
 }
 function getValueByTab(player) {
 switch(currentLeaderboardTab) {
-case 'level': return '⭐ ' + player.level;
-case 'clicks': return '👆 ' + player.clicks;
-case 'achievements': return '🏆 ' + player.achievements;
+case 'level': return '⭐ ' + (player.level || 1);
+case 'clicks': return '👆 ' + (player.clicks || 0);
+case 'achievements': return '🏆 ' + (player.achievements || 0);
 default: return '-';
 }
 }
 function switchLeaderboardTab(tab) {
 currentLeaderboardTab = tab;
 document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
-event.target.classList.add('active');
+if(event && event.target) event.target.classList.add('active');
 loadLeaderboard();
 }
 function updatePlayTime() { game.totalPlayTime++; updateUI(); }
@@ -2902,11 +3173,22 @@ function checkDailyReward() {
 const today = new Date().toISOString().split('T')[0];
 const lastClaim = game.lastDailyClaim;
 const modal = document.getElementById('dailyRewardModal');
+if (game.lastDailyClaim && game.lastDailyClaim !== today) {
+const lastClaimDate = new Date(game.lastDailyClaim);
+const now = new Date();
+const diffDays = Math.floor((now - lastClaimDate) / (1000 * 60 * 60 * 24));
+if (diffDays > 1) {
+game.dailyStreak = 0;
+}
+}
 const dayNumber = Math.min(game.dailyStreak + 1, 7);
 const reward = DAILY_REWARDS[dayNumber - 1];
-document.getElementById('dailyDayNumber').textContent = dayNumber;
-document.getElementById('dailyRewardAmount').textContent = '+' + reward.gold + ' 💰 +' + reward.promo + ' 💎';
+const dayNumberEl = document.getElementById('dailyDayNumber');
+const rewardAmountEl = document.getElementById('dailyRewardAmount');
+if(dayNumberEl) dayNumberEl.textContent = dayNumber;
+if(rewardAmountEl) rewardAmountEl.textContent = '+' + reward.gold + ' 💰 +' + reward.promo + ' 💎';
 const daysContainer = document.getElementById('dailyRewardDays');
+if(daysContainer) {
 daysContainer.innerHTML = '';
 for (let i = 1; i <= 7; i++) {
 const dayEl = document.createElement('div');
@@ -2914,15 +3196,18 @@ dayEl.className = 'daily-reward-day' + (i < dayNumber ? ' claimed' : '') + (i ==
 dayEl.textContent = i;
 daysContainer.appendChild(dayEl);
 }
+}
 const btnClaim = document.getElementById('btnClaimDaily');
+if (btnClaim) {
 if (lastClaim === today) {
 btnClaim.disabled = true;
 btnClaim.textContent = 'УЖЕ ПОЛУЧЕНО';
-modal.classList.remove('active');
+if(modal) modal.classList.remove('active');
 } else {
 btnClaim.disabled = false;
 btnClaim.textContent = 'ПОЛУЧИТЬ НАГРАДУ';
-modal.classList.add('active');
+if(modal) modal.classList.add('active');
+}
 }
 }
 function claimDailyReward() {
@@ -2940,7 +3225,8 @@ game.lastDailyClaim = today;
 game.dailyStreak = (game.dailyStreak % 7) + 1;
 showToast('🎁 Получено: +' + reward.gold + ' 💰 +' + reward.promo + ' 💎');
 playSound('winSound');
-document.getElementById('dailyRewardModal').classList.remove('active');
+const modal = document.getElementById('dailyRewardModal');
+if(modal) modal.classList.remove('active');
 updateUI();
 saveGame();
 syncWithFirebase();
@@ -2948,6 +3234,7 @@ syncWithFirebase();
 function updateComboUI() {
 const comboCounter = document.getElementById('comboCounter');
 const comboCount = document.getElementById('comboCount');
+if(!comboCounter || !comboCount) return;
 if(game.comboCount > 1) {
 comboCounter.classList.add('active');
 comboCount.innerText = game.comboCount;
@@ -2962,8 +3249,10 @@ for(let i = 1; i <= 3; i++) {
 if(game.abilities[i].cooldown > 0) {
 game.abilities[i].cooldown = Math.max(0, game.abilities[i].cooldown - 100);
 const cooldownPercent = (game.abilities[i].cooldown / game.abilities[i].maxCooldown) * 100;
-document.getElementById('cooldown' + i).style.height = cooldownPercent + '%';
-if(game.abilities[i].cooldown <= 0) document.getElementById('ability' + i).classList.remove('disabled');
+const cooldownEl = document.getElementById('cooldown' + i);
+if(cooldownEl) cooldownEl.style.height = cooldownPercent + '%';
+const abilityEl = document.getElementById('ability' + i);
+if(game.abilities[i].cooldown <= 0 && abilityEl) abilityEl.classList.remove('disabled');
 }
 }
 }, 100);
@@ -2991,7 +3280,8 @@ showToast('🛡️ Защита! +' + energyRestore + ' энергии');
 updateUI();
 }
 game.abilities[id].cooldown = game.abilities[id].maxCooldown;
-document.getElementById('ability' + id).classList.add('disabled');
+const abilityEl = document.getElementById('ability' + id);
+if(abilityEl) abilityEl.classList.add('disabled');
 saveGame();
 }
 function handleAttack(x, y) {
@@ -3013,22 +3303,26 @@ playSound('clickSound');
 const char = CHARACTERS[game.currentEnemy];
 let dmg = game.damage;
 let isCrit = Math.random() * 100 < game.critChance;
-if(game.comboCount >= 10) dmg = Math.floor(dmg * 1.1);
+if(game.comboCount >= 10) dmg = Math.floor(dmg * (1 + game.comboBonusLevel * 0.01));
 if (isCrit) {
 dmg = Math.floor(dmg * (game.critDamage / 100));
 game.totalCrits++;
 showDamage(x, y, 'CRIT ' + dmg + '!', true);
 playSound('critSound');
 const img = document.getElementById('charImg');
+if(img) {
 img.classList.remove('hit', 'crit-hit');
 void img.offsetWidth;
 img.classList.add('crit-hit');
+}
 } else {
 showDamage(x, y, dmg, false);
 const img = document.getElementById('charImg');
+if(img) {
 img.classList.remove('hit', 'crit-hit');
 void img.offsetWidth;
 img.classList.add('hit');
+}
 }
 game.enemyHp -= dmg;
 if (game.enemyHp < 0) game.enemyHp = 0;
@@ -3036,6 +3330,9 @@ let goldGain = Math.floor(dmg / 3);
 if (game.goldBonusPercent > 0) goldGain = Math.floor(goldGain * (1 + game.goldBonusPercent / 100));
 const prestigeGoldBonus = game.prestigeBonuses.gold * 5;
 goldGain = Math.floor(goldGain * (1 + prestigeGoldBonus / 100));
+if(Math.random() * 100 < game.luckLevel * 2) {
+goldGain *= 2;
+}
 game.gold += goldGain;
 game.totalGold += goldGain;
 addXP(1);
@@ -3047,10 +3344,12 @@ if (game.enemyHp <= 0) enemyDefeated();
 updateUI();
 }
 function enemyDefeated() {
+game.isTransitioning = true; // Блокируем клики сразу
 const char = CHARACTERS[game.currentEnemy];
 let bonus = Math.floor(char.hp / 20);
 game.gold += bonus;
 game.totalGold += bonus;
+game.totalKills++;
 if(game.comboCount >= 20) {
 const comboBonus = Math.floor(bonus * 0.1 * (game.comboCount / 20));
 game.gold += comboBonus;
@@ -3076,15 +3375,24 @@ setTimeout(() => { showVictoryScreen(char.name); }, 500);
 }
 function showVictoryScreen(enemyName) {
 const victoryScreen = document.getElementById('victoryScreen');
-document.getElementById('victoryEnemyName').textContent = enemyName + ' повержен';
-victoryScreen.classList.add('active');
-setTimeout(() => { victoryScreen.classList.remove('active'); nextEnemyWithCountdown(); }, 2000);
+const victoryEnemyName = document.getElementById('victoryEnemyName');
+if(victoryEnemyName) victoryEnemyName.textContent = enemyName + ' повержен';
+if(victoryScreen) victoryScreen.classList.add('active');
+setTimeout(() => {
+if(victoryScreen) victoryScreen.classList.remove('active');
+nextEnemyWithCountdown();
+}, 2000);
 }
 function nextEnemyWithCountdown() {
 game.isTransitioning = true;
 const charContainer = document.getElementById('charContainer');
 if(charContainer) charContainer.classList.add('disabled');
 let currentIndex = CHARACTER_ORDER.indexOf(game.currentEnemy);
+// FIX: Валидация индекса текущего персонажа
+if (currentIndex < 0) {
+console.error('❌ Текущий враг "' + game.currentEnemy + '" не найден в CHARACTER_ORDER');
+currentIndex = 0; // Фолбэк на первого персонажа
+}
 const char = CHARACTERS[game.currentEnemy];
 if (game.currentRound < char.rounds) {
 game.currentRound++;
@@ -3095,11 +3403,16 @@ updateCharacterDisplay();
 updateUI();
 saveGame();
 showToast('⚔️ Раунд ' + game.currentRound + ' из ' + char.rounds);
-setTimeout(() => { game.isTransitioning = false; if(charContainer) charContainer.classList.remove('disabled'); }, 1500);
+setTimeout(() => {
+game.isTransitioning = false;
+if(charContainer) charContainer.classList.remove('disabled');
+}, 1500);
 } else if (currentIndex < CHARACTER_ORDER.length - 1) {
+// FIX: Прямой переход к следующему по индексу
 const nextEnemyKey = CHARACTER_ORDER[currentIndex + 1];
 const nextChar = CHARACTERS[nextEnemyKey];
 if (char.chapter === 1 && nextChar.chapter === 2) showToast('🎉 ГЛАВА 1 ПРОЙДЕНА! НАЧИНАЕТСЯ ГЛАВА 2!');
+// Обновляем game.currentEnemy сразу для консистентности состояния
 game.currentEnemy = nextEnemyKey;
 game.currentRound = 1;
 game.maxRounds = nextChar.rounds;
@@ -3109,14 +3422,19 @@ document.body.style.backgroundImage = "url('" + nextChar.bgImg + "')";
 updateRoundInfo();
 updateCharacterDisplay();
 showCountdown(() => {
-document.getElementById('countdownNumber').textContent = '⚔️';
-document.getElementById('fightButton').classList.add('active');
+const countdownNumber = document.getElementById('countdownNumber');
+const fightButton = document.getElementById('fightButton');
+if(countdownNumber) countdownNumber.textContent = '⚔️';
+if(fightButton) fightButton.classList.add('active');
 window.nextEnemyData = { key: nextEnemyKey, char: nextChar };
 game.isTransitioning = false;
 if(charContainer) charContainer.classList.remove('disabled');
 });
 } else {
-if (!game.chapter2Complete) { game.chapter2Complete = true; showToast('🏆 ГЛАВА 2 ПРОЙДЕНА! ВЫ ПОБЕДИЛИ МАСТЕРА БЕЗМОЛВИЯ!'); }
+if (!game.chapter2Complete) {
+game.chapter2Complete = true;
+showToast('🏆 ГЛАВА 2 ПРОЙДЕНА! ВЫ ПОБЕДИЛИ МАСТЕРА БЕЗМОЛВИЯ!');
+}
 showToast('🏆 Игра пройдена! Заново...');
 setTimeout(() => {
 game.currentEnemy = 'shin';
@@ -3136,22 +3454,26 @@ saveGame();
 }
 function updateRoundInfo() {
 const char = CHARACTERS[game.currentEnemy];
-document.getElementById('roundInfo').textContent = 'Раунд ' + game.currentRound + ' из ' + char.rounds;
+const roundInfo = document.getElementById('roundInfo');
+if(roundInfo && char) roundInfo.textContent = 'Раунд ' + game.currentRound + ' из ' + char.rounds;
 }
 function showCountdown(callback) {
 const countdownScreen = document.getElementById('countdownScreen');
 const countdownNumber = document.getElementById('countdownNumber');
-document.getElementById('fightButton').classList.remove('active');
+const fightButton = document.getElementById('fightButton');
+if(fightButton) fightButton.classList.remove('active');
 let count = 3;
-countdownScreen.classList.add('active');
-countdownNumber.textContent = count;
+if(countdownScreen) countdownScreen.classList.add('active');
+if(countdownNumber) countdownNumber.textContent = count;
 countdownInterval = setInterval(() => {
 count--;
 if (count >= 0) {
+if(countdownNumber) {
 countdownNumber.textContent = count;
 countdownNumber.style.animation = 'none';
 void countdownNumber.offsetWidth;
 countdownNumber.style.animation = 'countdownPop 1s ease-in-out';
+}
 } else {
 clearInterval(countdownInterval);
 if (callback) callback();
@@ -3160,8 +3482,10 @@ if (callback) callback();
 }
 function startFight() {
 playSound('fightSound');
-document.getElementById('countdownScreen').classList.remove('active');
-document.getElementById('fightButton').classList.remove('active');
+const countdownScreen = document.getElementById('countdownScreen');
+const fightButton = document.getElementById('fightButton');
+if(countdownScreen) countdownScreen.classList.remove('active');
+if(fightButton) fightButton.classList.remove('active');
 if (window.nextEnemyData) {
 playSound('transitionSound');
 game.currentEnemy = window.nextEnemyData.key;
@@ -3193,15 +3517,23 @@ game.promoCurrency -= cost;
 game.rouletteSpins++;
 updateAchievementProgress(19, game.rouletteSpins);
 rouletteSpinning = true;
-document.getElementById('rouletteBtn').disabled = true;
-const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
-reels.forEach(reel => reel.classList.add('spinning'));
+const rouletteBtn = document.getElementById('rouletteBtn');
+if(rouletteBtn) rouletteBtn.disabled = true;
+const reels = [
+document.getElementById('reel1'),
+document.getElementById('reel2'),
+document.getElementById('reel3')
+];
+reels.forEach(reel => { if(reel) reel.classList.add('spinning'); });
 let spinInterval = setInterval(() => {
-reels.forEach(reel => { reel.textContent = ['🍒', '🍋', '🍇', '💎', '7️⃣', '⚔️'][Math.floor(Math.random() * 6)]; });
+const symbols = ['🍒', '🍋', '🍇', '💎', '7️⃣', '⚔️'];
+reels.forEach(reel => {
+if(reel) reel.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+});
 }, 100);
 setTimeout(() => {
 clearInterval(spinInterval);
-reels.forEach(reel => reel.classList.remove('spinning'));
+reels.forEach(reel => { if(reel) reel.classList.remove('spinning'); });
 const rand = Math.random() * 100;
 let result;
 if (rand < 50) result = 'gold';
@@ -3209,12 +3541,12 @@ else if (rand < 75) result = 'upgrade';
 else if (rand < 95) result = 'gold_diamond';
 else result = 'jackpot';
 const results = getResultByType(result);
-reels[0].textContent = results[0];
-reels[1].textContent = results[1];
-reels[2].textContent = results[2];
+if(reels[0]) reels[0].textContent = results[0];
+if(reels[1]) reels[1].textContent = results[1];
+if(reels[2]) reels[2].textContent = results[2];
 checkWin(results, result);
 rouletteSpinning = false;
-document.getElementById('rouletteBtn').disabled = false;
+if(rouletteBtn) rouletteBtn.disabled = false;
 updateUI();
 saveGame();
 }, 3000);
@@ -3233,23 +3565,23 @@ const resultEl = document.getElementById('rouletteResult');
 if (resultType === 'gold') {
 const amount = Math.floor(Math.random() * 500) + 500;
 game.gold += amount;
-resultEl.textContent = '💰 Золото: +' + amount + ' 💰';
+if(resultEl) resultEl.textContent = '💰 Золото: +' + amount + ' 💰';
 } else if (resultType === 'upgrade') {
 const upgrades = ['damage', 'critChance', 'critDamage', 'maxEnergy', 'goldBonus'];
 const randomUpgrade = upgrades[Math.floor(Math.random() * upgrades.length)];
 buyUpgrade(randomUpgrade, true);
-resultEl.textContent = '⚔️ Случайное улучшение!';
+if(resultEl) resultEl.textContent = '⚔️ Случайное улучшение!';
 } else if (resultType === 'gold_diamond') {
 const gold = Math.floor(Math.random() * 1000) + 1000;
 const diamonds = Math.floor(Math.random() * 3) + 1;
 game.gold += gold;
 game.promoCurrency += diamonds;
-resultEl.textContent = '💰💎 +' + gold + ' 💰 +' + diamonds + ' 💎';
+if(resultEl) resultEl.textContent = '💰💎 +' + gold + ' 💰 +' + diamonds + ' 💎';
 } else if (resultType === 'jackpot') {
 game.gold += 10000;
 game.promoCurrency += 20;
 stats.jackpotWins++;
-resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!';
+if(resultEl) resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!';
 }
 addXP(10);
 updateUI();
@@ -3268,15 +3600,20 @@ saveGame();
 function updateCharacterDisplay() {
 const char = CHARACTERS[game.currentEnemy];
 const img = document.getElementById('charImg');
+const charDesc = document.getElementById('charDesc');
+if(!img || !char) return;
 img.src = char.img;
-document.getElementById('charDesc').textContent = char.desc;
+if(charDesc) charDesc.textContent = char.desc;
 img.style.display = 'block';
 img.onerror = function() {
 this.style.display = 'none';
 const container = document.getElementById('charContainer');
-container.style.background = 'rgba(0,0,0,0.6)';
-container.style.border = '3px solid #fff';
-container.innerHTML = '<div style="color:#fff; text-align:center; padding: 20px;"><div style="font-size: 24px; font-weight: bold;">' + char.name + '</div></div>';
+if(container) {
+container.style.background = 'linear-gradient(135deg, #1a1a2e, #2d1b4e)';
+container.innerHTML = '<div style="color:#fff; text-align:center; padding: 20px;">' +
+'<div style="font-size: 48px;">⚔️</div>' +
+'<div style="font-size: 24px; font-weight: bold;">' + char.name + '</div></div>';
+}
 };
 }
 function buyUpgrade(type, free = false) {
@@ -3322,7 +3659,7 @@ showToast('❌ Недостаточно алмазов!');
 }
 function activatePromoCode() {
 const input = document.getElementById('promoCodeInput');
-const code = input.value.trim().toUpperCase();
+const code = input ? input.value.trim().toUpperCase() : '';
 if (!code) { showToast('❌ Введите код!'); return; }
 if (game.usedPromoCodes.includes(code)) { showToast('❌ Код уже использован!'); return; }
 if (promoCodes[code]) {
@@ -3334,7 +3671,7 @@ game.usedPromoCodes.push(code);
 stats.totalPromoActivations++;
 showToast('🎁 Код активирован! +' + promo.gold + ' 💰 +' + promo.promo + ' 💎');
 playSound('winSound');
-input.value = '';
+if(input) input.value = '';
 updateUI();
 saveGame();
 } else { showToast('❌ Неверный код!'); }
@@ -3343,19 +3680,15 @@ function buyPromoItem(item) {
 const items = {
 'gold1000': { cost: 5, gold: 1000 },
 'gold5000': { cost: 20, gold: 5000 },
-'energy': { cost: 3, energy: 100 },
 'damage5': { cost: 15, damage: 5 },
 'crit5': { cost: 20, critChance: 5 },
-'critDmg50': { cost: 30, critDamage: 50 },
-'crit_master': { cost: 20, critChance: 10 },
-'destroyer': { cost: 30, critDamage: 25 }
+'critDmg50': { cost: 30, critDamage: 50 }
 };
 const purchase = items[item];
 if (!purchase) return;
 if (game.promoCurrency >= purchase.cost) {
 game.promoCurrency -= purchase.cost;
 if (purchase.gold) { game.gold += purchase.gold; game.totalGold += purchase.gold; }
-if (purchase.energy) { game.energy = Math.min(game.energy + purchase.energy, game.maxEnergy); }
 if (purchase.damage) { game.damage += purchase.damage; }
 if (purchase.critChance) { game.critChance = Math.min(game.critChance + purchase.critChance, 50); }
 if (purchase.critDamage) { game.critDamage += purchase.critDamage; }
@@ -3365,8 +3698,16 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно алмазов!'); }
 }
-function openDevMenu() { document.getElementById('devPasswordModal').style.display = 'flex'; }
-function closeDevPasswordModal() { document.getElementById('devPasswordModal').style.display = 'none'; document.getElementById('devPasswordInput').value = ''; }
+function openDevMenu() {
+const modal = document.getElementById('devPasswordModal');
+if(modal) modal.style.display = 'flex';
+}
+function closeDevPasswordModal() {
+const modal = document.getElementById('devPasswordModal');
+const input = document.getElementById('devPasswordInput');
+if(modal) modal.style.display = 'none';
+if(input) input.value = '';
+}
 function checkDevPassword() {
 const password = document.getElementById('devPasswordInput').value;
 if (password === '159000a') {
@@ -3374,11 +3715,16 @@ closeDevPasswordModal();
 switchScreen('dev', document.querySelectorAll('.side-nav-btn')[0]);
 renderDevCharSelect();
 showToast('🔧 Меню разработчика открыто');
-} else { showToast('❌ Неверный пароль!'); document.getElementById('devPasswordInput').value = ''; }
+} else {
+showToast('❌ Неверный пароль!');
+const input = document.getElementById('devPasswordInput');
+if(input) input.value = '';
+}
 }
 function closeDevMenu() { closeAllTabs(); }
 function renderDevCharSelect() {
 const container = document.getElementById('devCharSelect');
+if(!container) return;
 container.innerHTML = '';
 CHARACTER_ORDER.forEach(key => {
 const char = CHARACTERS[key];
@@ -3403,23 +3749,23 @@ saveGame();
 }
 function devAddGold() {
 const input = document.getElementById('devGoldInput');
-const amount = parseInt(input.value);
+const amount = parseInt(input ? input.value : 0);
 if (amount > 0) {
 game.gold += amount;
 game.totalGold += amount;
 showToast('💰 Добавлено ' + amount + ' золота');
-input.value = '';
+if(input) input.value = '';
 updateUI();
 saveGame();
 }
 }
 function devAddDiamonds() {
 const input = document.getElementById('devDiamondInput');
-const amount = parseInt(input.value);
+const amount = parseInt(input ? input.value : 0);
 if (amount > 0) {
 game.promoCurrency += amount;
 showToast('💎 Добавлено ' + amount + ' алмазов');
-input.value = '';
+if(input) input.value = '';
 updateUI();
 saveGame();
 }
@@ -3461,21 +3807,51 @@ function checkAchievements() {
 ACHIEVEMENTS.forEach((ach) => {
 if (!game.achievements.includes(ach.id)) {
 let unlocked = false;
-if (ach.type === 'click' && ach.id === 13 && game.clicks >= 100) unlocked = true;
-else if (ach.type === 'click' && ach.id === 14 && game.clicks >= 1000) unlocked = true;
-else if (ach.type === 'gold' && ach.id === 15 && game.totalGold >= 10000) unlocked = true;
-else if (ach.type === 'crit' && ach.id === 16 && game.totalCrits >= 100) unlocked = true;
-else if (ach.type === 'win' && ach.id === 17 && game.totalWins >= 50) unlocked = true;
-else if (ach.type === 'level' && ach.id === 18 && game.level >= 10) unlocked = true;
-else if (ach.type === 'roulette' && ach.id === 19 && game.rouletteSpins >= 25) unlocked = true;
-else if (ach.type === 'streak' && ach.id === 20 && game.loginStreak >= 7) unlocked = true;
-else if (ach.type === 'achievement' && ach.id === 21 && game.achievements.length >= 1) unlocked = true;
-else if (ach.type === 'boss' && game.achievements.includes(ach.id)) unlocked = true;
-else if (ach.type === 'boss_master' && game.chapter2Complete) unlocked = true;
-else if (ach.type === 'crit_total' && game.totalCrits >= 500) unlocked = true;
-else if (ach.type === 'gold_total_new' && game.totalGold >= 500000) unlocked = true;
-else if (ach.type === 'time_marathon' && game.totalPlayTime >= 6000) unlocked = true;
-else if (ach.type === 'win_legend' && game.totalWins >= 200) unlocked = true;
+switch(ach.type) {
+case 'click':
+if (ach.id === 13 && (game.clicks || 0) >= 100) unlocked = true;
+else if (ach.id === 14 && (game.clicks || 0) >= 1000) unlocked = true;
+break;
+case 'gold':
+if (ach.id === 15 && (game.totalGold || 0) >= 10000) unlocked = true;
+break;
+case 'crit':
+if (ach.id === 16 && (game.totalCrits || 0) >= 100) unlocked = true;
+break;
+case 'win':
+if (ach.id === 17 && (game.totalWins || 0) >= 50) unlocked = true;
+break;
+case 'level':
+if (ach.id === 18 && (game.level || 1) >= 10) unlocked = true;
+break;
+case 'roulette':
+if (ach.id === 19 && (game.rouletteSpins || 0) >= 25) unlocked = true;
+break;
+case 'streak':
+if (ach.id === 20 && (game.loginStreak || 0) >= 7) unlocked = true;
+break;
+case 'achievement':
+if (ach.id === 21 && (game.achievements || []).length >= 1) unlocked = true;
+break;
+case 'boss':
+if (game.achievements.includes(ach.id)) unlocked = true;
+break;
+case 'boss_master':
+if (game.chapter2Complete) unlocked = true;
+break;
+case 'crit_total':
+if ((game.totalCrits || 0) >= 500) unlocked = true;
+break;
+case 'gold_total_new':
+if ((game.totalGold || 0) >= 500000) unlocked = true;
+break;
+case 'time_marathon':
+if ((game.totalPlayTime || 0) >= 6000) unlocked = true;
+break;
+case 'win_legend':
+if ((game.totalWins || 0) >= 200) unlocked = true;
+break;
+}
 if (unlocked) {
 game.achievements.push(ach.id);
 game.gold += ach.reward;
@@ -3491,32 +3867,45 @@ updateUI();
 }
 function initAudio() {
 const music = document.getElementById('bgMusic');
-if (game.musicOn && music.paused) { music.volume = 0.3; music.play().catch(e => console.log('Audio autoplay blocked')); }
+if (game.musicOn && music && music.paused) {
+music.volume = 0.3;
+music.play().catch(e => console.log('Audio autoplay blocked'));
+}
 }
 function toggleMusic() {
 game.musicOn = !game.musicOn;
 const music = document.getElementById('bgMusic');
 const btn = document.getElementById('musicBtn');
-if (game.musicOn) { music.play(); btn.innerHTML = '🎵'; showToast('🎵 Музыка включена'); }
-else { music.pause(); btn.innerHTML = '🔇'; showToast('🔇 Музыка выключена'); }
+if (game.musicOn) {
+if(music) music.play();
+if(btn) btn.innerHTML = '🎵';
+showToast('🎵 Музыка включена');
+} else {
+if(music) music.pause();
+if(btn) btn.innerHTML = '🔇';
+showToast('🔇 Музыка выключена');
+}
 saveGame();
 }
 function toggleSound() {
 game.soundOn = !game.soundOn;
 const btn = document.getElementById('soundBtn');
-btn.innerHTML = game.soundOn ? '🔊' : '🔇';
+if(btn) btn.innerHTML = game.soundOn ? '🔊' : '🔇';
 showToast(game.soundOn ? '🔊 Звук включён' : '🔇 Звук выключен');
 saveGame();
 }
 function playSound(soundId) {
 if (!game.soundOn) return;
 const sound = document.getElementById(soundId);
-if (sound) { sound.currentTime = 0; sound.volume = 0.5; sound.play().catch(e => {}); }
+if (sound) {
+sound.currentTime = 0;
+sound.volume = 0.5;
+sound.play().catch(e => console.log('🔇 Аудио не доступно:', soundId));
 }
-// ================= PRESTIGE SYSTEM FUNCTIONS =================
+}
 function calculatePrestigeChips() {
-const chipsFromClicks = Math.floor(game.clicks / 1000);
-const chipsFromUpgrades = Math.floor(game.totalUpgrades / 5);
+const chipsFromClicks = Math.floor((game.clicks || 0) / 1000);
+const chipsFromUpgrades = Math.floor((game.totalUpgrades || 0) / 5);
 let chipsFromCharacters = 0;
 game.defeatedCharacters.forEach(charKey => {
 const char = CHARACTERS[charKey];
@@ -3533,24 +3922,42 @@ total: chipsFromClicks + chipsFromUpgrades + chipsFromCharacters
 }
 function updatePrestigeUI() {
 const chips = calculatePrestigeChips();
-document.getElementById('prestigeChips').textContent = game.prestigeChips;
-document.getElementById('prestigeLevel').textContent = game.prestigeLevel;
-document.getElementById('prestigeDamageBonus').textContent = '+' + (game.prestigeBonuses.damage * 5) + '%';
-document.getElementById('prestigeGoldBonus').textContent = '+' + (game.prestigeBonuses.gold * 5) + '%';
-document.getElementById('prestigeCritBonus').textContent = '+' + (game.prestigeBonuses.crit * 2) + '%';
-document.getElementById('prestigeDmgLevel').textContent = game.prestigeBonuses.damage;
-document.getElementById('prestigeGoldLevel').textContent = game.prestigeBonuses.gold;
-document.getElementById('prestigeCritLevel').textContent = game.prestigeBonuses.crit;
-document.getElementById('chipsFromClicks').textContent = chips.clicks;
-document.getElementById('chipsFromUpgrades').textContent = chips.upgrades;
-document.getElementById('chipsFromCharacters').textContent = chips.characters;
-document.getElementById('chipsTotal').textContent = chips.total;
-document.getElementById('btnPrestigeReset').disabled = chips.total < 10;
-document.getElementById('btnPrestigeDmg').disabled = game.prestigeChips < 10;
-document.getElementById('btnPrestigeGold').disabled = game.prestigeChips < 10;
-document.getElementById('btnPrestigeCrit').disabled = game.prestigeChips < 10;
-document.getElementById('statPrestige').textContent = game.prestigeLevel;
-document.getElementById('uiPrestigeChips').textContent = game.prestigeChips;
+const elChips = document.getElementById('prestigeChips');
+const elLevel = document.getElementById('prestigeLevel');
+const elDmgBonus = document.getElementById('prestigeDamageBonus');
+const elGoldBonus = document.getElementById('prestigeGoldBonus');
+const elCritBonus = document.getElementById('prestigeCritBonus');
+const elDmgLevel = document.getElementById('prestigeDmgLevel');
+const elGoldLevel = document.getElementById('prestigeGoldLevel');
+const elCritLevel = document.getElementById('prestigeCritLevel');
+const elChipsClicks = document.getElementById('chipsFromClicks');
+const elChipsUpgrades = document.getElementById('chipsFromUpgrades');
+const elChipsChars = document.getElementById('chipsFromCharacters');
+const elChipsTotal = document.getElementById('chipsTotal');
+const btnReset = document.getElementById('btnPrestigeReset');
+const btnDmg = document.getElementById('btnPrestigeDmg');
+const btnGold = document.getElementById('btnPrestigeGold');
+const btnCrit = document.getElementById('btnPrestigeCrit');
+const statPrestige = document.getElementById('statPrestige');
+const uiPrestigeChips = document.getElementById('uiPrestigeChips');
+if(elChips) elChips.textContent = game.prestigeChips;
+if(elLevel) elLevel.textContent = game.prestigeLevel;
+if(elDmgBonus) elDmgBonus.textContent = '+' + (game.prestigeBonuses.damage * 5) + '%';
+if(elGoldBonus) elGoldBonus.textContent = '+' + (game.prestigeBonuses.gold * 5) + '%';
+if(elCritBonus) elCritBonus.textContent = '+' + (game.prestigeBonuses.crit * 2) + '%';
+if(elDmgLevel) elDmgLevel.textContent = game.prestigeBonuses.damage;
+if(elGoldLevel) elGoldLevel.textContent = game.prestigeBonuses.gold;
+if(elCritLevel) elCritLevel.textContent = game.prestigeBonuses.crit;
+if(elChipsClicks) elChipsClicks.textContent = chips.clicks;
+if(elChipsUpgrades) elChipsUpgrades.textContent = chips.upgrades;
+if(elChipsChars) elChipsChars.textContent = chips.characters;
+if(elChipsTotal) elChipsTotal.textContent = chips.total;
+if(btnReset) btnReset.disabled = chips.total < 10;
+if(btnDmg) btnDmg.disabled = game.prestigeChips < 10;
+if(btnGold) btnGold.disabled = game.prestigeChips < 10;
+if(btnCrit) btnCrit.disabled = game.prestigeChips < 10;
+if(statPrestige) statPrestige.textContent = game.prestigeLevel;
+if(uiPrestigeChips) uiPrestigeChips.textContent = game.prestigeChips;
 }
 function buyPrestigeBonus(type) {
 if (game.prestigeChips < 10) {
@@ -3583,30 +3990,16 @@ return;
 }
 game.prestigeChips += chips.total;
 game.prestigeLevel++;
-game.gold = 500;
-game.totalGold = 0;
-game.promoCurrency = 0;
-game.damage = 1;
-game.critChance = 5;
-game.critDamage = 200;
-game.energy = 100;
-game.maxEnergy = 100;
-game.clicks = 0;
-game.totalCrits = 0;
-game.day = 1;
-game.achievements = [];
-game.chapter1Complete = false;
-game.chapter2Complete = false;
-game.currentEnemy = 'shin';
-game.currentRound = 1;
-game.enemyHp = CHARACTERS.shin.hp;
-game.enemyMaxHp = CHARACTERS.shin.hp;
-game.totalWins = 0;
-game.xp = 0;
-game.level = 1;
+game.gold = 500; game.totalGold = 0; game.promoCurrency = 0;
+game.damage = 1; game.critChance = 5; game.critDamage = 200;
+game.energy = 100; game.maxEnergy = 100;
+game.clicks = 0; game.totalCrits = 0; game.day = 1;
+game.achievements = []; game.chapter1Complete = false; game.chapter2Complete = false;
+game.currentEnemy = 'shin'; game.currentRound = 1;
+game.enemyHp = CHARACTERS.shin.hp; game.enemyMaxHp = CHARACTERS.shin.hp;
+game.totalWins = 0; game.xp = 0; game.level = 1;
 game.costs = { damage: 25, critChance: 100, critDamage: 200, maxEnergy: 400, goldBonus: 500 };
-game.defeatedCharacters = [];
-game.totalUpgrades = 0;
+game.defeatedCharacters = []; game.totalUpgrades = 0;
 document.body.style.backgroundImage = "url('" + CHARACTERS.shin.bgImg + "')";
 updateCharacterDisplay();
 showToast('💜 Престиж выполнен! Уровень: ' + game.prestigeLevel);
@@ -3616,69 +4009,212 @@ saveGame();
 syncWithFirebase();
 closeAllTabs();
 }
+// НОВЫЕ ФУНКЦИИ УЛУЧШЕНИЙ V3.0.1
+function updateUpgradesUI() {
+document.getElementById('dmgLevel').textContent = game.dmgLevel;
+document.getElementById('dmgCost').textContent = game.dmgCost;
+document.getElementById('critChanceLevel').textContent = game.critChanceLevel;
+document.getElementById('critChanceCost').textContent = game.critChanceCost;
+document.getElementById('critDmgLevel').textContent = game.critDmgLevel;
+document.getElementById('critDmgCost').textContent = game.critDmgCost;
+document.getElementById('autoClickerLevel').textContent = game.autoClickerLevel;
+document.getElementById('autoClickerCost').textContent = game.autoClickerCost;
+document.getElementById('luckLevel').textContent = game.luckLevel;
+document.getElementById('luckCost').textContent = game.luckCost;
+document.getElementById('comboBonusLevel').textContent = game.comboBonusLevel;
+document.getElementById('comboBonusCost').textContent = game.comboBonusCost;
+document.getElementById('goldBonusLevel').textContent = game.goldBonusLevel;
+document.getElementById('goldBonusCost').textContent = game.goldBonusCost;
+document.getElementById('btnDmgUpgrade').disabled = game.gold < game.dmgCost || game.dmgLevel >= 100;
+document.getElementById('btnCritChanceUpgrade').disabled = game.gold < game.critChanceCost || game.critChanceLevel >= 50;
+document.getElementById('btnCritDmgUpgrade').disabled = game.gold < game.critDmgCost || game.critDmgLevel >= 50;
+document.getElementById('btnAutoClickerUpgrade').disabled = game.gold < game.autoClickerCost || game.autoClickerLevel >= 10;
+document.getElementById('btnLuckUpgrade').disabled = game.gold < game.luckCost || game.luckLevel >= 20;
+document.getElementById('btnComboBonusUpgrade').disabled = game.gold < game.comboBonusCost || game.comboBonusLevel >= 20;
+document.getElementById('btnGoldBonusUpgrade').disabled = game.gold < game.goldBonusCost || game.goldBonusLevel >= 20;
+if(game.dmgLevel >= 100) document.getElementById('btnDmgUpgrade').classList.add('maxed');
+if(game.critChanceLevel >= 50) document.getElementById('btnCritChanceUpgrade').classList.add('maxed');
+if(game.critDmgLevel >= 50) document.getElementById('btnCritDmgUpgrade').classList.add('maxed');
+if(game.autoClickerLevel >= 10) document.getElementById('btnAutoClickerUpgrade').classList.add('maxed');
+if(game.luckLevel >= 20) document.getElementById('btnLuckUpgrade').classList.add('maxed');
+if(game.comboBonusLevel >= 20) document.getElementById('btnComboBonusUpgrade').classList.add('maxed');
+if(game.goldBonusLevel >= 20) document.getElementById('btnGoldBonusUpgrade').classList.add('maxed');
+}
+function buyDmgUpgrade() {
+if(game.gold >= game.dmgCost && game.dmgLevel < 100) {
+game.gold -= game.dmgCost;
+game.dmgLevel++;
+game.damage += 1;
+game.dmgCost = Math.floor(game.dmgCost * 1.2);
+showToast('✅ Сила удара улучшена!');
+updateUpgradesUI();
+updateUI();
+saveGame();
+}
+}
+function buyCritChanceUpgrade() {
+if(game.gold >= game.critChanceCost && game.critChanceLevel < 50) {
+game.gold -= game.critChanceCost;
+game.critChanceLevel++;
+game.critChance += 1;
+game.critChanceCost = Math.floor(game.critChanceCost * 1.3);
+showToast('✅ Шанс крита улучшен!');
+updateUpgradesUI();
+updateUI();
+saveGame();
+}
+}
+function buyCritDmgUpgrade() {
+if(game.gold >= game.critDmgCost && game.critDmgLevel < 50) {
+game.gold -= game.critDmgCost;
+game.critDmgLevel++;
+game.critDamage += 10;
+game.critDmgCost = Math.floor(game.critDmgCost * 1.3);
+showToast('✅ Крит. урон улучшен!');
+updateUpgradesUI();
+updateUI();
+saveGame();
+}
+}
+function buyAutoClickerUpgrade() {
+if(game.gold >= game.autoClickerCost && game.autoClickerLevel < 10) {
+game.gold -= game.autoClickerCost;
+game.autoClickerLevel++;
+game.autoClickerCost = Math.floor(game.autoClickerCost * 2);
+if(autoClickerInterval) clearInterval(autoClickerInterval);
+startAutoClicker();
+showToast('✅ Авто-кликер улучшен!');
+updateUpgradesUI();
+updateUI();
+saveGame();
+}
+}
+function buyLuckUpgrade() {
+if(game.gold >= game.luckCost && game.luckLevel < 20) {
+game.gold -= game.luckCost;
+game.luckLevel++;
+game.luckCost = Math.floor(game.luckCost * 1.5);
+showToast('✅ Удача улучшена!');
+updateUpgradesUI();
+updateUI();
+saveGame();
+}
+}
+function buyComboBonusUpgrade() {
+if(game.gold >= game.comboBonusCost && game.comboBonusLevel < 20) {
+game.gold -= game.comboBonusCost;
+game.comboBonusLevel++;
+game.comboBonusCost = Math.floor(game.comboBonusCost * 1.5);
+showToast('✅ Комбо бонус улучшен!');
+updateUpgradesUI();
+updateUI();
+saveGame();
+}
+}
+function buyGoldBonusUpgrade() {
+if(game.gold >= game.goldBonusCost && game.goldBonusLevel < 20) {
+game.gold -= game.goldBonusCost;
+game.goldBonusLevel++;
+game.goldBonusPercent += 5;
+game.goldBonusCost = Math.floor(game.goldBonusCost * 1.5);
+showToast('✅ Золотой бонус улучшен!');
+updateUpgradesUI();
+updateUI();
+saveGame();
+}
+}
+function startAutoClicker() {
+if(autoClickerInterval) clearInterval(autoClickerInterval);
+if(game.autoClickerLevel > 0) {
+autoClickerInterval = setInterval(() => {
+if(game.energy > 0 && !game.isTransitioning) {
+handleAttack(window.innerWidth / 2, window.innerHeight / 2);
+}
+}, 1000 / game.autoClickerLevel);
+}
+}
 function updateUI() {
+if(uiUpdateTimeout) clearTimeout(uiUpdateTimeout);
+uiUpdateTimeout = setTimeout(() => {
 const char = CHARACTERS[game.currentEnemy];
-document.getElementById('uiGold').innerText = Math.floor(game.gold);
-document.getElementById('uiDiamonds').innerText = Math.floor(game.promoCurrency);
-document.getElementById('uiPrestigeChips').innerText = game.prestigeChips;
-document.getElementById('uiLevel').innerText = game.level;
-document.getElementById('uiEnergy').innerText = game.energy + '/' + game.maxEnergy;
-let energyPct = (game.energy / game.maxEnergy) * 100;
-energyPct = Math.max(0, Math.min(100, energyPct));
+
+// [ИСПРАВЛЕНО] Обновление цен и текущих значений в магазине
+const costDmg = document.getElementById('costDmg'); if(costDmg) costDmg.innerText = game.costs.damage;
+const shopDmg = document.getElementById('shopDmg'); if(shopDmg) shopDmg.innerText = game.damage;
+const costCrit = document.getElementById('costCrit'); if(costCrit) costCrit.innerText = game.costs.critChance;
+const shopCrit = document.getElementById('shopCrit'); if(shopCrit) shopCrit.innerText = game.critChance;
+const costCritDmg = document.getElementById('costCritDmg'); if(costCritDmg) costCritDmg.innerText = game.costs.critDamage;
+const shopCritDmg = document.getElementById('shopCritDmg'); if(shopCritDmg) shopCritDmg.innerText = game.critDamage;
+const costEnergy = document.getElementById('costEnergy'); if(costEnergy) costEnergy.innerText = game.costs.maxEnergy;
+const shopEnergy = document.getElementById('shopEnergy'); if(shopEnergy) shopEnergy.innerText = game.maxEnergy;
+const costGold = document.getElementById('costGold'); if(costGold) costGold.innerText = game.costs.goldBonus;
+
+// [ИСПРАВЛЕНО] Обновление уровней и цен супер-способностей
+for(let i = 1; i <= 3; i++) {
+    const lvlEl = document.getElementById(`ability${i}LevelDisplay`);
+    const costEl = document.getElementById(`ability${i}Cost`);
+    const btnEl = document.getElementById(`btnAbility${i}Upgrade`);
+    if(lvlEl) lvlEl.innerText = `Ур.${game.abilityLevels[i]}`;
+    if(costEl) costEl.innerText = game.abilityUpgradeCosts[i];
+    if(btnEl) {
+        const isMaxed = game.abilityLevels[i] >= 30;
+        const canAfford = game.promoCurrency >= game.abilityUpgradeCosts[i];
+        btnEl.disabled = isMaxed || !canAfford;
+        btnEl.innerText = isMaxed ? 'МАКС' : 'Улучшить';
+        if(isMaxed) btnEl.classList.add('purchased'); else btnEl.classList.remove('purchased');
+    }
+}
+
+const uiGold = document.getElementById('uiGold');
+const uiDiamonds = document.getElementById('uiDiamonds');
+const uiPrestigeChips = document.getElementById('uiPrestigeChips');
+const uiLevel = document.getElementById('uiLevel');
+const uiEnergy = document.getElementById('uiEnergy');
 const energyFill = document.getElementById('energyFill');
-if (energyFill) {
+const enemyName = document.getElementById('enemyName');
+const hpFill = document.getElementById('hpFill');
+const hpText = document.getElementById('hpText');
+if(uiGold) uiGold.innerText = Math.floor(game.gold || 0).toLocaleString();
+if(uiDiamonds) uiDiamonds.innerText = Math.floor(game.promoCurrency || 0).toLocaleString();
+if(uiPrestigeChips) uiPrestigeChips.innerText = (game.prestigeChips || 0).toLocaleString();
+if(uiLevel) uiLevel.innerText = game.level || 1;
+if(uiEnergy) uiEnergy.innerText = (game.energy || 0) + '/' + (game.maxEnergy || 100);
+if(energyFill) {
+let energyPct = ((game.energy || 0) / (game.maxEnergy || 100)) * 100;
+energyPct = Math.max(0, Math.min(100, energyPct));
 energyFill.style.width = energyPct + '%';
 energyFill.style.display = 'block';
 }
-const energyText = document.getElementById('uiEnergy');
-if (energyText) {
-energyText.style.color = '#fff';
-energyText.style.display = 'block';
-}
-document.getElementById('enemyName').innerText = char.name + (char.isBoss ? ' (БОСС)' : '');
+if(enemyName && char) enemyName.innerText = char.name + (char.isBoss ? ' (БОСС)' : '');
 updateRoundInfo();
-let hpPct = (game.enemyHp / game.enemyMaxHp) * 100;
-document.getElementById('hpFill').style.width = hpPct + '%';
-document.getElementById('hpText').innerText = Math.ceil(game.enemyHp) + '/' + game.enemyMaxHp;
-document.getElementById('shopDmg').innerText = game.damage;
-document.getElementById('shopCrit').innerText = game.critChance;
-document.getElementById('shopCritDmg').innerText = game.critDamage;
-document.getElementById('shopEnergy').innerText = game.maxEnergy;
-document.getElementById('costDmg').innerText = game.costs.damage;
-document.getElementById('costCrit').innerText = game.costs.critChance;
-document.getElementById('costCritDmg').innerText = game.costs.critDamage;
-document.getElementById('costEnergy').innerText = game.costs.maxEnergy;
-document.getElementById('costGold').innerText = game.costs.goldBonus;
-document.getElementById('btnBuyDmg').disabled = game.gold < game.costs.damage;
-document.getElementById('btnBuyCrit').disabled = game.gold < game.costs.critChance;
-document.getElementById('btnBuyCritDmg').disabled = game.gold < game.costs.critDamage;
-document.getElementById('btnBuyEnergy').disabled = game.gold < game.costs.maxEnergy;
-document.getElementById('btnBuyGold').disabled = game.gold < game.costs.goldBonus;
-for (let i = 1; i <= 3; i++) {
-const level = game.abilityLevels[i];
-const cost = game.abilityUpgradeCosts[i];
-document.getElementById(`ability${i}LevelDisplay`).textContent = `Ур.${level}`;
-document.getElementById(`ability${i}Cost`).textContent = cost;
-const btn = document.getElementById(`btnAbility${i}Upgrade`);
-if (level >= 30) {
-btn.disabled = true;
-btn.textContent = 'MAX';
-btn.style.background = '#4caf50';
-} else {
-btn.disabled = game.promoCurrency < cost;
-btn.textContent = 'Улучшить';
-btn.style.background = '';
+if(hpFill && game.enemyMaxHp > 0) {
+let hpPct = ((game.enemyHp || 0) / game.enemyMaxHp) * 100;
+hpFill.style.width = hpPct + '%';
 }
-}
-document.getElementById('statKills').innerText = game.achievements.filter(id => id <= 12).length;
-document.getElementById('statClicks').innerText = game.clicks;
-document.getElementById('statDay').innerText = game.day;
-document.getElementById('statCrits').innerText = game.totalCrits;
-document.getElementById('statTotalGold').innerText = Math.floor(game.totalGold);
-document.getElementById('statStreak').innerText = Math.min(game.loginStreak, 7);
-document.getElementById('statDiamonds').innerText = Math.floor(game.promoCurrency);
-document.getElementById('statRoulette').innerText = game.rouletteSpins;
-document.getElementById('statMaxCombo').innerText = game.maxCombo;
+if(hpText) hpText.innerText = Math.ceil(game.enemyHp || 0).toLocaleString() + '/' + game.enemyMaxHp.toLocaleString();
+const statKills = document.getElementById('statKills');
+const statClicks = document.getElementById('statClicks');
+const statDay = document.getElementById('statDay');
+const statCrits = document.getElementById('statCrits');
+const statTotalGold = document.getElementById('statTotalGold');
+const statStreak = document.getElementById('statStreak');
+const statDiamonds = document.getElementById('statDiamonds');
+const statRoulette = document.getElementById('statRoulette');
+const statMaxCombo = document.getElementById('statMaxCombo');
+const statNextReward = document.getElementById('statNextReward');
+const rankBadge = document.getElementById('rankBadge');
+const levelDisplay = document.getElementById('levelDisplay');
+const xpFill = document.getElementById('xpFill');
+const xpText = document.getElementById('xpText');
+if(statKills) statKills.innerText = (game.totalKills || 0).toLocaleString();
+if(statClicks) statClicks.innerText = (game.clicks || 0).toLocaleString();
+if(statDay) statDay.innerText = game.day;
+if(statCrits) statCrits.innerText = game.totalCrits;
+if(statTotalGold) statTotalGold.innerText = Math.floor(game.totalGold || 0).toLocaleString();
+if(statStreak) statStreak.innerText = Math.min(game.dailyStreak || 0, 7);
+if(statDiamonds) statDiamonds.innerText = Math.floor(game.promoCurrency || 0);
+if(statRoulette) statRoulette.innerText = game.rouletteSpins;
+if(statMaxCombo) statMaxCombo.innerText = game.maxCombo;
 const now = new Date();
 const tomorrow = new Date(now);
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -3686,63 +4222,95 @@ tomorrow.setHours(0, 0, 0, 0);
 const diffMs = tomorrow - now;
 const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
 const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-document.getElementById('statNextReward').innerText = diffHrs + 'ч ' + diffMins + 'м';
-document.getElementById('rankBadge').innerText = getRankName();
-document.getElementById('levelDisplay').innerText = game.level;
+if(statNextReward) statNextReward.innerText = diffHrs + 'ч ' + diffMins + 'м';
+if(rankBadge) rankBadge.innerText = getRankName();
+if(levelDisplay) levelDisplay.innerText = game.level;
 const nextLevelXP = getNextLevelXP();
 const xpPct = (game.xp / nextLevelXP) * 100;
-document.getElementById('xpFill').style.width = xpPct + '%';
-document.getElementById('xpText').innerText = game.xp + '/' + nextLevelXP + ' XP';
+if(xpFill) xpFill.style.width = xpPct + '%';
+if(xpText) xpText.innerText = (game.xp || 0).toLocaleString() + '/' + nextLevelXP.toLocaleString() + ' XP';
+}, 100);
 }
 function renderAchievements() {
 const list = document.getElementById('achievementsList');
+if(!list) return;
 list.innerHTML = '';
 ACHIEVEMENTS.forEach(ach => {
 const unlocked = game.achievements.includes(ach.id);
-const progress = ach.required > 0 ? Math.min(ach.current, ach.required) + '/' + ach.required : '';
-const percent = ach.required > 0 ? Math.round((ach.current / ach.required) * 100) : 0;
+const progress = ach.required > 0 ? Math.min(ach.current || 0, ach.required) + '/' + ach.required : '';
+const percent = ach.required > 0 ? Math.round(((ach.current || 0) / ach.required) * 100) : 0;
 list.innerHTML += '<div class="achievement-item ' + (unlocked ? 'unlocked' : 'locked') + '"><div style="font-weight: bold; color: ' + (unlocked ? '#4caf50' : '#888') + '">' + (unlocked ? '✅' : '🔒') + ' ' + ach.name + '</div><div style="font-size: 12px; color: #aaa; margin-top: 5px;">' + ach.desc + ' | ' + ach.reward + ' 💰 + ' + ach.diamondReward + ' 💎</div>' + (!unlocked && progress ? '<div class="achievement-progress">Прогресс: ' + progress + ' (' + percent + '%)</div>' : '') + '</div>';
 });
 }
 function showToast(msg) {
 const t = document.getElementById('toast');
+if(!t) return;
 t.innerText = msg;
 t.classList.add('show');
 setTimeout(() => t.classList.remove('show'), 2500);
 }
 function saveGame(showIndicator = false) {
+if(saveTimeout) clearTimeout(saveTimeout);
+saveTimeout = setTimeout(() => {
 game.lastSave = new Date().toISOString();
 game.lastOfflineTime = Date.now();
+try {
 localStorage.setItem('sf2_chapter1', JSON.stringify(game));
 localStorage.setItem('sf2_promoCodes', JSON.stringify(promoCodes));
 localStorage.setItem('sf2_version', gameVersion);
 localStorage.setItem('sf2_stats', JSON.stringify(stats));
 if (showIndicator) {
 const indicator = document.getElementById('saveIndicator');
+if(indicator) {
 indicator.classList.add('show');
 setTimeout(() => indicator.classList.remove('show'), 2000);
 }
 }
+} catch(e) {
+console.error('❌ Ошибка сохранения:', e);
+showToast('⚠️ Ошибка сохранения!');
+}
+}, 1000);
+}
 function loadGame() {
+try {
 const saved = localStorage.getItem('sf2_chapter1');
 const savedPromo = localStorage.getItem('sf2_promoCodes');
 const savedVersion = localStorage.getItem('sf2_version');
 const savedStats = localStorage.getItem('sf2_stats');
-if (saved) { const parsed = JSON.parse(saved); game = { ...game, ...parsed }; }
+if (saved) {
+const parsed = JSON.parse(saved);
+Object.keys(parsed).forEach(key => {
+if (game.hasOwnProperty(key)) {
+game[key] = parsed[key];
+}
+});
+}
 if (savedPromo) promoCodes = { ...promoCodes, ...JSON.parse(savedPromo) };
 if (savedVersion) gameVersion = savedVersion;
 if (savedStats) stats = JSON.parse(savedStats);
+// [ИСПРАВЛЕНО: СБРОС ЗАБЛОКИРОВАННЫХ СОСТОЯНИЙ]
+game.isTransitioning = false;
+if(game.energy <= 0) game.energy = game.maxEnergy;
 const char = CHARACTERS[game.currentEnemy];
 if (char) {
 document.body.style.backgroundImage = "url('" + char.bgImg + "')";
 updateCharacterDisplay();
 game.enemyMaxHp = char.hp;
 }
-if (!game.musicOn) document.getElementById('musicBtn').innerHTML = '🔇';
-if (!game.soundOn) document.getElementById('soundBtn').innerHTML = '🔇';
+const musicBtn = document.getElementById('musicBtn');
+const soundBtn = document.getElementById('soundBtn');
+if (!game.musicOn && musicBtn) musicBtn.innerHTML = '🔇';
+if (!game.soundOn && soundBtn) soundBtn.innerHTML = '🔇';
+updateUI(); // Обновляем UI после загрузки
+} catch(e) {
+console.error('❌ Ошибка загрузки:', e);
+showToast('⚠️ Ошибка загрузки сохранения!');
+}
 }
 function updateVersionBadge() {
-document.getElementById('versionBadge').textContent = 'v' + gameVersion;
+const badge = document.getElementById('versionBadge');
+if(badge) badge.textContent = 'v' + gameVersion;
 }
 </script>
 </body>
