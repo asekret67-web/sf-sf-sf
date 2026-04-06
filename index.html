@@ -45,8 +45,8 @@ user-select: none;
 html, body {
 height: 100vh;
 width: 100vw;
-touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: только вертикальный скролл */
-overscroll-behavior-y: contain; /* ✅ ИСПРАВЛЕНО: предотвращаем навигацию браузера */
+touch-action: pan-y;
+overscroll-behavior-y: contain;
 }
 body {
 font-family: 'Roboto', sans-serif;
@@ -136,8 +136,8 @@ padding: 20px;
 padding-bottom: 80px;
 animation: fadeIn 0.3s;
 -webkit-overflow-scrolling: touch;
-overscroll-behavior-y: contain; /* ✅ ИСПРАВЛЕНО: скролл работает */
-touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: вертикальный скролл */
+overscroll-behavior-y: contain;
+touch-action: pan-y;
 }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -246,8 +246,8 @@ min-width: 40px;
 }
 .menu-toggle-btn {
 position: fixed;
-top: 80px;
-left: 10px;
+bottom: 20px; /* ✅ Перенесено вниз */
+left: 20px;   /* ✅ Позиция слева внизу */
 z-index: 100;
 background: rgba(255, 152, 0, 0.3);
 border: 2px solid var(--accent);
@@ -268,6 +268,30 @@ transition: all 0.3s;
 transform: scale(1.1);
 box-shadow: 0 0 30px rgba(255, 152, 0, 0.8);
 }
+/* ✅ Кнопка авто-кликера */
+.auto-toggle-btn {
+position: fixed;
+bottom: 20px;
+right: 20px;
+z-index: 100;
+background: rgba(0, 188, 212, 0.3);
+border: 2px solid var(--auto);
+color: #fff;
+width: 50px;
+height: 50px;
+border-radius: 50%;
+cursor: pointer;
+font-size: 24px;
+backdrop-filter: blur(5px);
+display: flex;
+align-items: center;
+justify-content: center;
+box-shadow: 0 0 20px rgba(0, 188, 212, 0.5);
+transition: all 0.3s;
+}
+.auto-toggle-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 188, 212, 0.8); }
+.auto-toggle-btn.active { background: rgba(0, 188, 212, 0.7); box-shadow: 0 0 30px rgba(0, 188, 212, 0.8); animation: pulse 1.5s infinite; }
+.auto-toggle-btn.disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); pointer-events: none; }
 .side-nav {
 position: fixed;
 top: 0;
@@ -314,7 +338,7 @@ overflow-y: auto;
 display: flex;
 flex-direction: column;
 align-items: stretch;
-touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: скролл в меню */
+touch-action: pan-y;
 }
 .side-nav-btn {
 background: rgba(255,255,255,0.05);
@@ -466,7 +490,7 @@ max-width: 100%;
 filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
 transition: all 0.1s;
 pointer-events: none;
-opacity: 0; /* ✅ ИСПРАВЛЕНО: скрыто пока грузится */
+opacity: 0;
 }
 .character-img.loaded {
 opacity: 1;
@@ -713,9 +737,9 @@ z-index: 300;
 padding-top: 80px;
 display: none;
 overflow-y: auto;
-overscroll-behavior-y: contain; /* ✅ ИСПРАВЛЕНО: скролл работает */
+overscroll-behavior-y: contain;
 -webkit-overflow-scrolling: touch;
-touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: скролл на телефоне */
+touch-action: pan-y;
 }
 #screen-shop.active, #screen-profile.active, #screen-promo.active, #screen-dev.active, #screen-roulette.active, #screen-leaderboard.active, #screen-prestige.active, #screen-quests.active, #screen-upgrades.active {
 display: block;
@@ -1130,7 +1154,7 @@ border-radius: 10px;
 padding: 15px;
 max-height: 400px;
 overflow-y: auto;
-touch-action: pan-y; /* ✅ ИСПРАВЛЕНО: скролл списка */
+touch-action: pan-y;
 }
 .leaderboard-item {
 display: flex;
@@ -1777,6 +1801,7 @@ cursor: default;
 .upgrade-item { flex-direction: column; align-items: flex-start; }
 .upgrade-cost { margin-left: 0; margin-top: 10px; }
 .btn-upgrade { width: 100%; margin-top: 10px; }
+.menu-toggle-btn, .auto-toggle-btn { bottom: 15px; width: 45px; height: 45px; font-size: 20px; }
 }
 @media (max-width: 360px) {
 .loading-text { font-size: 18px; }
@@ -1910,6 +1935,7 @@ cursor: default;
 </div>
 </div>
 <button class="menu-toggle-btn" onclick="toggleSideNav()">☰</button>
+<button class="auto-toggle-btn" id="autoToggleBtn" onclick="toggleAutoClicker()">🤖</button>
 <div id="screen-battle" class="screen active">
 <div class="boss-info">
 <div class="enemy-name" id="enemyName">Клинок Рассвета</div>
@@ -1951,13 +1977,11 @@ cursor: default;
 <div><div style="font-weight: bold;">💰 Золотой Удар</div><small style="color:#888">+5% золота за клик</small></div>
 <button class="btn-buy" id="btnBuyGold" onclick="buyUpgrade('goldBonus')"><span id="costGold">500</span> 💰</button>
 </div>
-<!-- ✅ НОВОЕ: Покупка энергии -->
 <div class="shop-item">
 <div><div style="font-weight: bold;">⚡ +50 Энергии</div><small style="color:#888">Мгновенное восстановление</small></div>
 <button class="btn-buy" id="btnBuyEnergyInstant" onclick="buyEnergy()">100 💰</button>
 </div>
 </div>
-<!-- НОВЫЙ ЭКРАН УЛУЧШЕНИЙ V3.0.1 -->
 <div id="screen-upgrades" class="screen">
 <button class="close-tab-btn" onclick="closeAllTabs()">✕</button>
 <h2 style="margin: 20px 0; text-align: center;">⬆️ Улучшения</h2>
@@ -2291,28 +2315,12 @@ cursor: default;
 </div>
 </div>
 <div class="registration-modal" id="registrationModal">
-<div class="registration-content">
-<h2 style="color: var(--accent); margin-bottom: 15px;">👤 Регистрация</h2>
-<p style="color: #ccc; margin-bottom: 20px;">Создайте аккаунт для сохранения прогресса</p>
-<input type="text" class="registration-input" id="regUsername" placeholder="Логин">
-<input type="password" class="registration-input" id="regPassword" placeholder="Пароль">
-<input type="password" class="registration-input" id="regPasswordConfirm" placeholder="Подтвердите пароль">
-<button class="registration-btn" onclick="registerUser()">Зарегистрироваться</button>
-<p style="color: #888; margin-top: 15px; font-size: 12px;">Уже есть аккаунт? <a href="#" onclick="showLoginModal()" style="color: var(--accent);">Войти</a></p>
-</div>
-</div>
-<div class="modal" id="loginModal" onclick="if(event.target===this) this.style.display='none'">
-<div class="modal-content" style="border-color: var(--accent);">
-<h2 style="color: var(--accent); margin-bottom: 15px;">🔐 Вход</h2>
-<p style="color: #ccc; margin-bottom: 20px;">Введите данные аккаунта</p>
-<input type="text" class="promo-input" id="loginUsername" placeholder="Логин" style="width: 100%;">
-<input type="password" class="promo-input" id="loginPassword" placeholder="Пароль" style="width: 100%; margin-top: 10px;">
-<div class="modal-buttons">
-<button class="modal-btn cancel" onclick="closeLoginModal()">Отмена</button>
-<button class="modal-btn confirm" style="background: var(--accent);" onclick="loginUser()">Войти</button>
-</div>
-<p style="color: #888; margin-top: 15px; font-size: 12px;">Нет аккаунта? <a href="#" onclick="showRegisterModal()" style="color: var(--accent);">Зарегистрироваться</a></p>
-</div>
+    <div class="registration-content">
+        <h2 style="color: var(--accent); margin-bottom: 15px;">👤 Ввод Никнейма</h2>
+        <p style="color: #ccc; margin-bottom: 20px;">Введите имя для вашего профиля</p>
+        <input type="text" class="registration-input" id="nicknameInput" placeholder="Ваш никнейм">
+        <button class="registration-btn" onclick="saveNickname()">Начать Игру</button>
+    </div>
 </div>
 <div class="modal" id="devPasswordModal" onclick="if(event.target===this) this.style.display='none'">
 <div class="modal-content" style="border-color: var(--dev-accent);">
@@ -2332,7 +2340,7 @@ cursor: default;
 <input type="text" class="promo-input" id="editNicknameInput" placeholder="Новый никнейм" style="width: 100%;">
 <div class="modal-buttons">
 <button class="modal-btn cancel" onclick="closeEditNicknameModal()">Отмена</button>
-<button class="modal-btn confirm" style="background: var(--blue);" onclick="saveNickname()">Сохранить</button>
+<button class="modal-btn confirm" style="background: var(--blue);" onclick="saveNicknameEdit()">Сохранить</button>
 </div>
 </div>
 </div>
@@ -2515,6 +2523,7 @@ critDmgLevel: 0,
 critDmgCost: 200,
 autoClickerLevel: 0,
 autoClickerCost: 5000,
+autoClickerEnabled: true, // ✅ ВКЛ/ВЫКЛ АВТО-КЛИКЕРА
 luckLevel: 0,
 luckCost: 2000,
 comboBonusLevel: 0,
@@ -2612,6 +2621,7 @@ checkDailyReward();
 initAudio();
 updateUI();
 updateUserInfo();
+updateAutoClickerBtn(); // ✅ Обновляем состояние кнопки авто-кликера
 renderDevCharSelect();
 updateVersionBadge();
 startAbilityTimer();
@@ -2681,13 +2691,11 @@ saveGame(true);
 window.addEventListener('unhandledrejection', function(e) {
 console.error('🔴 Необработанное Promise:', e.reason);
 });
-// ✅ ИСПРАВЛЕНО: Скролл на телефоне - не блокируем вертикальное перемещение
 document.addEventListener('touchmove', function(e) {
-// Разрешаем скролл, блокируем только зум
 if (e.scale !== 1) {
 e.preventDefault();
 }
-}, { passive: true }); // ✅ passive: true улучшает производительность скролла
+}, { passive: true });
 document.addEventListener('contextmenu', function(e) {
 e.preventDefault();
 });
@@ -2975,83 +2983,38 @@ const regModal = document.getElementById('registrationModal');
 if(regModal) regModal.classList.add('active');
 }
 }
-function showRegisterModal() {
-const loginModal = document.getElementById('loginModal');
-const regModal = document.getElementById('registrationModal');
-if(loginModal) loginModal.style.display = 'none';
-if(regModal) regModal.classList.add('active');
+function saveNickname() {
+    const input = document.getElementById('nicknameInput');
+    const nickname = input.value.trim();
+    if (!nickname) {
+        showToast('❌ Введите никнейм!');
+        return;
+    }
+    if (nickname.length < 3) {
+        showToast('❌ Никнейм должен быть не менее 3 символов!');
+        return;
+    }
+
+    // Генерируем новый ID если его нет
+    const userId = game.userId || ('user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9));
+    
+    game.userId = userId;
+    game.username = nickname;
+    
+    localStorage.setItem('sf2_user_auth', JSON.stringify({
+        userId,
+        username: nickname,
+        avatar: game.avatar || null
+    }));
+    
+    syncWithFirebase();
+    showUserInfo();
+    
+    const regModal = document.getElementById('registrationModal');
+    if(regModal) regModal.classList.remove('active');
+    showToast('✅ Добро пожаловать, ' + nickname + '!');
 }
-function showLoginModal() {
-const regModal = document.getElementById('registrationModal');
-const loginModal = document.getElementById('loginModal');
-if(regModal) regModal.classList.remove('active');
-if(loginModal) loginModal.style.display = 'flex';
-}
-function closeLoginModal() {
-const loginModal = document.getElementById('loginModal');
-if(loginModal) loginModal.style.display = 'none';
-}
-function registerUser() {
-const username = document.getElementById('regUsername').value.trim();
-const password = document.getElementById('regPassword').value;
-const passwordConfirm = document.getElementById('regPasswordConfirm').value;
-if (!username || !password) {
-showToast('❌ Заполните все поля!');
-return;
-}
-if (password !== passwordConfirm) {
-showToast('❌ Пароли не совпадают!');
-return;
-}
-if (password.length < 6) {
-showToast('❌ Пароль должен быть не менее 6 символов!');
-return;
-}
-if (username.length < 3) {
-showToast('❌ Логин должен быть не менее 3 символов!');
-return;
-}
-const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-game.userId = userId;
-game.username = username;
-localStorage.setItem('sf2_user_auth', JSON.stringify({
-userId,
-username,
-password,
-avatar: game.avatar
-}));
-syncWithFirebase();
-showUserInfo();
-const regModal = document.getElementById('registrationModal');
-if(regModal) regModal.classList.remove('active');
-showToast('✅ Регистрация успешна!');
-}
-function loginUser() {
-const username = document.getElementById('loginUsername').value.trim();
-const password = document.getElementById('loginPassword').value;
-if (!username || !password) { showToast('❌ Заполните все поля!'); return; }
-const savedUser = localStorage.getItem('sf2_user_auth');
-if (savedUser) {
-try {
-const user = JSON.parse(savedUser);
-if (user.username === username && user.password === password) {
-game.userId = user.userId;
-game.username = user.username;
-game.avatar = user.avatar || null;
-showUserInfo();
-closeLoginModal();
-loadGame();
-showToast('✅ Вход успешен!');
-} else {
-showToast('❌ Неверный логин или пароль!');
-}
-} catch(e) {
-showToast('❌ Ошибка данных аккаунта!');
-}
-} else {
-showToast('❌ Аккаунт не найден! Сначала зарегистрируйтесь.');
-}
-}
+
 function showUserInfo() {
 const userInfo = document.getElementById('userInfo');
 const userName = document.getElementById('userName');
@@ -3078,7 +3041,7 @@ function closeEditNicknameModal() {
 const modal = document.getElementById('editNicknameModal');
 if(modal) modal.style.display = 'none';
 }
-function saveNickname() {
+function saveNicknameEdit() {
 const newNickname = document.getElementById('editNicknameInput').value.trim();
 if (!newNickname) { showToast('❌ Введите никнейм!'); return; }
 game.username = newNickname;
@@ -3132,7 +3095,6 @@ console.log('✅ Данные сохранены в Firebase');
 console.log('⚠️ Firebase offline режим');
 });
 }
-// ✅ ИСПРАВЛЕНА ФУНКЦИЯ ЗАГРУЗКИ ЛИДЕРБОРДА
 function loadLeaderboard() {
 const leaderboardList = document.getElementById('leaderboardList');
 if(!leaderboardList) return;
@@ -3172,7 +3134,6 @@ rank++;
 });
 }).catch(err => {
 console.error('🔴 Ошибка загрузки лидерборда:', err.code, err.message);
-// Если ошибка MISSING_INDEX, Firebase выдаст ссылку для создания
 if(err.code === 'failed-precondition' && err.message.includes('index')) {
 leaderboardList.innerHTML = `
 <div style="text-align: center; padding: 40px; color: #888;">
@@ -3192,12 +3153,11 @@ case 'achievements': return '🏆 ' + (player.achievements || 0);
 default: return '-';
 }
 }
-// ✅ ИСПРАВЛЕНА ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ТАБОВ
 function switchLeaderboardTab(tab, btn) {
 currentLeaderboardTab = tab;
 document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
-if(btn) btn.classList.add('active'); // Безопасно меняем класс
-loadLeaderboard(); // Перезагружаем данные
+if(btn) btn.classList.add('active');
+loadLeaderboard();
 }
 function updatePlayTime() { game.totalPlayTime++; updateUI(); }
 function checkDailyReward() {
@@ -3375,7 +3335,7 @@ if (game.enemyHp <= 0) enemyDefeated();
 updateUI();
 }
 function enemyDefeated() {
-game.isTransitioning = true; // Блокируем клики сразу
+game.isTransitioning = true;
 const char = CHARACTERS[game.currentEnemy];
 let bonus = Math.floor(char.hp / 20);
 game.gold += bonus;
@@ -3419,11 +3379,7 @@ game.isTransitioning = true;
 const charContainer = document.getElementById('charContainer');
 if(charContainer) charContainer.classList.add('disabled');
 let currentIndex = CHARACTER_ORDER.indexOf(game.currentEnemy);
-// FIX: Валидация индекса текущего персонажа
-if (currentIndex < 0) {
-console.error('❌ Текущий враг "' + game.currentEnemy + '" не найден в CHARACTER_ORDER');
-currentIndex = 0; // Фолбэк на первого персонажа
-}
+if (currentIndex < 0) { currentIndex = 0; }
 const char = CHARACTERS[game.currentEnemy];
 if (game.currentRound < char.rounds) {
 game.currentRound++;
@@ -3434,16 +3390,11 @@ updateCharacterDisplay();
 updateUI();
 saveGame();
 showToast('⚔️ Раунд ' + game.currentRound + ' из ' + char.rounds);
-setTimeout(() => {
-game.isTransitioning = false;
-if(charContainer) charContainer.classList.remove('disabled');
-}, 1500);
+setTimeout(() => { game.isTransitioning = false; if(charContainer) charContainer.classList.remove('disabled'); }, 1500);
 } else if (currentIndex < CHARACTER_ORDER.length - 1) {
-// FIX: Прямой переход к следующему по индексу
 const nextEnemyKey = CHARACTER_ORDER[currentIndex + 1];
 const nextChar = CHARACTERS[nextEnemyKey];
 if (char.chapter === 1 && nextChar.chapter === 2) showToast('🎉 ГЛАВА 1 ПРОЙДЕНА! НАЧИНАЕТСЯ ГЛАВА 2!');
-// Обновляем game.currentEnemy сразу для консистентности состояния
 game.currentEnemy = nextEnemyKey;
 game.currentRound = 1;
 game.maxRounds = nextChar.rounds;
@@ -3617,7 +3568,6 @@ if(resultEl) resultEl.textContent = '🎉 ДЖЕКПОТ! +10000 💰 +20 💎!'
 addXP(10);
 updateUI();
 }
-// ✅ НОВАЯ ФУНКЦИЯ: Покупка энергии
 function buyEnergy() {
 if (game.gold >= 100) {
 game.gold -= 100;
@@ -3629,26 +3579,20 @@ updateUI();
 saveGame();
 } else { showToast('❌ Недостаточно золота'); }
 }
-// ✅ ИСПРАВЛЕНА: Загрузка изображения персонажа с заглушкой
 function updateCharacterDisplay() {
 const char = CHARACTERS[game.currentEnemy];
 const img = document.getElementById('charImg');
 const charDesc = document.getElementById('charDesc');
 if(!img || !char) return;
-
-// ✅ Скрываем пока грузится
 img.style.opacity = '0';
 img.classList.remove('loaded');
 img.src = char.img;
-
 img.onload = function() {
 img.style.opacity = '1';
 img.classList.add('loaded');
 img.style.display = 'block';
 };
-
 img.onerror = function() {
-// ✅ Заглушка при ошибке
 this.style.display = 'none';
 const container = document.getElementById('charContainer');
 if(container) {
@@ -3658,7 +3602,6 @@ container.innerHTML = '<div style="color:#fff; text-align:center; padding: 20px;
 '<div style="font-size: 24px; font-weight: bold;">' + char.name + '</div></div>';
 }
 };
-
 if(charDesc) charDesc.textContent = char.desc;
 }
 function buyUpgrade(type, free = false) {
@@ -3689,13 +3632,9 @@ if (game.promoCurrency >= cost) {
 game.promoCurrency -= cost;
 game.abilityLevels[abilityId]++;
 game.abilityUpgradeCosts[abilityId] = Math.floor(cost * 1.3);
-if (abilityId === 1) {
-showToast(`✅ Ускорение улучшено до уровня ${currentLevel + 1}!`);
-} else if (abilityId === 2) {
-showToast(`✅ Ярость улучшена до уровня ${currentLevel + 1}!`);
-} else if (abilityId === 3) {
-showToast(`✅ Защита улучшена до уровня ${currentLevel + 1}!`);
-}
+if (abilityId === 1) showToast(`✅ Ускорение улучшено до уровня ${currentLevel + 1}!`);
+else if (abilityId === 2) showToast(`✅ Ярость улучшена до уровня ${currentLevel + 1}!`);
+else if (abilityId === 3) showToast(`✅ Защита улучшена до уровня ${currentLevel + 1}!`);
 updateUI();
 saveGame();
 } else {
@@ -4054,7 +3993,31 @@ saveGame();
 syncWithFirebase();
 closeAllTabs();
 }
-// НОВЫЕ ФУНКЦИИ УЛУЧШЕНИЙ V3.0.1
+// ✅ ФУНКЦИЯ УПРАВЛЕНИЯ АВТО-КЛИКЕРОМ
+function toggleAutoClicker() {
+if (game.autoClickerLevel <= 0) {
+showToast('❌ Сначала купите авто-кликер в улучшениях!');
+return;
+}
+game.autoClickerEnabled = !game.autoClickerEnabled;
+updateAutoClickerBtn();
+showToast(game.autoClickerEnabled ? '🤖 Авто-кликер включён' : '🤖 Авто-кликер выключен');
+saveGame();
+}
+function updateAutoClickerBtn() {
+const btn = document.getElementById('autoToggleBtn');
+if(!btn) return;
+if(game.autoClickerLevel <= 0) {
+btn.classList.add('disabled');
+btn.classList.remove('active');
+} else if(game.autoClickerEnabled) {
+btn.classList.add('active');
+btn.classList.remove('disabled');
+} else {
+btn.classList.remove('active');
+btn.classList.add('disabled');
+}
+}
 function updateUpgradesUI() {
 document.getElementById('dmgLevel').textContent = game.dmgLevel;
 document.getElementById('dmgCost').textContent = game.dmgCost;
@@ -4084,6 +4047,7 @@ if(game.autoClickerLevel >= 10) document.getElementById('btnAutoClickerUpgrade')
 if(game.luckLevel >= 20) document.getElementById('btnLuckUpgrade').classList.add('maxed');
 if(game.comboBonusLevel >= 20) document.getElementById('btnComboBonusUpgrade').classList.add('maxed');
 if(game.goldBonusLevel >= 20) document.getElementById('btnGoldBonusUpgrade').classList.add('maxed');
+updateAutoClickerBtn();
 }
 function buyDmgUpgrade() {
 if(game.gold >= game.dmgCost && game.dmgLevel < 100) {
@@ -4172,7 +4136,8 @@ function startAutoClicker() {
 if(autoClickerInterval) clearInterval(autoClickerInterval);
 if(game.autoClickerLevel > 0) {
 autoClickerInterval = setInterval(() => {
-if(game.energy > 0 && !game.isTransitioning) {
+// ✅ Проверяем флаг включения авто-кликера
+if(game.energy > 0 && !game.isTransitioning && game.autoClickerEnabled) {
 handleAttack(window.innerWidth / 2, window.innerHeight / 2);
 }
 }, 1000 / game.autoClickerLevel);
@@ -4182,7 +4147,6 @@ function updateUI() {
 if(uiUpdateTimeout) clearTimeout(uiUpdateTimeout);
 uiUpdateTimeout = setTimeout(() => {
 const char = CHARACTERS[game.currentEnemy];
-// [ИСПРАВЛЕНО] Обновление цен и текущих значений в магазине
 const costDmg = document.getElementById('costDmg'); if(costDmg) costDmg.innerText = game.costs.damage;
 const shopDmg = document.getElementById('shopDmg'); if(shopDmg) shopDmg.innerText = game.damage;
 const costCrit = document.getElementById('costCrit'); if(costCrit) costCrit.innerText = game.costs.critChance;
@@ -4192,71 +4156,36 @@ const shopCritDmg = document.getElementById('shopCritDmg'); if(shopCritDmg) shop
 const costEnergy = document.getElementById('costEnergy'); if(costEnergy) costEnergy.innerText = game.costs.maxEnergy;
 const shopEnergy = document.getElementById('shopEnergy'); if(shopEnergy) shopEnergy.innerText = game.maxEnergy;
 const costGold = document.getElementById('costGold'); if(costGold) costGold.innerText = game.costs.goldBonus;
-
-// ✅ ПОДСВЕТКА ДОСТУПНЫХ ПОКУПОК В МАГАЗИНЕ
 const btnBuyDmg = document.getElementById('btnBuyDmg');
 if(btnBuyDmg) {
-if(game.gold >= game.costs.damage) {
-btnBuyDmg.classList.add('affordable');
-btnBuyDmg.classList.remove('unaffordable');
-} else {
-btnBuyDmg.classList.add('unaffordable');
-btnBuyDmg.classList.remove('affordable');
-}
+if(game.gold >= game.costs.damage) { btnBuyDmg.classList.add('affordable'); btnBuyDmg.classList.remove('unaffordable'); }
+else { btnBuyDmg.classList.add('unaffordable'); btnBuyDmg.classList.remove('affordable'); }
 }
 const btnBuyCrit = document.getElementById('btnBuyCrit');
 if(btnBuyCrit) {
-if(game.gold >= game.costs.critChance) {
-btnBuyCrit.classList.add('affordable');
-btnBuyCrit.classList.remove('unaffordable');
-} else {
-btnBuyCrit.classList.add('unaffordable');
-btnBuyCrit.classList.remove('affordable');
-}
+if(game.gold >= game.costs.critChance) { btnBuyCrit.classList.add('affordable'); btnBuyCrit.classList.remove('unaffordable'); }
+else { btnBuyCrit.classList.add('unaffordable'); btnBuyCrit.classList.remove('affordable'); }
 }
 const btnBuyCritDmg = document.getElementById('btnBuyCritDmg');
 if(btnBuyCritDmg) {
-if(game.gold >= game.costs.critDamage) {
-btnBuyCritDmg.classList.add('affordable');
-btnBuyCritDmg.classList.remove('unaffordable');
-} else {
-btnBuyCritDmg.classList.add('unaffordable');
-btnBuyCritDmg.classList.remove('affordable');
-}
+if(game.gold >= game.costs.critDamage) { btnBuyCritDmg.classList.add('affordable'); btnBuyCritDmg.classList.remove('unaffordable'); }
+else { btnBuyCritDmg.classList.add('unaffordable'); btnBuyCritDmg.classList.remove('affordable'); }
 }
 const btnBuyEnergy = document.getElementById('btnBuyEnergy');
 if(btnBuyEnergy) {
-if(game.gold >= game.costs.maxEnergy) {
-btnBuyEnergy.classList.add('affordable');
-btnBuyEnergy.classList.remove('unaffordable');
-} else {
-btnBuyEnergy.classList.add('unaffordable');
-btnBuyEnergy.classList.remove('affordable');
-}
+if(game.gold >= game.costs.maxEnergy) { btnBuyEnergy.classList.add('affordable'); btnBuyEnergy.classList.remove('unaffordable'); }
+else { btnBuyEnergy.classList.add('unaffordable'); btnBuyEnergy.classList.remove('affordable'); }
 }
 const btnBuyGold = document.getElementById('btnBuyGold');
 if(btnBuyGold) {
-if(game.gold >= game.costs.goldBonus) {
-btnBuyGold.classList.add('affordable');
-btnBuyGold.classList.remove('unaffordable');
-} else {
-btnBuyGold.classList.add('unaffordable');
-btnBuyGold.classList.remove('affordable');
+if(game.gold >= game.costs.goldBonus) { btnBuyGold.classList.add('affordable'); btnBuyGold.classList.remove('unaffordable'); }
+else { btnBuyGold.classList.add('unaffordable'); btnBuyGold.classList.remove('affordable'); }
 }
-}
-// ✅ Кнопка покупки энергии
 const btnBuyEnergyInstant = document.getElementById('btnBuyEnergyInstant');
 if(btnBuyEnergyInstant) {
-if(game.gold >= 100) {
-btnBuyEnergyInstant.classList.add('affordable');
-btnBuyEnergyInstant.classList.remove('unaffordable');
-} else {
-btnBuyEnergyInstant.classList.add('unaffordable');
-btnBuyEnergyInstant.classList.remove('affordable');
+if(game.gold >= 100) { btnBuyEnergyInstant.classList.add('affordable'); btnBuyEnergyInstant.classList.remove('unaffordable'); }
+else { btnBuyEnergyInstant.classList.add('unaffordable'); btnBuyEnergyInstant.classList.remove('affordable'); }
 }
-}
-
-// [ИСПРАВЛЕНО] Обновление уровней и цен супер-способностей
 for(let i = 1; i <= 3; i++) {
 const lvlEl = document.getElementById(`ability${i}LevelDisplay`);
 const costEl = document.getElementById(`ability${i}Cost`);
@@ -4395,7 +4324,6 @@ game[key] = parsed[key];
 if (savedPromo) promoCodes = { ...promoCodes, ...JSON.parse(savedPromo) };
 if (savedVersion) gameVersion = savedVersion;
 if (savedStats) stats = JSON.parse(savedStats);
-// [ИСПРАВЛЕНО: СБРОС ЗАБЛОКИРОВАННЫХ СОСТОЯНИЙ]
 game.isTransitioning = false;
 if(game.energy <= 0) game.energy = game.maxEnergy;
 const char = CHARACTERS[game.currentEnemy];
@@ -4408,7 +4336,7 @@ const musicBtn = document.getElementById('musicBtn');
 const soundBtn = document.getElementById('soundBtn');
 if (!game.musicOn && musicBtn) musicBtn.innerHTML = '🔇';
 if (!game.soundOn && soundBtn) soundBtn.innerHTML = '🔇';
-updateUI(); // Обновляем UI после загрузки
+updateUI();
 } catch(e) {
 console.error('❌ Ошибка загрузки:', e);
 showToast('⚠️ Ошибка загрузки сохранения!');
